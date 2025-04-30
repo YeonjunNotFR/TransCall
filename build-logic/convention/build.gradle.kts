@@ -1,46 +1,33 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `kotlin-dsl`
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
 }
 
 dependencies {
     compileOnly(libs.android.gradle.plugin)
     compileOnly(libs.kotlin.gradle.plugin)
-    compileOnly(libs.compose.gradlePlugin)
+    compileOnly(libs.compose.gradle.plugin)
 }
 
 gradlePlugin {
     plugins {
         register("androidApplication") {
-            id = "com.youhajun.android.application"
+            id = libs.plugins.youhajun.android.application.asProvider().get().pluginId
             implementationClass = "AndroidApplicationConventionPlugin"
         }
         register("androidLibrary") {
-            id = "com.youhajun.android.library"
+            id = libs.plugins.youhajun.android.library.asProvider().get().pluginId
             implementationClass = "AndroidLibraryConventionPlugin"
         }
         register("androidApplicationCompose") {
-            id = "com.youhajun.android.application.compose"
+            id = libs.plugins.youhajun.android.application.compose.get().pluginId
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
         register("androidComposeLibrary") {
-            id = "com.youhajun.android.library.compose"
+            id = libs.plugins.youhajun.android.library.compose.get().pluginId
             implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
         register("androidHilt") {
-            id = "com.youhajun.android.hilt"
+            id = libs.plugins.youhajun.android.hilt.get().pluginId
             implementationClass = "HiltConventionPlugin"
         }
     }

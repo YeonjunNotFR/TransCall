@@ -1,5 +1,5 @@
 plugins {
-    id("com.youhajun.android.library.compose")
+    alias(libs.plugins.youhajun.android.library.compose)
 }
 
 android {

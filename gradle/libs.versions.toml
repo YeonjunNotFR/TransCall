@@ -11,7 +11,7 @@ composeBom = "2025.04.01"
 appcompat = "1.7.0"
 material = "1.12.0"
 jetbrainsKotlinJvm = "2.0.0"
-ksp = "1.9.0-1.0.13"
+ksp = "2.1.10-1.0.31"
 hilt = "2.56"
 
 [libraries]
@@ -39,7 +39,7 @@ hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-comp
 # Gradle
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+compose-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -49,3 +49,10 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+# Plugins defined by this project
+youhajun-android-application = { id = "com.youhajun.android.application" }
+youhajun-android-library = { id = "com.youhajun.android.library" }
+youhajun-android-application-compose = { id = "com.youhajun.android.application.compose" }
+youhajun-android-library-compose = { id = "com.youhajun.android.library.compose" }
+youhajun-android-hilt = { id = "com.youhajun.android.hilt" }
