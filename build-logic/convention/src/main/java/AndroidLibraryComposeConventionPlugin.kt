@@ -10,7 +10,7 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            apply("com.android.library")
+            apply(plugin = "com.youhajun.android.library")
             apply(plugin = "org.jetbrains.kotlin.plugin.compose")
 
             extensions.configure<LibraryExtension> {
