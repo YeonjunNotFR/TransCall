@@ -1,4 +1,4 @@
-package com.youhajun.feature.room
+package com.youhajun.feature.room.api
 
 import org.junit.Test
 
