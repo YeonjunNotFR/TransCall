@@ -20,7 +20,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.ConnectionPool
 import java.util.concurrent.TimeUnit
 
-object KtorHttpClient {
+internal object KtorHttpClient {
 
     fun create(
         baseUrl: String,
