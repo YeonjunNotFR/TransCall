@@ -30,5 +30,9 @@ gradlePlugin {
             id = libs.plugins.youhajun.android.hilt.get().pluginId
             implementationClass = "HiltConventionPlugin"
         }
+        register("jvmLibrary") {
+            id = libs.plugins.youhajun.jvm.library.get().pluginId
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
     }
 }

@@ -68,6 +68,7 @@ youhajun-android-library = { id = "com.youhajun.android.library" }
 youhajun-android-application-compose = { id = "com.youhajun.android.application.compose" }
 youhajun-android-library-compose = { id = "com.youhajun.android.library.compose" }
 youhajun-android-hilt = { id = "com.youhajun.android.hilt" }
+youhajun-jvm-library = { id = "com.youhajun.jvm.library" }
 
 [bundles]
 ktor = ["ktor-client-auth", "ktor-client-core", "ktor-client-okhttp", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json", "ktor-client-logging"]
