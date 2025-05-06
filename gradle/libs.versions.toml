@@ -19,6 +19,7 @@ javaxInject = "1"
 navigation = "2.8.9"
 hiltNavigation = "1.2.0"
 kotlinx-collections-immutable = "0.3.7"
+orbit = "6.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +42,12 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+
+#orbit
+orbit_core = { group = "org.orbit-mvi", name = "orbit-core", version.ref = "orbit" }
+orbit_compose = { group = "org.orbit-mvi", name = "orbit-compose", version.ref = "orbit" }
+orbit_viewmodel = { group = "org.orbit-mvi", name = "orbit-viewmodel", version.ref = "orbit" }
+
 #navigation
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }
@@ -88,3 +95,4 @@ youhajun-jvm-library = { id = "com.youhajun.jvm.library" }
 [bundles]
 ktor = ["ktor-client-auth", "ktor-client-core", "ktor-client-okhttp", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json", "ktor-client-logging"]
 navigation = ["androidx-navigation-compose", "androidx-hilt-navigation-compose"]
+orbit = ["orbit_core", "orbit_compose", "orbit_viewmodel"]
