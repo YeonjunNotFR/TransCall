@@ -13,6 +13,6 @@ internal abstract class CallBindModule {
 
     @Binds
     abstract fun callNavGraphRegisterBind(
-        graph: CallNavGraphRegistrar,
-    ): CallNavGraphRegistrarImpl
+        graph: CallNavGraphRegistrarImpl,
+    ): CallNavGraphRegistrar
 }
