@@ -9,39 +9,38 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val TransCallLightColorScheme: ColorScheme = lightColorScheme(
-    primary = TransCallColors.Primary,
-    onPrimary = TransCallColors.White,
-    primaryContainer = TransCallColors.PrimaryLight,
-    onPrimaryContainer = TransCallColors.Black,
-    secondary = TransCallColors.Secondary,
-    onSecondary = TransCallColors.Black,
-    background = TransCallColors.BackgroundLight,
-    onBackground = TransCallColors.Gray900,
-    surface = TransCallColors.SurfaceLight,
-    onSurface = TransCallColors.Gray900,
-    error = TransCallColors.Error,
-    onError = TransCallColors.White,
-    outline = TransCallColors.Outline
+    primary = Colors.Primary,
+    onPrimary = Colors.White,
+    primaryContainer = Colors.PrimaryLight,
+    onPrimaryContainer = Colors.Black,
+    secondary = Colors.Secondary,
+    onSecondary = Colors.Black,
+    background = Colors.BackgroundLight,
+    onBackground = Colors.Gray900,
+    surface = Colors.SurfaceLight,
+    onSurface = Colors.Gray900,
+    error = Colors.Error,
+    onError = Colors.White,
+    outline = Colors.Outline
 )
 
 private val TransCallDarkColorScheme: ColorScheme = darkColorScheme(
-    primary = TransCallColors.PrimaryLight,
-    onPrimary = TransCallColors.Black,
-    primaryContainer = TransCallColors.PrimaryDark,
-    onPrimaryContainer = TransCallColors.White,
-    secondary = TransCallColors.SecondaryLight,
-    onSecondary = TransCallColors.Black,
-    background = TransCallColors.BackgroundDark,
-    onBackground = TransCallColors.White,
-    surface = TransCallColors.SurfaceDark,
-    onSurface = TransCallColors.White,
-    error = TransCallColors.Error,
-    onError = TransCallColors.Black,
-    outline = TransCallColors.Gray500
+    primary = Colors.PrimaryLight,
+    onPrimary = Colors.Black,
+    primaryContainer = Colors.PrimaryDark,
+    onPrimaryContainer = Colors.White,
+    secondary = Colors.SecondaryLight,
+    onSecondary = Colors.Black,
+    background = Colors.BackgroundDark,
+    onBackground = Colors.White,
+    surface = Colors.SurfaceDark,
+    onSurface = Colors.White,
+    error = Colors.Error,
+    onError = Colors.Black,
+    outline = Colors.Gray500
 )
 
 @Composable
@@ -62,7 +61,7 @@ fun TransCallTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = TransCallTypography,
+        typography = Typography,
         content = content
     )
 }

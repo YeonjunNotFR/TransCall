@@ -2,7 +2,7 @@ package com.youhajun.transcall.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-object TransCallColors {
+object Colors {
     // Brand Colors
     val Primary = Color(0xFF0061A4)
     val PrimaryLight = Color(0xFF4A90E2)
@@ -38,4 +38,11 @@ object TransCallColors {
 
     // Border / Outline
     val Outline = Color(0xFFBDBDBD)
+
+    val FF50A7F3 = Color(0xFF50A7F3)
+    val FF374151 = Color(0xFF374151)
+    val FFE5E7EB = Color(0xFFE5E7EB)
+    val FF6366F1 = Color(0xFF6366F1)
+    val FF2F80ED = Color(0xFF2F80ED)
+    val FFB2F2FF = Color(0xFFD2ECFE)
 }
