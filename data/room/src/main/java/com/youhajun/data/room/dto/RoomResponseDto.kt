@@ -1,6 +1,7 @@
 package com.youhajun.data.room.dto
 
 import com.youhajun.core.model.RoomInfo
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -21,7 +22,7 @@ internal data class RoomResponseDto(
         code = code,
         name = name,
         hostId = hostId,
-        participants = participants.map { it.toModel() },
+        participants = participants.map { it.toModel() }.toImmutableList(),
         createdAt = createdAt
     )
 }
