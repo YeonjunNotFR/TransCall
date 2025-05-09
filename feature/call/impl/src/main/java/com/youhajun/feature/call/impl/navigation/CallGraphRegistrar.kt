@@ -13,7 +13,7 @@ internal class CallNavGraphRegistrarImpl @Inject constructor() : CallNavGraphReg
 
         }
 
-        builder.composable<CallNavRoute.Wait> {
+        builder.composable<CallNavRoute.Waiting> {
 
         }
     }

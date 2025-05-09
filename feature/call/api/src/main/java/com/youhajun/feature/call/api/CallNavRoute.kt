@@ -9,5 +9,5 @@ sealed interface CallNavRoute: TransCallRoute {
     data class Calling(val roomCode: String) : CallNavRoute
 
     @Serializable
-    data class Wait(val roomCode: String) : CallNavRoute
+    data class Waiting(val roomCode: String) : CallNavRoute
 }
