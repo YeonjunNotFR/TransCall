@@ -2,8 +2,8 @@ package com.youhajun.core.model
 
 data class CallHistory(
     val callId: String,
-    val partnerName: String,
+    val partnerName: String = "",
     val partnerImageUrl: String? = null,
-    val startedAtEpochSeconds: Long,
-    val durationSeconds: Int,
+    val startedAtEpochSeconds: Long = 0,
+    val durationSeconds: Int = 0,
 )
