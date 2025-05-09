@@ -6,7 +6,6 @@ plugins {
 
 android {
     namespace = "com.youhajun.data.room"
-    compileSdk = 35
 }
 
 dependencies {
@@ -14,6 +13,7 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.model)
     implementation(libs.bundles.ktor)
+    implementation(libs.kotlinx.collections.immutable)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
