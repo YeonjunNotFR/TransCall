@@ -1,5 +1,8 @@
 package com.youhajun.data.history
 
+import com.youhajun.core.model.pagination.OffsetPageRequest
+import com.youhajun.data.common.pagination.OffsetPageDto
+import com.youhajun.data.common.parametersFrom
 import com.youhajun.data.history.dto.CallHistoryDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -8,7 +11,7 @@ import io.ktor.client.request.get
 import javax.inject.Inject
 
 internal interface HistoryRemoteDataSource {
-    suspend fun getHistoryList(): List<CallHistoryDto>
+    suspend fun getHistoryList(request: OffsetPageRequest): OffsetPageDto<CallHistoryDto>
     suspend fun getHistoryDetail(callId: String): CallHistoryDto
     suspend fun deleteHistory(callId: String)
 }
@@ -17,8 +20,10 @@ internal class HistoryRemoteDataSourceImpl @Inject constructor(
     private val client: HttpClient
 ): HistoryRemoteDataSource {
 
-    override suspend fun getHistoryList(): List<CallHistoryDto> {
-        return client.get(HistoryEndpoint.List.path).body()
+    override suspend fun getHistoryList(request: OffsetPageRequest): OffsetPageDto<CallHistoryDto> {
+        return client.get(HistoryEndpoint.List.path) {
+            parametersFrom(request)
+        }.body()
     }
 
     override suspend fun getHistoryDetail(callId: String): CallHistoryDto {

@@ -9,6 +9,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.data.common)
     implementation(projects.domain.history)
     implementation(projects.core.network)
     implementation(projects.core.model)
