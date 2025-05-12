@@ -11,12 +11,15 @@ internal data class HistoryParticipantDto(
     val userId: String = "",
     @SerialName("displayName")
     val displayName: String = "",
+    @SerialName("imageUrl")
+    val imageUrl: String? = null,
     @SerialName("language")
     val language: String = "",
 ) {
     fun toModel(): Participant = Participant(
         userId = userId,
         displayName = displayName,
+        imageUrl = imageUrl,
         language = LanguageType.fromCode(language),
     )
 }

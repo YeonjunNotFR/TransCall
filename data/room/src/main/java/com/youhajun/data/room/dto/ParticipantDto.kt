@@ -11,6 +11,8 @@ internal data class ParticipantDto(
     val userId: String = "",
     @SerialName("displayName")
     val displayName: String = "",
+    @SerialName("imageUrl")
+    val imageUrl: String? = null,
     @SerialName("language")
     val language: String = "",
     @SerialName("isHost")
@@ -19,6 +21,7 @@ internal data class ParticipantDto(
     fun toModel(): Participant = Participant(
         userId = userId,
         displayName = displayName,
+        imageUrl = imageUrl,
         isHost = isHost,
         language = LanguageType.fromCode(language),
     )
