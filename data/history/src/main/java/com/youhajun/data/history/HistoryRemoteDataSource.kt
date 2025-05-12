@@ -1,5 +1,6 @@
 package com.youhajun.data.history
 
+import com.youhajun.core.model.filter.DateRangeFilter
 import com.youhajun.core.model.pagination.OffsetPageRequest
 import com.youhajun.data.common.pagination.OffsetPageDto
 import com.youhajun.data.common.parametersFrom
@@ -11,7 +12,7 @@ import io.ktor.client.request.get
 import javax.inject.Inject
 
 internal interface HistoryRemoteDataSource {
-    suspend fun getHistoryList(request: OffsetPageRequest): OffsetPageDto<CallHistoryDto>
+    suspend fun getHistoryList(request: OffsetPageRequest, range: DateRangeFilter?): OffsetPageDto<CallHistoryDto>
     suspend fun getHistoryDetail(callId: String): CallHistoryDto
     suspend fun deleteHistory(callId: String)
 }
@@ -20,9 +21,10 @@ internal class HistoryRemoteDataSourceImpl @Inject constructor(
     private val client: HttpClient
 ): HistoryRemoteDataSource {
 
-    override suspend fun getHistoryList(request: OffsetPageRequest): OffsetPageDto<CallHistoryDto> {
+    override suspend fun getHistoryList(request: OffsetPageRequest, range: DateRangeFilter?): OffsetPageDto<CallHistoryDto> {
         return client.get(HistoryEndpoint.List.path) {
             parametersFrom(request)
+            range?.let { parametersFrom(it) }
         }.body()
     }
 
