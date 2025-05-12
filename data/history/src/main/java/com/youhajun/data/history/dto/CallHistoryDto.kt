@@ -8,10 +8,8 @@ import kotlinx.serialization.Serializable
 internal data class CallHistoryDto(
     @SerialName("callId")
     val callId: String = "",
-    @SerialName("partnerName")
-    val partnerName: String = "",
-    @SerialName("partnerImageUrl")
-    val partnerImageUrl: String? = null,
+    @SerialName("partner")
+    val partner: HistoryParticipantDto? = null,
     @SerialName("startedAt")
     val startedAt: Long = 0,
     @SerialName("durationSeconds")
@@ -21,8 +19,7 @@ internal data class CallHistoryDto(
 ) {
     fun toModel(): CallHistory = CallHistory(
         callId = callId,
-        partnerName = partnerName,
-        partnerImageUrl = partnerImageUrl,
+        partner = partner?.toModel(),
         startedAtEpochSeconds = startedAt,
         durationSeconds = durationSeconds,
         isFavorite = isFavorite,
