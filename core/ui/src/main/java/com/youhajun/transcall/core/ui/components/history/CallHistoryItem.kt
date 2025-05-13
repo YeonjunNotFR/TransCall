@@ -1,6 +1,5 @@
 package com.youhajun.transcall.core.ui.components.history
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -44,7 +44,7 @@ fun CallHistoryItem(
         modifier = Modifier
             .border(
                 width = 1.dp,
-                color = Colors.Gray300,
+                color = Colors.FFB2F2FF,
                 shape = RoundedCornerShape(12.dp)
             )
             .background(Color.White, shape = RoundedCornerShape(12.dp))
@@ -108,10 +108,14 @@ fun CallHistoryItem(
             }
         }
 
-        Image(
+        Icon(
             painter = painterResource(id = R.drawable.ic_home),
             contentDescription = null,
-            modifier = Modifier.size(24.dp).noRippleClickable { onClickCallAgain(callHistory.callId) }
+            modifier = Modifier.noRippleClickable {
+                callHistory.partner?.userId?.let { userId ->
+                    onClickCallAgain(userId)
+                }
+            }.size(24.dp)
         )
     }
 }

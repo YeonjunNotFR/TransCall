@@ -34,7 +34,6 @@ fun MembershipBadge(
     ) {
         Text(
             text = plan.name,
-            fontSize = 12.sp,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
             style = Typography.labelSmall,
         )
