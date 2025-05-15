@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 interface HomeNavGraphRegistrar {
     fun register(
         builder: NavGraphBuilder,
-        onNavigateToCall: (roomCode: String) -> Unit
+        onNavigateToCallWaiting: (roomCode: String) -> Unit,
+        onNavigateToHistory: () -> Unit,
     )
 }
