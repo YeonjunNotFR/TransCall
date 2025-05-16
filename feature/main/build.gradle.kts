@@ -13,6 +13,7 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.feature.home.api)
     implementation(projects.feature.call.api)
+    implementation(projects.feature.history.api)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
