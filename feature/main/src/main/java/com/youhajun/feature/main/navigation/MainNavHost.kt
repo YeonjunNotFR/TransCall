@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import com.youhajun.feature.call.api.CallNavGraphRegistrar
 import com.youhajun.feature.call.api.CallNavRoute
+import com.youhajun.feature.history.api.HistoryNavGraphRegistrar
+import com.youhajun.feature.history.api.HistoryNavRoute
 import com.youhajun.feature.home.api.HomeNavGraphRegistrar
 
 @Composable
@@ -14,7 +16,8 @@ internal fun MainNavHost(
     padding: PaddingValues,
     navigator: MainNavigator,
     homeNavGraphRegistrar: HomeNavGraphRegistrar,
-    callNavGraphRegistrar: CallNavGraphRegistrar
+    callNavGraphRegistrar: CallNavGraphRegistrar,
+    historyNavGraphRegistrar: HistoryNavGraphRegistrar,
 ) {
     NavHost(
         modifier = Modifier.padding(padding),
@@ -23,11 +26,16 @@ internal fun MainNavHost(
     ) {
         homeNavGraphRegistrar.register(
             this,
-            onNavigateToCall = { roomCode ->
-                navigator.navigate(CallNavRoute.Calling(roomCode))
+            onNavigateToCallWaiting = { roomCode ->
+                navigator.navigate(CallNavRoute.Waiting(roomCode))
+            },
+            onNavigateToHistory = {
+                navigator.navigate(HistoryNavRoute.HistoryList)
             }
         )
 
         callNavGraphRegistrar.register(this)
+
+        historyNavGraphRegistrar.register(this)
     }
 }
