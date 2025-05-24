@@ -25,19 +25,31 @@ dependencyResolutionManagement {
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "TransCall"
 include(":app")
-include(":feature:home:api")
-include(":feature:home:impl")
-include(":feature:call:api")
-include(":feature:call:impl")
-include(":feature:main")
-include(":data:room")
-include(":domain:room")
-include(":core:network")
-include(":core:ui")
-include(":core:common")
-include(":core:model")
-include(":feature:history:api")
-include(":feature:history:impl")
-include(":data:history")
-include(":domain:history")
-include(":data:common")
+
+include(
+    ":feature:main",
+    ":feature:home:api",
+    ":feature:home:impl",
+    ":feature:call:api",
+    ":feature:call:impl",
+    ":feature:history:api",
+    ":feature:history:impl",
+)
+
+include(
+    ":data:room",
+    ":data:history",
+    ":data:common",
+)
+
+include(
+    ":domain:room",
+    ":domain:history",
+)
+
+include(
+    ":core:network",
+    ":core:ui",
+    ":core:common",
+    ":core:model",
+)
