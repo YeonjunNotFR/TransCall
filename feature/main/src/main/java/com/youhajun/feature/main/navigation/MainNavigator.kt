@@ -3,15 +3,14 @@ package com.youhajun.feature.main.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import androidx.navigation.toRoute
 import com.youhajun.core.model.navigation.TransCallRoute
-import com.youhajun.feature.home.api.HomeNavRoute
 
 internal class MainNavigator(
     val navController: NavHostController,
@@ -22,8 +21,9 @@ internal class MainNavigator(
 
     val currentTab: MainTab?
         @Composable get() = currentBackStackEntry
-            ?.toRoute<TransCallRoute>()
-            ?.let(MainTab::find)
+            ?.destination
+            ?.hierarchy
+            ?.let(MainTab::findByHierarchy)
 
     val startDestination = MainTab.startDestination()
 
@@ -44,16 +44,9 @@ internal class MainNavigator(
         navController.popBackStack()
     }
 
-    fun popBackStackIfNotStart() {
-        navController.currentBackStackEntry?.toRoute<HomeNavRoute.Home>()?.let {
-            popBackStack()
-        }
-    }
-
     @Composable
     fun shouldShowBottomBar(): Boolean {
-        val currentRoute = currentBackStackEntry?.toRoute<TransCallRoute>() ?: return false
-        return currentRoute in MainTab
+        return currentTab != null
     }
 }
 
