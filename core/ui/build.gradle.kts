@@ -8,8 +8,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.design)
     implementation(projects.core.model)
-    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.kotlinx.collections.immutable)

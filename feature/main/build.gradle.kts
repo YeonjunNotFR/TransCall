@@ -9,6 +9,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.design)
     implementation(projects.core.ui)
     implementation(projects.core.model)
     implementation(projects.feature.home.api)

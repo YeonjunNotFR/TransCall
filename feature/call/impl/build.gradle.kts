@@ -11,6 +11,7 @@ android {
 dependencies {
     implementation(projects.feature.call.api)
     implementation(projects.core.ui)
+    implementation(projects.core.design)
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

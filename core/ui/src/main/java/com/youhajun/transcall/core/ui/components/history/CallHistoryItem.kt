@@ -22,12 +22,12 @@ import androidx.compose.ui.unit.dp
 import com.youhajun.core.model.CallHistory
 import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.Participant
-import com.youhajun.core.ui.R
 import com.youhajun.transcall.core.ui.components.CircleAsyncImage
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
-import com.youhajun.transcall.core.ui.theme.Colors
-import com.youhajun.transcall.core.ui.theme.Typography
+import com.youhajun.core.design.Colors
+import com.youhajun.core.design.Typography
+import com.youhajun.core.design.R
 import com.youhajun.transcall.core.ui.util.DateFormatPatterns
 import com.youhajun.transcall.core.ui.util.TimeFormatPatterns
 import com.youhajun.transcall.core.ui.util.noRippleClickable

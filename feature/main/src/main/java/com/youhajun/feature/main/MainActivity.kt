@@ -5,13 +5,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import androidx.navigation.compose.rememberNavController
 import com.youhajun.feature.call.api.CallNavGraphRegistrar
 import com.youhajun.feature.history.api.HistoryNavGraphRegistrar
 import com.youhajun.feature.home.api.HomeNavGraphRegistrar
 import com.youhajun.feature.main.navigation.MainTab
 import com.youhajun.feature.main.navigation.rememberMainNavigator
-import com.youhajun.transcall.core.ui.theme.TransCallTheme
+import com.youhajun.core.design.TransCallTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.collections.immutable.toImmutableList
 import javax.inject.Inject

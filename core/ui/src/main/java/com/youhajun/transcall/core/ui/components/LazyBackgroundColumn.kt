@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.youhajun.transcall.core.ui.theme.Colors
+import com.youhajun.core.design.Colors
 
 @Composable
 fun LazyBackgroundColumn(

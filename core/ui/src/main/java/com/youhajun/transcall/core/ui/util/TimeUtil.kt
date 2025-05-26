@@ -2,7 +2,7 @@ package com.youhajun.transcall.core.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.youhajun.core.ui.R
+import com.youhajun.core.design.R
 import java.util.Locale
 
 enum class TimeFormatPatterns {

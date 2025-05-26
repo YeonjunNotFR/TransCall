@@ -36,7 +36,7 @@ import com.youhajun.core.model.MembershipPlan
 import com.youhajun.core.model.MyInfo
 import com.youhajun.core.model.Participant
 import com.youhajun.core.model.RemainTime
-import com.youhajun.core.ui.R
+import com.youhajun.core.design.R
 import com.youhajun.transcall.core.ui.components.CircleAsyncImage
 import com.youhajun.transcall.core.ui.components.FilledActionButton
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
@@ -44,8 +44,8 @@ import com.youhajun.transcall.core.ui.components.MembershipBadge
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.bottomSheet.JoinWithCodeBottomSheet
 import com.youhajun.transcall.core.ui.components.history.CallHistoryItem
-import com.youhajun.transcall.core.ui.theme.Colors
-import com.youhajun.transcall.core.ui.theme.Typography
+import com.youhajun.core.design.Colors
+import com.youhajun.core.design.Typography
 import com.youhajun.transcall.core.ui.util.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

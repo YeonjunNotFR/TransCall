@@ -13,6 +13,7 @@ dependencies {
     implementation(projects.domain.room)
     implementation(projects.domain.history)
     implementation(projects.core.ui)
+    implementation(projects.core.design)
     implementation(projects.core.model)
     implementation(libs.bundles.navigation)
     implementation(libs.androidx.compose.constraintlayout)

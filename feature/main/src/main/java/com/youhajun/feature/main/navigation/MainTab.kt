@@ -4,7 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.youhajun.core.model.navigation.TransCallRoute
-import com.youhajun.core.ui.R
+import com.youhajun.core.design.R
 import com.youhajun.feature.history.api.HistoryNavRoute
 import com.youhajun.feature.home.api.HomeNavRoute
 

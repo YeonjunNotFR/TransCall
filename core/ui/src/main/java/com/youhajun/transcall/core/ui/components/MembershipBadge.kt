@@ -9,10 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.youhajun.core.model.MembershipPlan
-import com.youhajun.transcall.core.ui.theme.Colors
-import com.youhajun.transcall.core.ui.theme.Typography
+import com.youhajun.core.design.Colors
+import com.youhajun.core.design.Typography
 
 @Composable
 fun MembershipBadge(

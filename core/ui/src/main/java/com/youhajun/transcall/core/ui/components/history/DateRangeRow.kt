@@ -32,9 +32,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.youhajun.core.model.DateRange
-import com.youhajun.core.ui.R
-import com.youhajun.transcall.core.ui.theme.Colors
-import com.youhajun.transcall.core.ui.theme.Typography
+import com.youhajun.core.design.Colors
+import com.youhajun.core.design.Typography
+import com.youhajun.core.design.R
 import com.youhajun.transcall.core.ui.util.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList

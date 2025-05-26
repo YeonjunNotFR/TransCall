@@ -13,6 +13,7 @@ dependencies {
     implementation(projects.domain.history)
     implementation(projects.core.ui)
     implementation(projects.core.model)
+    implementation(projects.core.design)
     implementation(libs.bundles.navigation)
     implementation(libs.androidx.compose.constraintlayout)
     implementation(libs.bundles.orbit)
