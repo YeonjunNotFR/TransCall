@@ -1,4 +1,8 @@
-package com.youhajun.core.model
+package com.youhajun.core.model.user
+
+import com.youhajun.core.model.LanguageType
+import com.youhajun.core.model.MembershipPlan
+import com.youhajun.core.model.RemainTime
 
 data class MyInfo(
     val userId: String,
