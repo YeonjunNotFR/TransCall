@@ -2,7 +2,9 @@ package com.youhajun.domain.history.usecase
 
 import com.youhajun.domain.history.HistoryRepository
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class DeleteHistoryUseCase @Inject constructor(
     private val repository: HistoryRepository
 ) {

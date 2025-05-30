@@ -6,7 +6,9 @@ import com.youhajun.core.model.pagination.OffsetPage
 import com.youhajun.core.model.pagination.OffsetPageRequest
 import com.youhajun.domain.history.HistoryRepository
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class GetHistoryListUseCase @Inject constructor(
     private val repository: HistoryRepository
 ) {
