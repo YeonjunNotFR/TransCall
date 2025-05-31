@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.youhajun.core.local"
+    namespace = "com.youhajun.core.datastore"
 }
 
 dependencies {
