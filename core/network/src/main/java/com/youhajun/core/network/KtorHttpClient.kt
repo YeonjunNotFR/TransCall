@@ -47,9 +47,9 @@ internal object KtorHttpClient {
                     }
 
                     refreshTokens {
-                        val tokens = tokenRefresher.refreshTokens(this)
-                        tokens?.also {
-                            tokenProvider.saveTokens(it.accessToken, it.refreshToken)
+                        tokenRefresher.refreshTokens(this).also { tokens ->
+                            if (tokens == null) tokenProvider.deleteTokens()
+                            else tokenProvider.saveTokens(tokens.accessToken, tokens.refreshToken)
                         }
                     }
                 }
