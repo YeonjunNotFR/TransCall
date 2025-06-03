@@ -3,6 +3,12 @@
 
     <string name="screen_title_history">통화 기록</string>
 
+    <string name="language_english">English</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文</string>
+    <string name="language_spanish">Español</string>
+
     <string name="common_duration_minute_label">분</string>
     <string name="common_duration_second_label">초</string>
     <string name="common_duration_hour_label">시간</string>
@@ -21,4 +27,16 @@
     <string name="home_call_start">통화 시작</string>
     <string name="home_call_join">코드로 참여</string>
     <string name="home_call_history">최근 통화 기록</string>
+    
+    <string name="waiting_room_code_header">Room Code</string>
+    <string name="waiting_other_user">상대방을 기다리는 중..</string>
+    <string name="waiting_call_cancel">통화 취소</string>
+
+    <string name="notification_channel_name_fcm">알림</string>
+    <string name="notification_channel_desc_fcm">TransCall 알림</string>
+    <string name="notification_channel_name_call">통화</string>
+    <string name="notification_channel_desc_call">영상/음성 통화 관련 알림</string>
+    <string name="notification_call_title">통화 중</string>
+    <string name="notification_call_content">상대방과 통화가 진행 중입니다</string>
+    <string name="notification_call_end">통화 종료</string>
 </resources>
