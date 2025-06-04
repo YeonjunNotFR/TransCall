@@ -8,6 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.model)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit)
