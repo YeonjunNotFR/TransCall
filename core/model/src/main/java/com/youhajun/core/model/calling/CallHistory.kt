@@ -1,4 +1,6 @@
-package com.youhajun.core.model
+package com.youhajun.core.model.calling
+
+import com.youhajun.core.model.room.Participant
 
 data class CallHistory(
     val callId: String,

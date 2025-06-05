@@ -1,4 +1,6 @@
-package com.youhajun.core.model
+package com.youhajun.core.model.room
+
+import com.youhajun.core.model.LanguageType
 
 data class Participant(
     val userId: String,
