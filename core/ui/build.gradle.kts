@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.coil)
+    implementation(libs.bundles.webRtc)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }
