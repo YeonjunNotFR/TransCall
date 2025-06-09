@@ -19,9 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.youhajun.core.model.CallHistory
+import com.youhajun.core.model.calling.CallHistory
 import com.youhajun.core.model.LanguageType
-import com.youhajun.core.model.Participant
+import com.youhajun.core.model.room.Participant
 import com.youhajun.transcall.core.ui.components.CircleAsyncImage
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
