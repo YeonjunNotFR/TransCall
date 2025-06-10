@@ -6,7 +6,9 @@ import com.youhajun.data.auth.AuthLocalDataSource
 import com.youhajun.data.auth.AuthLocalDataSourceImpl
 import com.youhajun.data.auth.AuthRemoteDataSource
 import com.youhajun.data.auth.AuthRemoteDataSourceImpl
+import com.youhajun.data.auth.AuthRepositoryImpl
 import com.youhajun.data.auth.TokenRefresherImpl
+import com.youhajun.domain.auth.AuthRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -41,4 +43,10 @@ internal interface AuthDataModule {
     fun bindAuthRemoteDataSource(
         remote: AuthRemoteDataSourceImpl
     ): AuthRemoteDataSource
+
+    @Singleton
+    @Binds
+    fun bindAuthRepository(
+        repository: AuthRepositoryImpl
+    ): AuthRepository
 }
