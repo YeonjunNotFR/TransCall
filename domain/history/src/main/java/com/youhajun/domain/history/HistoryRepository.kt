@@ -1,6 +1,6 @@
 package com.youhajun.domain.history
 
-import com.youhajun.core.model.CallHistory
+import com.youhajun.core.model.calling.CallHistory
 import com.youhajun.core.model.filter.DateRangeFilter
 import com.youhajun.core.model.pagination.OffsetPage
 import com.youhajun.core.model.pagination.OffsetPageRequest
