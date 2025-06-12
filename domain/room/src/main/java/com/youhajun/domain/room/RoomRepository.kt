@@ -1,6 +1,6 @@
 package com.youhajun.domain.room
 
-import com.youhajun.core.model.RoomInfo
+import com.youhajun.core.model.room.RoomInfo
 
 interface RoomRepository {
     suspend fun createRoom(): Result<RoomInfo>
