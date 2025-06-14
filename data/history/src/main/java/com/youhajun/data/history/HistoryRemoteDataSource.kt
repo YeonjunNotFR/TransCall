@@ -2,6 +2,7 @@ package com.youhajun.data.history
 
 import com.youhajun.core.model.filter.DateRangeFilter
 import com.youhajun.core.model.pagination.OffsetPageRequest
+import com.youhajun.core.network.di.RestHttpClient
 import com.youhajun.data.common.pagination.OffsetPageDto
 import com.youhajun.data.common.parametersFrom
 import com.youhajun.data.history.dto.CallHistoryDto
@@ -18,7 +19,7 @@ internal interface HistoryRemoteDataSource {
 }
 
 internal class HistoryRemoteDataSourceImpl @Inject constructor(
-    private val client: HttpClient
+    @RestHttpClient private val client: HttpClient
 ): HistoryRemoteDataSource {
 
     override suspend fun getHistoryList(request: OffsetPageRequest, range: DateRangeFilter?): OffsetPageDto<CallHistoryDto> {

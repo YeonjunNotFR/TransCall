@@ -1,6 +1,6 @@
 package com.youhajun.data.history.dto
 
-import com.youhajun.core.model.CallHistory
+import com.youhajun.core.model.calling.CallHistory
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
