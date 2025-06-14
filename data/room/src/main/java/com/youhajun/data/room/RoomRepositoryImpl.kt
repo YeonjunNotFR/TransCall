@@ -1,6 +1,6 @@
 package com.youhajun.data.room
 
-import com.youhajun.core.model.RoomInfo
+import com.youhajun.core.model.room.RoomInfo
 import com.youhajun.domain.room.RoomRepository
 import javax.inject.Inject
 

@@ -1,6 +1,7 @@
 package com.youhajun.data.room
 
-import com.youhajun.data.room.dto.RoomResponseDto
+import com.youhajun.core.network.di.RestHttpClient
+import com.youhajun.data.room.dto.RoomInfoDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -9,22 +10,22 @@ import io.ktor.client.request.post
 import javax.inject.Inject
 
 internal interface RoomRemoteDataSource {
-    suspend fun createRoom(): RoomResponseDto
-    suspend fun joinRoom(roomCode: String): RoomResponseDto
+    suspend fun createRoom(): RoomInfoDto
+    suspend fun joinRoom(roomCode: String): RoomInfoDto
     suspend fun leaveRoom(roomCode: String)
     suspend fun deleteRoom(roomCode: String)
-    suspend fun getRoomInfo(roomCode: String): RoomResponseDto
+    suspend fun getRoomInfo(roomCode: String): RoomInfoDto
 }
 
 internal class RoomRemoteDataSourceImpl @Inject constructor(
-    private val client: HttpClient
+    @RestHttpClient private val client: HttpClient
 ): RoomRemoteDataSource {
 
-    override suspend fun createRoom(): RoomResponseDto {
+    override suspend fun createRoom(): RoomInfoDto {
         return client.post(RoomEndpoint.Create.path).body()
     }
 
-    override suspend fun joinRoom(roomCode: String): RoomResponseDto {
+    override suspend fun joinRoom(roomCode: String): RoomInfoDto {
         return client.post(RoomEndpoint.Join(roomCode).path).body()
     }
 
@@ -32,7 +33,7 @@ internal class RoomRemoteDataSourceImpl @Inject constructor(
         return client.delete(RoomEndpoint.Delete(roomCode).path).body()
     }
 
-    override suspend fun getRoomInfo(roomCode: String): RoomResponseDto {
+    override suspend fun getRoomInfo(roomCode: String): RoomInfoDto {
         return client.get(RoomEndpoint.Info(roomCode).path).body()
     }
 

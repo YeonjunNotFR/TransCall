@@ -1,7 +1,7 @@
 package com.youhajun.data.room.dto
 
 import com.youhajun.core.model.LanguageType
-import com.youhajun.core.model.Participant
+import com.youhajun.core.model.room.Participant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
