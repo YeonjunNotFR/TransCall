@@ -1,0 +1,50 @@
+package com.youhajun.data.conversation.dto
+
+import com.youhajun.core.model.LanguageType
+import com.youhajun.core.model.conversation.Conversation
+import com.youhajun.core.model.conversation.ConversationMessageType
+import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Polymorphic
+@Serializable
+internal sealed interface ConversationDataDto {
+
+    @Serializable
+    @SerialName("sttMessage")
+    data class SttMessageDto(
+        @SerialName("roomCode")
+        val roomCode: String,
+        @SerialName("text")
+        val text: String,
+        @SerialName("languageType")
+        val languageType: LanguageType,
+    ) : ConversationDataDto
+
+    fun toModel(): ConversationMessageType = when (this) {
+        is SttMessageDto -> ConversationMessageType.SttMessage(
+            roomCode = roomCode,
+            text = text,
+            languageType = languageType
+        )
+        is ConversationDto -> toModel()
+    }
+}
+
+internal fun ConversationMessageType.toDto(): ConversationDataDto = when (this) {
+    is ConversationMessageType.SttMessage -> ConversationDataDto.SttMessageDto(
+        roomCode = roomCode,
+        text = text,
+        languageType = languageType
+    )
+    is Conversation -> ConversationDto(
+        id = id,
+        roomCode = roomCode,
+        senderInfo = senderInfo.toDto(),
+        originText = originText,
+        transText = transText,
+        transLanguageCode = transLanguage.code,
+        timestamp = timestamp
+    )
+}
