@@ -14,7 +14,7 @@ data class OffsetPageDto<T>(
     val limit: Int = 20,
     @SerialName("total")
     val total: Int? = null,
-    @SerialName("has_more")
+    @SerialName("hasMore")
     val hasMore: Boolean? = null
 ) {
     fun <M>toModel(mapper: (T) -> M): OffsetPage<M> = OffsetPage(
