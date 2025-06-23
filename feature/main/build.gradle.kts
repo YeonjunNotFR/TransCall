@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.youhajun.android.library)
     alias(libs.plugins.youhajun.android.library.compose)
     alias(libs.plugins.youhajun.android.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -11,17 +12,28 @@ android {
 dependencies {
     implementation(projects.core.design)
     implementation(projects.core.ui)
+    implementation(projects.core.route)
+    implementation(projects.core.event)
     implementation(projects.core.model)
+    implementation(projects.feature.splash.api)
+    implementation(projects.feature.splash.impl)
+    implementation(projects.feature.auth.api)
+    implementation(projects.feature.auth.impl)
     implementation(projects.feature.home.api)
-    implementation(projects.feature.call.api)
+    implementation(projects.feature.home.impl)
     implementation(projects.feature.history.api)
+    implementation(projects.feature.history.impl)
+    implementation(projects.feature.call.api)
+    implementation(projects.domain.auth)
 
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.bundles.orbit)
+    implementation(libs.bundles.navigation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.compose.activity)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.collections.immutable)
 
     testImplementation(libs.junit)
