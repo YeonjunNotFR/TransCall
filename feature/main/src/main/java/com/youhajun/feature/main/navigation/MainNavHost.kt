@@ -4,38 +4,45 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.youhajun.feature.call.api.CallNavGraphRegistrar
-import com.youhajun.feature.call.api.CallNavRoute
-import com.youhajun.feature.history.api.HistoryNavGraphRegistrar
-import com.youhajun.feature.history.api.HistoryNavRoute
-import com.youhajun.feature.home.api.HomeNavGraphRegistrar
+import androidx.navigation.compose.navigation
+import com.youhajun.core.route.NavigationEvent
+import com.youhajun.feature.auth.api.AuthNavRoute
+import com.youhajun.feature.auth.impl.navigation.loginNavGraph
+import com.youhajun.feature.history.impl.navigation.historyNavGraph
+import com.youhajun.feature.home.api.HomeNavRoute
+import com.youhajun.feature.home.impl.navigation.homeNavGraph
+import com.youhajun.feature.splash.api.SplashNavRoute
+import com.youhajun.feature.splash.impl.navigation.splashNavGraph
 
 @Composable
 internal fun MainNavHost(
     padding: PaddingValues,
-    navigator: MainNavigator,
-    homeNavGraphRegistrar: HomeNavGraphRegistrar,
-    callNavGraphRegistrar: CallNavGraphRegistrar,
-    historyNavGraphRegistrar: HistoryNavGraphRegistrar,
+    navController: NavHostController,
+    onNavigationEvent: (NavigationEvent) -> Unit,
 ) {
     NavHost(
         modifier = Modifier.padding(padding),
-        navController = navigator.navController,
-        startDestination = navigator.startDestination
+        navController = navController,
+        startDestination = SplashNavRoute.Splash
     ) {
-        homeNavGraphRegistrar.register(
-            this,
-            onNavigateToCallWaiting = { roomCode ->
-                navigator.navigate(CallNavRoute.Waiting(roomCode))
-            },
-            onNavigateToHistory = {
-                navigator.navigate(HistoryNavRoute.HistoryList)
-            }
-        )
+        splashNavGraph()
+        authNestedGraph(onNavigationEvent)
+        mainNestedGraph(onNavigationEvent)
+    }
+}
 
-        callNavGraphRegistrar.register(this)
+private fun NavGraphBuilder.authNestedGraph(onNavigationEvent: (NavigationEvent) -> Unit) {
+    navigation<MainNavRoute.AuthNestedGraph>(startDestination = AuthNavRoute.Login) {
+        loginNavGraph(onNavigationEvent)
+    }
+}
 
-        historyNavGraphRegistrar.register(this)
+private fun NavGraphBuilder.mainNestedGraph(onNavigationEvent: (NavigationEvent) -> Unit) {
+    navigation<MainNavRoute.MainNestedGraph>(startDestination = HomeNavRoute.Home) {
+        homeNavGraph(onNavigationEvent)
+        historyNavGraph(onNavigationEvent)
     }
 }
