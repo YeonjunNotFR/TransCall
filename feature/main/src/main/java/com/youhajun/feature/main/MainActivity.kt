@@ -1,18 +1,25 @@
 package com.youhajun.feature.main
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
-import com.youhajun.feature.call.api.CallNavGraphRegistrar
-import com.youhajun.feature.history.api.HistoryNavGraphRegistrar
-import com.youhajun.feature.home.api.HomeNavGraphRegistrar
+import androidx.navigation.compose.rememberNavController
+import com.youhajun.core.design.TransCallTheme
+import com.youhajun.core.route.rememberNavigationEventHandler
+import com.youhajun.feature.auth.api.GoogleAuthManager
+import com.youhajun.feature.auth.impl.util.LocalGoogleAuthManager
 import com.youhajun.feature.main.navigation.MainTab
 import com.youhajun.feature.main.navigation.rememberMainNavigator
-import com.youhajun.core.design.TransCallTheme
+import com.youhajun.transcall.core.ui.components.locals.LocalEglBaseContext
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.collections.immutable.toImmutableList
+import org.orbitmvi.orbit.compose.collectSideEffect
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -21,31 +28,50 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
 
     @Inject
-    lateinit var homeNavGraphRegistrar: HomeNavGraphRegistrar
-
-    @Inject
-    lateinit var callNavGraphRegistrar: CallNavGraphRegistrar
-
-    @Inject
-    lateinit var historyNavGraphRegistrar: HistoryNavGraphRegistrar
-
+    lateinit var googleAuthManager: GoogleAuthManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        handleIntent(intent)
 
         setContent {
             TransCallTheme {
-                val navigator = rememberMainNavigator()
-                MainScreen(
-                    mainNavigator = navigator,
-                    homeNavGraphRegistrar = homeNavGraphRegistrar,
-                    callNavGraphRegistrar = callNavGraphRegistrar,
-                    historyNavGraphRegistrar = historyNavGraphRegistrar,
-                    mainTabs = MainTab.tabList().toImmutableList(),
-                )
+                val navigator = rememberNavController()
+                val mainNavigator = rememberMainNavigator(navigator)
+                val navigationEventHandler = rememberNavigationEventHandler(navigator)
+
+                viewModel.collectSideEffect {
+                    when (it) {
+                        is MainSideEffect.Navigation -> {
+                            navigationEventHandler.handleNavigationEvent(it.event)
+                        }
+                    }
+                }
+
+                CompositionLocalProvider(
+                    LocalGoogleAuthManager provides googleAuthManager
+                ) {
+                    MainScreen(
+                        navController = navigator,
+                        bottomBarVisibility = mainNavigator.shouldShowBottomBar(),
+                        currentTab = mainNavigator.currentTab ?: MainTab.Home,
+                        mainTabs = MainTab.tabList().toImmutableList(),
+                        onNavigationEvent = viewModel::onNavigationEvent,
+                        onClickMainTab = viewModel::onClickMainTab
+                    )
+                }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        viewModel.onHandleIntent(intent)
     }
 }

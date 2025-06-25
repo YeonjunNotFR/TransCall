@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,9 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.youhajun.feature.call.api.CallNavGraphRegistrar
-import com.youhajun.feature.history.api.HistoryNavGraphRegistrar
-import com.youhajun.feature.home.api.HomeNavGraphRegistrar
+import androidx.navigation.NavHostController
+import com.youhajun.core.route.NavigationEvent
 import com.youhajun.feature.main.navigation.MainNavHost
 import com.youhajun.feature.main.navigation.MainNavigator
 import com.youhajun.feature.main.navigation.MainTab
@@ -41,42 +41,41 @@ import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal fun MainScreen(
-    mainNavigator: MainNavigator,
+    navController: NavHostController,
+    bottomBarVisibility: Boolean,
     mainTabs: ImmutableList<MainTab>,
-    homeNavGraphRegistrar: HomeNavGraphRegistrar,
-    callNavGraphRegistrar: CallNavGraphRegistrar,
-    historyNavGraphRegistrar: HistoryNavGraphRegistrar,
+    currentTab: MainTab,
+    onNavigationEvent: (NavigationEvent) -> Unit,
+    onClickMainTab: (MainTab) -> Unit
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surfaceDim,
         bottomBar = {
             MainBottomBar(
-                visible = mainNavigator.shouldShowBottomBar(),
+                visibility = bottomBarVisibility,
+                currentTab = currentTab,
                 tabs = mainTabs,
-                currentTab = mainNavigator.currentTab,
-                onTabSelected = { mainNavigator.navigate(it.route) }
+                onClickMainTab = onClickMainTab
             )
         },
     ) { padding ->
         MainNavHost(
             padding = padding,
-            navigator = mainNavigator,
-            homeNavGraphRegistrar = homeNavGraphRegistrar,
-            callNavGraphRegistrar = callNavGraphRegistrar,
-            historyNavGraphRegistrar = historyNavGraphRegistrar,
+            navController = navController,
+            onNavigationEvent = onNavigationEvent,
         )
     }
 }
 
 @Composable
 private fun MainBottomBar(
-    visible: Boolean,
+    visibility: Boolean,
+    currentTab: MainTab,
     tabs: ImmutableList<MainTab>,
-    currentTab: MainTab?,
-    onTabSelected: (MainTab) -> Unit,
+    onClickMainTab: (MainTab) -> Unit
 ) {
     AnimatedVisibility(
-        visible = visible,
+        visible = visibility,
         enter = fadeIn() + slideIn { IntOffset(0, it.height) },
         exit = fadeOut() + slideOut { IntOffset(0, it.height) }
     ) {
@@ -101,8 +100,8 @@ private fun MainBottomBar(
             tabs.forEach { tab ->
                 MainTabItem(
                     tab = tab,
-                    selected = tab.route == currentTab?.route,
-                    onClick = { onTabSelected(tab) },
+                    selected = tab.route == currentTab.route,
+                    onClick = onClickMainTab,
                 )
             }
         }
@@ -113,7 +112,7 @@ private fun MainBottomBar(
 private fun RowScope.MainTabItem(
     tab: MainTab,
     selected: Boolean,
-    onClick: () -> Unit,
+    onClick: (MainTab) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -124,7 +123,7 @@ private fun RowScope.MainTabItem(
                 indication = null,
                 role = null,
                 interactionSource = remember { MutableInteractionSource() },
-                onClick = onClick,
+                onClick = { onClick(tab) },
             ),
         contentAlignment = Alignment.Center,
     ) {
