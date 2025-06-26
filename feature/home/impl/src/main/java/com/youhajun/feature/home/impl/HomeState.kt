@@ -1,7 +1,7 @@
 package com.youhajun.feature.home.impl
 
-import com.youhajun.core.model.CallHistory
-import com.youhajun.core.model.MyInfo
+import com.youhajun.core.model.calling.CallHistory
+import com.youhajun.core.model.user.MyInfo
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

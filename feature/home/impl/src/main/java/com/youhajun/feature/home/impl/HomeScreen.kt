@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -30,11 +31,11 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.youhajun.core.model.CallHistory
+import com.youhajun.core.model.calling.CallHistory
 import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.MembershipPlan
-import com.youhajun.core.model.MyInfo
-import com.youhajun.core.model.Participant
+import com.youhajun.core.model.user.MyInfo
+import com.youhajun.core.model.room.Participant
 import com.youhajun.core.model.RemainTime
 import com.youhajun.core.design.R
 import com.youhajun.transcall.core.ui.components.CircleAsyncImage
@@ -46,6 +47,7 @@ import com.youhajun.transcall.core.ui.components.bottomSheet.JoinWithCodeBottomS
 import com.youhajun.transcall.core.ui.components.history.CallHistoryItem
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.Typography
+import com.youhajun.core.route.NavigationEvent
 import com.youhajun.transcall.core.ui.util.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -54,13 +56,14 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 internal fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigate: (HomeSideEffect.Navigation) -> Unit
+    onNavigate: (NavigationEvent) -> Unit
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
 
     viewModel.collectSideEffect {
         when (it) {
-            is HomeSideEffect.Navigation -> onNavigate(it)
+            is HomeSideEffect.Navigation -> onNavigate(it.navigationEvent)
+            is HomeSideEffect.GoToCall -> Unit
         }
     }
 
@@ -298,9 +301,11 @@ private fun ColumnScope.CallHistorySection(
     previewMaxSize: Int,
 ) {
     callHistoryList.take(previewMaxSize).forEach { call ->
-        CallHistoryItem(call, onClickCallAgain = onClickCallAgain)
+        key(call.callId) {
+            CallHistoryItem(call, onClickCallAgain = onClickCallAgain)
 
-        VerticalSpacer(8.dp)
+            VerticalSpacer(8.dp)
+        }
     }
 
     if (callHistoryList.size > previewMaxSize) {

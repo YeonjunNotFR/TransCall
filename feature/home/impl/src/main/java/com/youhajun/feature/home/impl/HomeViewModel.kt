@@ -4,9 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.youhajun.core.model.pagination.OffsetPageRequest
+import com.youhajun.core.route.NavigationEvent
 import com.youhajun.domain.history.usecase.GetHistoryListUseCase
 import com.youhajun.domain.room.usecase.CreateRoomUseCase
 import com.youhajun.domain.room.usecase.JoinRoomUseCase
+import com.youhajun.feature.history.api.HistoryNavRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -37,7 +39,7 @@ class HomeViewModel @Inject constructor(
             createRoomUseCase()
                 .onSuccess { roomInfo ->
                     intent {
-                        postSideEffect(HomeSideEffect.Navigation.GoToCallWaiting(roomInfo.code))
+                        postSideEffect(HomeSideEffect.GoToCall(roomInfo.code))
                     }
                 }
         }
@@ -55,7 +57,13 @@ class HomeViewModel @Inject constructor(
 
     fun onClickHistoryMore() {
         intent {
-            postSideEffect(HomeSideEffect.Navigation.GoToCallHistory)
+            postSideEffect(HomeSideEffect.Navigation(
+                NavigationEvent.Navigate(
+                    route = HistoryNavRoute.HistoryList,
+                    saveState = true,
+                    launchSingleTop = true
+                )
+            ))
         }
     }
 
@@ -76,7 +84,7 @@ class HomeViewModel @Inject constructor(
             joinRoomUseCase(roomCode)
                 .onSuccess { roomInfo ->
                     intent {
-                        postSideEffect(HomeSideEffect.Navigation.GoToCallWaiting(roomInfo.code))
+                        postSideEffect(HomeSideEffect.GoToCall(roomInfo.code))
                     }
                 }
         }
@@ -84,9 +92,7 @@ class HomeViewModel @Inject constructor(
 
     private fun onInit() {
         viewModelScope.launch {
-            launch {
-                getHistoryList()
-            }
+            getHistoryList()
         }
     }
 

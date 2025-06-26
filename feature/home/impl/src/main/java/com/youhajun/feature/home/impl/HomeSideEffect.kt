@@ -1,11 +1,9 @@
 package com.youhajun.feature.home.impl
 
+import com.youhajun.core.route.NavigationEvent
+
 sealed class HomeSideEffect {
 
-    sealed class Navigation: HomeSideEffect() {
-        data object GoToCallHistory: Navigation()
-        data class GoToCallWaiting(val roomCode: String): Navigation()
-    }
-
-
+    data class GoToCall(val roomCode: String) : HomeSideEffect()
+    data class Navigation(val navigationEvent: NavigationEvent) : HomeSideEffect()
 }

@@ -10,11 +10,13 @@ android {
 
 dependencies {
     implementation(projects.feature.home.api)
+    implementation(projects.feature.history.api)
     implementation(projects.domain.room)
     implementation(projects.domain.history)
     implementation(projects.core.ui)
     implementation(projects.core.design)
     implementation(projects.core.model)
+    implementation(projects.core.route)
     implementation(libs.bundles.navigation)
     implementation(libs.androidx.compose.constraintlayout)
     implementation(libs.bundles.orbit)
