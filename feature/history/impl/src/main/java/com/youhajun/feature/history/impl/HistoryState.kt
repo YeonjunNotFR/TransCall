@@ -1,6 +1,6 @@
 package com.youhajun.feature.history.impl
 
-import com.youhajun.core.model.CallHistory
+import com.youhajun.core.model.calling.CallHistory
 import com.youhajun.core.model.DateRange
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap

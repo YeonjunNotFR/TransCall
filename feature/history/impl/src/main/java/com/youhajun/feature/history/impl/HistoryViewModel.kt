@@ -2,7 +2,7 @@ package com.youhajun.feature.history.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youhajun.core.model.CallHistory
+import com.youhajun.core.model.calling.CallHistory
 import com.youhajun.core.model.DateRange
 import com.youhajun.core.model.pagination.OffsetPageRequest
 import com.youhajun.core.model.pagination.OffsetPagingState
@@ -68,7 +68,7 @@ class HistoryViewModel @Inject constructor(
             val newHistoryMap = groupByDate(historyList.data)
             val oldHistoryMap = container.stateFlow.value.callHistoryDateMap
             val mergedMap = if(pagingState.isFirstCall()) newHistoryMap else getMergedHistoryMap(oldHistoryMap, newHistoryMap)
-            pagingState.next(historyList)
+            pagingState = pagingState.next(historyList)
             intent {
                 reduce { state.copy(callHistoryDateMap = mergedMap.toImmutableMap()) }
             }
@@ -83,7 +83,7 @@ class HistoryViewModel @Inject constructor(
             putAll(oldMap)
 
             newMap.forEach { (date, newList) ->
-                val existingList = get(date) ?: emptyList()
+                val existingList = get(date).orEmpty()
                 val mergedList = existingList + newList
                 put(date, mergedList.toImmutableList())
             }

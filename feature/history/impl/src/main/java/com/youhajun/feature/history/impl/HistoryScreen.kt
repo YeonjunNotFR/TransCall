@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.youhajun.core.model.CallHistory
+import com.youhajun.core.model.calling.CallHistory
 import com.youhajun.core.model.DateRange
 import com.youhajun.core.design.R
 import com.youhajun.transcall.core.ui.components.LazyBackgroundColumn
@@ -33,6 +33,7 @@ import com.youhajun.transcall.core.ui.components.history.CallHistoryItem
 import com.youhajun.transcall.core.ui.components.history.DateRangeRow
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.Typography
+import com.youhajun.core.route.NavigationEvent
 import com.youhajun.transcall.core.ui.util.DateFormatPatterns
 import com.youhajun.transcall.core.ui.util.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
@@ -44,13 +45,13 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 internal fun HistoryRoute(
     viewModel: HistoryViewModel = hiltViewModel(),
-    onNavigate: (HistorySideEffect.Navigation) -> Unit
+    onNavigate: (NavigationEvent) -> Unit
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
 
     viewModel.collectSideEffect {
         when (it) {
-            is HistorySideEffect.Navigation -> onNavigate(it)
+            is HistorySideEffect.Navigation -> onNavigate(it.navigationEvent)
         }
     }
 
