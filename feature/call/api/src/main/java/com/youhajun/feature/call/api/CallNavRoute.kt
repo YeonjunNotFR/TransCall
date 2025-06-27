@@ -1,6 +1,6 @@
 package com.youhajun.feature.call.api
 
-import com.youhajun.core.model.navigation.TransCallRoute
+import com.youhajun.core.route.TransCallRoute
 import kotlinx.serialization.Serializable
 
 sealed interface CallNavRoute: TransCallRoute {
@@ -9,5 +9,5 @@ sealed interface CallNavRoute: TransCallRoute {
     data class Calling(val roomCode: String) : CallNavRoute
 
     @Serializable
-    data class Waiting(val roomCode: String) : CallNavRoute
+    data class Summary(val roomCode: String) : CallNavRoute
 }
