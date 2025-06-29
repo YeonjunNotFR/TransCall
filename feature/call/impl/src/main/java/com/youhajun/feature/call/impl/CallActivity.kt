@@ -1,0 +1,102 @@
+package com.youhajun.feature.call.impl
+
+import android.content.ComponentName
+import android.content.Context
+import android.content.ServiceConnection
+import android.os.Bundle
+import android.os.IBinder
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.youhajun.core.design.TransCallTheme
+import com.youhajun.core.route.rememberNavigationEventHandler
+import com.youhajun.feature.call.api.CallIntentFactory
+import com.youhajun.feature.call.api.CallNavRoute
+import com.youhajun.feature.call.impl.navigation.callNavGraph
+import com.youhajun.feature.call.impl.service.CallForegroundService
+import com.youhajun.feature.call.impl.service.CallServiceContract
+import com.youhajun.feature.call.impl.service.LocalCallServiceContract
+import com.youhajun.transcall.core.ui.components.locals.LocalEglBaseContext
+import dagger.hilt.android.AndroidEntryPoint
+import org.webrtc.EglBase
+import javax.inject.Inject
+
+@AndroidEntryPoint
+class CallActivity : AppCompatActivity() {
+
+    companion object {
+        const val INTENT_KEY_ROOM_CODE = "room_code"
+    }
+
+    @Inject
+    lateinit var callIntentFactory: CallIntentFactory
+
+    @Inject
+    lateinit var eglBaseContext: EglBase.Context
+
+    private var callServiceContract: CallServiceContract? = null
+    private var isBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+            val localBinder = binder as? CallForegroundService.LocalBinder
+            callServiceContract = localBinder?.getContract()
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            callServiceContract = null
+            isBound = false
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val roomCode = intent.getStringExtra(INTENT_KEY_ROOM_CODE) ?: throw IllegalArgumentException("Room code is required")
+        startCallService(roomCode)
+
+        setContent {
+            TransCallTheme {
+                val navigator = rememberNavController()
+                val navigationEventHandler = rememberNavigationEventHandler(navigator)
+                CompositionLocalProvider(
+                    LocalEglBaseContext provides eglBaseContext,
+                    LocalCallServiceContract provides callServiceContract
+                ) {
+                    NavHost(
+                        modifier = Modifier.fillMaxSize(),
+                        navController = navigator,
+                        startDestination = CallNavRoute.Calling(roomCode)
+                    ) {
+                        callNavGraph(navigationEventHandler::handleNavigationEvent)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startCallService(roomCode: String) {
+        val foregroundServiceIntent = callIntentFactory.startCallService(this, roomCode)
+        ContextCompat.startForegroundService(this, foregroundServiceIntent)
+
+        val bindServiceIntent = callIntentFactory.callService(this)
+        bindService(bindServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isBound) {
+            unbindService(serviceConnection)
+            isBound = false
+        }
+    }
+}
