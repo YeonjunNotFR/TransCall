@@ -84,14 +84,14 @@ internal fun HomeRoute(
 }
 
 @Composable
-private fun HomeScreen(
+internal fun HomeScreen(
     state: HomeState,
     onClickCallAgain: (String) -> Unit,
     onClickHistoryMore: () -> Unit,
     onClickStartCall: () -> Unit,
     onClickJoinCall: () -> Unit,
 ) {
-    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+    ConstraintLayout(modifier = Modifier.fillMaxSize().background(Colors.White)) {
         val (background, topRow, profileCenter, profileCard, bodyColumn) = createRefs()
 
         Box(
@@ -331,74 +331,9 @@ private fun ColumnScope.CallHistorySection(
     }
 }
 
-@Preview(showBackground = true)
+
 @Composable
-private fun HomeScreenPreview() {
-    HomeScreen(
-        state = HomeState(
-            myInfo = MyInfo(
-                userId = "1234567890",
-                displayName = "John Doe",
-                imageUrl = null,
-                membershipPlan = MembershipPlan.Free,
-                remainTime = RemainTime(
-                    remainingSeconds = 3600,
-                    resetAtEpochSeconds = 0,
-                    dailyLimitSeconds = null
-                ),
-                language = LanguageType.ENGLISH
-            ),
-            callHistoryPreviewMaxSize = 3,
-            callHistoryList = persistentListOf(
-                CallHistory(
-                    callId = "1234567890",
-                    partner = Participant(
-                        userId = "67890",
-                        displayName = "John Doe",
-                        imageUrl = "https://example.com/image.jpg",
-                        language = LanguageType.ENGLISH
-                    ),
-                    startedAtEpochSeconds = 0,
-                    durationSeconds = 3600,
-                ),
-                CallHistory(
-                    callId = "0987654321",
-                    partner = Participant(
-                        userId = "54321",
-                        displayName = "Jane Smith",
-                        imageUrl = null,
-                        language = LanguageType.ENGLISH
-                    ),
-                    startedAtEpochSeconds = 0,
-                    durationSeconds = 7200
-                ),
-                CallHistory(
-                    callId = "1122334455",
-                    partner = Participant(
-                        userId = "9988776655",
-                        displayName = "Alice Johnson",
-                        imageUrl = null,
-                        language = LanguageType.ENGLISH
-                    ),
-                    startedAtEpochSeconds = 0,
-                    durationSeconds = 1800
-                ),
-                CallHistory(
-                    callId = "5566778899",
-                    partner = Participant(
-                        userId = "2233445566",
-                        displayName = "Bob Brown",
-                        imageUrl = null,
-                        language = LanguageType.ENGLISH
-                    ),
-                    startedAtEpochSeconds = 0,
-                    durationSeconds = 5400
-                )
-            ),
-        ),
-        onClickCallAgain = {},
-        onClickHistoryMore = {},
-        onClickStartCall = {},
-        onClickJoinCall = {}
-    )
+@Preview(showBackground = false)
+private fun HomePreviewMirror() {
+    HomePreview()
 }
