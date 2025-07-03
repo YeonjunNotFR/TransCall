@@ -64,7 +64,7 @@ internal fun HistoryRoute(
 }
 
 @Composable
-private fun HistoryScreen(
+internal fun HistoryScreen(
     state: HistoryState,
     onClickCallAgain: (String) -> Unit,
     onClickFavorite: () -> Unit,
@@ -195,53 +195,6 @@ private fun ColumnScope.CallHistoryLazyColumn(
 
 @Preview
 @Composable
-private fun HistoryScreenPreview() {
-    HistoryScreen(
-        state = HistoryState(
-            callHistoryDateMap = persistentMapOf(
-                "2023-10-01" to persistentListOf(
-                    CallHistory(
-                        callId = "1",
-                        partner = null,
-                        startedAtEpochSeconds = 1633072800L,
-                        durationSeconds = 12001,
-                        isFavorite = false
-                    ),
-                    CallHistory(
-                        callId = "2",
-                        partner = null,
-                        startedAtEpochSeconds = 1633072800L,
-                        durationSeconds = 12001,
-                        isFavorite = false
-                    ),
-                    CallHistory(
-                        callId = "3",
-                        partner = null,
-                        startedAtEpochSeconds = 1633072800L,
-                        durationSeconds = 12001,
-                        isFavorite = false
-                    )
-                ),
-                "2023-10-02" to persistentListOf(
-                    CallHistory(
-                        callId = "4",
-                        partner = null,
-                        startedAtEpochSeconds = 1633072800L,
-                        durationSeconds = 12001,
-                        isFavorite = false
-                    ),
-                    CallHistory(
-                        callId = "5",
-                        partner = null,
-                        startedAtEpochSeconds = 1633072800L,
-                        durationSeconds = 12001,
-                        isFavorite = false
-                    )
-                )
-            )
-        ),
-        onClickCallAgain = {},
-        onClickDateRange = {},
-        onClickFavorite = {}
-    )
+private fun HistoryPreviewMirror() {
+    HistoryPreview()
 }
