@@ -34,17 +34,29 @@ include(
     ":feature:call:impl",
     ":feature:history:api",
     ":feature:history:impl",
+    ":feature:splash:api",
+    ":feature:splash:impl",
+    ":feature:auth:api",
+    ":feature:auth:impl",
 )
 
 include(
+    ":data:common",
     ":data:room",
     ":data:history",
-    ":data:common",
+    ":data:auth",
+    ":data:calling",
+    ":data:user",
+    ":data:conversation",
 )
 
 include(
     ":domain:room",
     ":domain:history",
+    ":domain:auth",
+    ":domain:calling",
+    ":domain:user",
+    ":domain:conversation",
 )
 
 include(
@@ -52,4 +64,12 @@ include(
     ":core:ui",
     ":core:common",
     ":core:model",
+    ":core:database",
+    ":core:webRtc",
+    ":core:notification",
+    ":core:design",
+    ":core:stt",
+    ":core:datastore",
+    ":core:route",
+    ":core:event",
 )
