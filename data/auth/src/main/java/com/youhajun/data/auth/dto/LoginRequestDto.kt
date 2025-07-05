@@ -8,13 +8,13 @@ import kotlinx.serialization.Serializable
 internal data class LoginRequestDto(
     @SerialName("socialType")
     val socialType: String,
-    @SerialName("authCode")
-    val authCode: String
+    @SerialName("token")
+    val token: String
 )
 
 internal fun LoginRequest.toDto(): LoginRequestDto {
     return LoginRequestDto(
         socialType = socialType.type,
-        authCode = authCode
+        token = token
     )
 }
