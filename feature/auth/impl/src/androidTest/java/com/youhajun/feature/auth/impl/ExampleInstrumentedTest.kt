@@ -1,4 +1,4 @@
-package com.youhajun.feature.room.impl
+package com.youhajun.feature.auth.impl
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
