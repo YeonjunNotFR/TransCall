@@ -2,11 +2,11 @@ package com.youhajun.feature.auth.impl.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youhajun.core.model.auth.LoginRequest
+import com.youhajun.core.model.auth.SocialLoginRequest
 import com.youhajun.core.model.auth.SocialType
 import com.youhajun.core.route.NavigationEvent
 import com.youhajun.domain.auth.usecase.GetLoginNonceUseCase
-import com.youhajun.domain.auth.usecase.LoginUseCase
+import com.youhajun.domain.auth.usecase.SocialLoginUseCase
 import com.youhajun.feature.home.api.HomeNavRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val getLoginNonceUseCase: GetLoginNonceUseCase,
-    private val loginUseCase: LoginUseCase
+    private val socialLoginUseCase: SocialLoginUseCase
 ) : ContainerHost<LoginState, LoginSideEffect>, ViewModel() {
 
     override val container: Container<LoginState, LoginSideEffect> = container(LoginState())
@@ -35,16 +35,16 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun onGoogleLoginResult(result: Result<String>) {
+    fun onGoogleLoginResult(loginRequestId: String, result: Result<String>) {
         result.onSuccess { idToken ->
-            val request = LoginRequest(SocialType.GOOGLE, idToken)
+            val request = SocialLoginRequest(loginRequestId, SocialType.GOOGLE, idToken)
             socialLogin(request)
         }
     }
 
-    private fun socialLogin(request: LoginRequest) {
+    private fun socialLogin(request: SocialLoginRequest) {
         viewModelScope.launch {
-            loginUseCase(request).onSuccess {
+            socialLoginUseCase(request).onSuccess {
                 intent {
                     val event = NavigationEvent.NavigateAndClear(HomeNavRoute.Home, true)
                     postSideEffect(LoginSideEffect.Navigation(event))

@@ -51,8 +51,8 @@ internal fun LoginRoute(
         when (it) {
             is LoginSideEffect.Navigation -> onNavigate(it.navigationEvent)
             is LoginSideEffect.GoogleSignIn -> {
-                val idToken = googleAuthManager.signIn(it.nonce)
-                viewModel.onGoogleLoginResult(idToken)
+                val idToken = googleAuthManager.signIn(it.nonce.nonce)
+                viewModel.onGoogleLoginResult(it.nonce.loginRequestId, idToken)
             }
         }
     }
