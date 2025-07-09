@@ -20,7 +20,7 @@ internal class AuthRepositoryImpl @Inject constructor(
         !local.getAccessToken().isNullOrBlank()
     }
 
-    override suspend fun getLoginNonce(): Result<String> = runCatching {
-        remote.getLoginNonce()
+    override suspend fun getLoginNonce(): Result<Nonce> = runCatching {
+        remote.getLoginNonce().toModel()
     }
 }

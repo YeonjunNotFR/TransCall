@@ -2,8 +2,8 @@ package com.youhajun.data.auth
 
 import com.youhajun.core.network.di.RestHttpClient
 import com.youhajun.data.auth.dto.JwtTokenDto
-import com.youhajun.data.auth.dto.LoginRequestDto
 import com.youhajun.data.auth.dto.SocialLoginRequestDto
+import com.youhajun.data.auth.dto.NonceDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -26,7 +26,7 @@ internal class AuthRemoteDataSourceImpl @Inject constructor(
         }.body()
     }
 
-    override suspend fun getLoginNonce(): String {
+    override suspend fun getLoginNonce(): NonceDto {
         return client.get(AuthEndpoint.Nonce.path).body()
     }
 }
