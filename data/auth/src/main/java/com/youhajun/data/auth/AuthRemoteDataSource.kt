@@ -9,6 +9,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import javax.inject.Inject
 
 internal interface AuthRemoteDataSource {
@@ -22,6 +24,7 @@ internal class AuthRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun socialLogin(request: SocialLoginRequestDto): JwtTokenDto {
         return client.post(AuthEndpoint.SocialLogin.path) {
+            contentType(ContentType.Application.Json)
             setBody(request)
         }.body()
     }
