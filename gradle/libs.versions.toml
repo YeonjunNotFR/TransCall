@@ -1,27 +1,35 @@
 [versions]
 agp = "8.8.2"
 kotlin = "2.1.10"
-coreKtx = "1.15.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.10.0"
-composeBom = "2025.04.01"
+lifecycleRuntimeKtx = "2.9.1"
+activityCompose = "1.10.1"
+composeBom = "2025.06.01"
 composeConstraintLayout = "1.1.1"
-appcompat = "1.7.0"
+appcompat = "1.7.1"
 material = "1.12.0"
 jetbrainsKotlinJvm = "2.1.10"
+gms = "4.4.3"
 ksp = "2.1.10-1.0.31"
 hilt = "2.56.1"
 ktor = "2.3.5"
 kotlinx-serialization-json = "1.6.3"
 javaxInject = "1"
-navigation = "2.8.9"
+navigation = "2.9.1"
 hiltNavigation = "1.2.0"
 kotlinx-collections-immutable = "0.3.7"
 orbit = "6.1.0"
 coil = "2.6.0"
+dataStore = "1.1.7"
+kotlinx-coroutines-core = "1.10.1"
+webRtc = "1.1.2"
+audio-switch = "1.2.0"
+room = "2.7.2"
+googleId = "1.1.1"
+credentials = "1.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +54,11 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "composeConstraintLayout" }
 
+#room
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+
 #coil
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
@@ -57,6 +70,14 @@ orbit_viewmodel = { group = "org.orbit-mvi", name = "orbit-viewmodel", version.r
 #navigation
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }
+
+#dataStore
+datastore = { group = "androidx.datastore", name = "datastore", version.ref = "dataStore" }
+datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
+
+stream-webrtc-android-compose = { module = "io.getstream:stream-webrtc-android-compose", version.ref = "webRtc" }
+stream-webrtc-android-ui = { module = "io.getstream:stream-webrtc-android-ui", version.ref = "webRtc" }
+stream-webrtc = { group = "io.getstream", name = "stream-webrtc-android", version.ref = "webRtc" }
 
 # hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
@@ -70,10 +91,21 @@ ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref =
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+ktor-client_cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+ktor-client-websockets = { group = "io.ktor", name = "ktor-client-websockets", version.ref = "ktor" }
+
+# audio
+audio-switch = { group = "com.twilio", name = "audioswitch", version.ref = "audio-switch" }
 
 #kotlinx
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
+
+# google login
+google-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+google-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
+google-id = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleId" }
 
 # Gradle
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -89,6 +121,7 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+gms = { id = "com.google.gms.google-services", version.ref = "gms" }
 
 # Plugins defined by this project
 youhajun-android-application = { id = "com.youhajun.android.application" }
@@ -99,6 +132,10 @@ youhajun-android-hilt = { id = "com.youhajun.android.hilt" }
 youhajun-jvm-library = { id = "com.youhajun.jvm.library" }
 
 [bundles]
-ktor = ["ktor-client-auth", "ktor-client-core", "ktor-client-okhttp", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json", "ktor-client-logging"]
+webRtc = ["stream-webrtc", "stream-webrtc-android-compose", "stream-webrtc-android-ui"]
+ktor = ["ktor-client-auth", "ktor-client-core", "ktor-client-okhttp", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json", "ktor-client-logging", "ktor-client_cio", "ktor-client-websockets"]
 navigation = ["androidx-navigation-compose", "androidx-hilt-navigation-compose"]
 orbit = ["orbit_core", "orbit_compose", "orbit_viewmodel"]
+dataStore = ["datastore", "datastore-preferences"]
+room = ["room-runtime", "room-ktx"]
+credentials = ["google-credentials", "google-credentials-play-services-auth", "google-id"]
