@@ -1,7 +1,6 @@
 package com.youhajun.feature.main
 
 import android.content.Intent
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.youhajun.core.event.MainEvent
@@ -39,11 +38,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onClickMainTab(tab: MainTab) = intent {
-        val event = NavigationEvent.Navigate(
-            route = tab.route,
-            saveState = true,
-            launchSingleTop = true
-        )
+        val event = NavigationEvent.NavigateBottomBar(route = tab.route, launchSingleTop = true)
         postSideEffect(MainSideEffect.Navigation(event))
     }
 
@@ -51,7 +46,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             val hasToken = hasAccessTokenUseCase().getOrDefault(false)
             val route = intent.toNavRoute(hasToken)
-            val event = NavigationEvent.NavigateAndClear(route, true)
+            val event = NavigationEvent.NavigateAndClear(route = route, launchSingleTop = true)
             postNavigationEvent(event)
         }
     }
@@ -67,10 +62,7 @@ class MainViewModel @Inject constructor(
             mainEventManager.events.collect { event ->
                 when (event) {
                     is MainEvent.RequireLogin -> {
-                        val navigationEvent = NavigationEvent.NavigateAndClear(
-                            route = AuthNavRoute.Login,
-                            launchSingleTop = true
-                        )
+                        val navigationEvent = NavigationEvent.NavigateAndClear(route = AuthNavRoute.Login, launchSingleTop = true)
                         postNavigationEvent(navigationEvent)
                     }
 

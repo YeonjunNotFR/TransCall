@@ -58,9 +58,8 @@ class HomeViewModel @Inject constructor(
     fun onClickHistoryMore() {
         intent {
             postSideEffect(HomeSideEffect.Navigation(
-                NavigationEvent.Navigate(
+                NavigationEvent.NavigateBottomBar(
                     route = HistoryNavRoute.HistoryList,
-                    saveState = true,
                     launchSingleTop = true
                 )
             ))
