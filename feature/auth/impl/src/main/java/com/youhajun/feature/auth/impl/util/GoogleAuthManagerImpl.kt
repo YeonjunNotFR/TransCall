@@ -24,7 +24,7 @@ class GoogleAuthManagerImpl @Inject constructor(
 
     override suspend fun signIn(nonce: String): Result<String> = runCatching {
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(true)
+            .setFilterByAuthorizedAccounts(false)
             .setServerClientId(BuildConfig.GOOGLE_WEB_CLIENT_ID)
             .setAutoSelectEnabled(true)
             .setNonce(nonce)
@@ -47,7 +47,6 @@ class GoogleAuthManagerImpl @Inject constructor(
     private fun handleSignIn(result: GetCredentialResponse): String? {
         val credential = result.credential
         return if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-            credential.type
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
             googleIdTokenCredential.idToken
         } else null
