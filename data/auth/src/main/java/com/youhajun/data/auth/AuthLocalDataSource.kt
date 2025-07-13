@@ -2,16 +2,11 @@ package com.youhajun.data.auth
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.youhajun.core.datastore.getValue
-import com.youhajun.core.network.TokenProvider
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
 internal interface AuthLocalDataSource {
     suspend fun getAccessToken(): String?
@@ -20,34 +15,35 @@ internal interface AuthLocalDataSource {
     suspend fun deleteTokens()
 }
 
+@Singleton
 internal class AuthLocalDataSourceImpl @Inject constructor(
-    private val data: DataStore<Preferences>
-): AuthLocalDataSource, TokenProvider {
+    private val data: DataStore<Preferences>,
+): AuthLocalDataSource {
 
     override suspend fun getAccessToken(): String? {
-        return data.getValue(stringPreferencesKey(KEY_ACCESS_TOKEN))
+        return data.getValue(KEY_ACCESS_TOKEN)
     }
 
     override suspend fun getRefreshToken(): String? {
-        return data.getValue(stringPreferencesKey(KEY_REFRESH_TOKEN))
+        return data.getValue(KEY_REFRESH_TOKEN)
     }
 
     override suspend fun saveTokens(accessToken: String, refreshToken: String) {
         data.edit {
-            it[stringPreferencesKey(KEY_ACCESS_TOKEN)] = accessToken
-            it[stringPreferencesKey(KEY_REFRESH_TOKEN)] = refreshToken
+            it[KEY_ACCESS_TOKEN] = accessToken
+            it[KEY_REFRESH_TOKEN] = refreshToken
         }
     }
 
     override suspend fun deleteTokens() {
         data.edit {
-            it.remove(stringPreferencesKey(KEY_ACCESS_TOKEN))
-            it.remove(stringPreferencesKey(KEY_REFRESH_TOKEN))
+            it.remove(KEY_ACCESS_TOKEN)
+            it.remove(KEY_REFRESH_TOKEN)
         }
     }
 
     companion object {
-        private const val KEY_ACCESS_TOKEN = "AccessToken"
-        private const val KEY_REFRESH_TOKEN = "RefreshToken"
+        private val KEY_ACCESS_TOKEN =  stringPreferencesKey("AccessToken")
+        private val KEY_REFRESH_TOKEN = stringPreferencesKey("RefreshToken")
     }
 }
