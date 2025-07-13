@@ -1,11 +1,7 @@
 package com.youhajun.core.network.di
 
-import com.youhajun.core.network.BuildConfig
 import com.youhajun.core.network.Config
 import com.youhajun.core.network.KtorHttpClient
-import com.youhajun.core.network.KtorWebsocketClient
-import com.youhajun.core.network.TokenProvider
-import com.youhajun.core.network.TokenRefresher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,23 +18,15 @@ internal object NetworkModule {
     @Singleton
     @RestHttpClient
     fun provideMainKtorHttpClient(
-        tokenProvider: TokenProvider,
-        tokenRefresher: TokenRefresher,
-    ): HttpClient = KtorHttpClient.create(
-        baseUrl = Config.REST_BASE_URL,
-        tokenProvider = tokenProvider,
-        tokenRefresher = tokenRefresher,
-    )
+        ktorHttpClient: KtorHttpClient
+    ): HttpClient = ktorHttpClient.createHttps(baseUrl = Config.REST_BASE_URL)
 
     @Provides
     @Singleton
     @WebSocketHttpClient
     fun provideWebSocketKtorHttpClient(
-        tokenProvider: TokenProvider,
-    ): HttpClient = KtorWebsocketClient.create(
-        baseUrl = Config.WEBSOCKET_BASE_URL,
-        tokenProvider = tokenProvider,
-    )
+        ktorHttpClient: KtorHttpClient
+    ): HttpClient = ktorHttpClient.createWss(baseUrl = Config.WEBSOCKET_BASE_URL)
 }
 
 @Qualifier

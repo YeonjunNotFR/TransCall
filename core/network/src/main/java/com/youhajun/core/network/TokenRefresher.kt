@@ -4,5 +4,5 @@ import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.RefreshTokensParams
 
 interface TokenRefresher {
-    suspend fun refreshTokens(param: RefreshTokensParams): BearerTokens?
+    suspend fun refreshTokens(param: RefreshTokensParams): Result<BearerTokens>
 }
