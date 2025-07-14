@@ -32,9 +32,14 @@ class NavigationEventHandler(
 
             is NavigationEvent.NavigateAndClear -> {
                 navController.navigate(event.route) {
-                    val popUpRoute = event.popUpRoute ?: navController.currentNestedGraphStartId()
-                    popUpTo(0) {
-                        inclusive = true
+                    if(event.popUpRoute != null) {
+                        popUpTo(event.popUpRoute) {
+                            saveState = true
+                        }
+                    } else {
+                        popUpTo(0) {
+                            saveState = true
+                        }
                     }
                     launchSingleTop = event.launchSingleTop
                 }
