@@ -35,7 +35,7 @@ import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.history.CallHistoryItem
 import com.youhajun.transcall.core.ui.components.history.DateRangeRow
 import com.youhajun.transcall.core.ui.util.DateFormatPatterns
-import com.youhajun.transcall.core.ui.util.noRippleClickable
+import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import org.orbitmvi.orbit.compose.collectSideEffect

@@ -20,7 +20,7 @@ import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
-import com.youhajun.transcall.core.ui.util.noRippleClickable
+import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 
 @Composable
 internal fun RoomCodeComp(

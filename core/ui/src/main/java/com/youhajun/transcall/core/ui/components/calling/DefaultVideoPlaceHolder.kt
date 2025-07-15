@@ -33,7 +33,7 @@ import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.room.Participant
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
-import com.youhajun.transcall.core.ui.util.speakingGlow
+import com.youhajun.transcall.core.ui.components.modifier.speakingGlow
 
 @Composable
 fun DefaultVideoPlaceHolder(

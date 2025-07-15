@@ -44,7 +44,7 @@ import com.youhajun.transcall.core.ui.components.MembershipBadge
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.bottomSheet.JoinWithCodeBottomSheet
 import com.youhajun.transcall.core.ui.components.history.CallHistoryItem
-import com.youhajun.transcall.core.ui.util.noRippleClickable
+import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
 import org.orbitmvi.orbit.compose.collectSideEffect
 

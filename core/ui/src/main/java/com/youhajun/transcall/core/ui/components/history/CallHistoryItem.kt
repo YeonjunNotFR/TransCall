@@ -30,7 +30,7 @@ import com.youhajun.core.design.Typography
 import com.youhajun.core.design.R
 import com.youhajun.transcall.core.ui.util.DateFormatPatterns
 import com.youhajun.transcall.core.ui.util.TimeFormatPatterns
-import com.youhajun.transcall.core.ui.util.noRippleClickable
+import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import com.youhajun.transcall.core.ui.util.toUiDateString
 import com.youhajun.transcall.core.ui.util.toUiDurationString
 

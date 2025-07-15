@@ -35,7 +35,7 @@ import com.youhajun.core.model.DateRange
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.Typography
 import com.youhajun.core.design.R
-import com.youhajun.transcall.core.ui.util.noRippleClickable
+import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 

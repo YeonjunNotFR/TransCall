@@ -36,7 +36,7 @@ import com.youhajun.core.route.NavigationEvent
 import com.youhajun.feature.auth.impl.util.LocalGoogleAuthManager
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
-import com.youhajun.transcall.core.ui.util.noRippleClickable
+import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
