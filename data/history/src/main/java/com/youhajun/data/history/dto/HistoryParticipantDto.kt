@@ -6,7 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class HistoryParticipantDto(
+internal data class ParticipantDto(
     @SerialName("userId")
     val userId: String = "",
     @SerialName("displayName")
@@ -19,7 +19,7 @@ internal data class HistoryParticipantDto(
     fun toModel(): Participant = Participant(
         userId = userId,
         displayName = displayName,
-        imageUrl = imageUrl,
+        imageUrl = imageUrl ?: "",
         language = LanguageType.fromCode(language),
     )
 }

@@ -15,14 +15,11 @@ internal data class ParticipantDto(
     val imageUrl: String? = null,
     @SerialName("language")
     val language: String = "",
-    @SerialName("isHost")
-    val isHost: Boolean = false
 ) {
     fun toModel(): Participant = Participant(
         userId = userId,
         displayName = displayName,
-        imageUrl = imageUrl,
-        isHost = isHost,
+        imageUrl = imageUrl ?: "",
         language = LanguageType.fromCode(language),
     )
 }
