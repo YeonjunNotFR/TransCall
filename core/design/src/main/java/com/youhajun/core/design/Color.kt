@@ -38,6 +38,7 @@ object Colors {
     val FF50A7F3 = Color(0xFF50A7F3)
     val FF374151 = Color(0xFF374151)
     val FFE5E7EB = Color(0xFFE5E7EB)
+    val FFE5E5E5 = Color(0xFFE5E5E5)
     val FF6366F1 = Color(0xFF6366F1)
     val FF2F80ED = Color(0xFF2F80ED)
     val FFB2F2FF = Color(0xFFD2ECFE)
@@ -47,4 +48,7 @@ object Colors {
     val FF292929 = Color(0xFF292929)
     val FFFF0000 = Color(0xFFFF0000)
     val FFF6F8FA = Color(0xFFF6F8FA)
+    val FF637BE8 = Color(0xFF637BE8)
+    val FF808080 = Color(0xFF808080)
+    val FF98AAFE = Color(0xFF98AAFE)
 }
