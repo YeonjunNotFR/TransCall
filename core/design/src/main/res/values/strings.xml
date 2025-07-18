@@ -9,9 +9,9 @@
     <string name="language_chinese">中文</string>
     <string name="language_spanish">Español</string>
 
-    <string name="common_duration_minute_label">분</string>
-    <string name="common_duration_second_label">초</string>
-    <string name="common_duration_hour_label">시간</string>
+    <string name="common_duration_minute_label">m</string>
+    <string name="common_duration_second_label">s</string>
+    <string name="common_duration_hour_label">h</string>
     <string name="common_more">더보기</string>
     <string name="common_cancel">취소</string>
     <string name="common_join">참여하기</string>
