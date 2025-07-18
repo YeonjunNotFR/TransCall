@@ -109,7 +109,6 @@ private fun VideoPlaceHolderPreview() {
             displayName = "John Doe",
             imageUrl = "https://example.com/image.jpg",
             language = LanguageType.ENGLISH,
-            isHost = false
         ),
     )
 }
