@@ -2,7 +2,9 @@ package com.youhajun.feature.history.impl
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.calling.CallHistory
+import com.youhajun.core.model.room.Participant
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 
@@ -14,47 +16,64 @@ internal fun HistoryPreview() {
             callHistoryDateMap = persistentMapOf(
                 "2023-10-01" to persistentListOf(
                     CallHistory(
-                        callId = "1",
-                        partner = null,
-                        startedAtEpochSeconds = 1633072800L,
+                        historyId = "12345",
+                        title = "Sample Call History Title",
+                        summary = "This is a sample call history summary that is quite long and should be truncated if it exceeds the maximum line limit.",
+                        participants = persistentListOf(
+                            Participant(
+                                userId = "67890",
+                                displayName = "John Doe dwaafwojfdkawdkadwkd dawkawd akwdkaw dawkd wa dwakd",
+                                imageUrl = "https://example.com/image.jpg",
+                                language = LanguageType.ENGLISH
+                            )
+                        ),
+                        startedAt = 1633072800L,
+                        endedAt = 1633076400L,
                         durationSeconds = 12001,
-                        isFavorite = false
+                        memo = "",
+                        isLiked = false
                     ),
                     CallHistory(
-                        callId = "2",
-                        partner = null,
-                        startedAtEpochSeconds = 1633072800L,
-                        durationSeconds = 12001,
-                        isFavorite = false
+                        historyId = "67890",
+                        title = "Another Call History",
+                        summary = "This is another call history summary that is also quite long and should be truncated if it exceeds the maximum line limit.",
+                        participants = persistentListOf(
+                            Participant(
+                                userId = "12345",
+                                displayName = "Jane Smith",
+                                imageUrl = "https://example.com/image2.jpg",
+                                language = LanguageType.SPANISH
+                            )
+                        ),
+                        startedAt = 1633072800L,
+                        endedAt = 1633076400L,
+                        durationSeconds = 600,
+                        memo = "This is a memo for the second call history.",
+                        isLiked = true
                     ),
-                    CallHistory(
-                        callId = "3",
-                        partner = null,
-                        startedAtEpochSeconds = 1633072800L,
-                        durationSeconds = 12001,
-                        isFavorite = false
-                    )
                 ),
                 "2023-10-02" to persistentListOf(
                     CallHistory(
-                        callId = "4",
-                        partner = null,
-                        startedAtEpochSeconds = 1633072800L,
-                        durationSeconds = 12001,
-                        isFavorite = false
-                    ),
-                    CallHistory(
-                        callId = "5",
-                        partner = null,
-                        startedAtEpochSeconds = 1633072800L,
-                        durationSeconds = 12001,
-                        isFavorite = false
+                        historyId = "11223",
+                        title = "Third Call History",
+                        summary = "This is the third call history summary, which is also quite long and should be truncated if it exceeds the maximum line limit.",
+                        participants = persistentListOf(
+                            Participant(
+                                userId = "33445",
+                                displayName = "Alice Johnson",
+                                imageUrl = "https://example.com/image3.jpg",
+                                language = LanguageType.SPANISH
+                            )
+                        ),
+                        startedAt = 1633072800L,
+                        endedAt = 1633076400L,
+                        durationSeconds = 300,
+                        memo = "This is a memo for the third call history.",
+                        isLiked = false
                     )
                 )
-            )
+            ),
         ),
-        onClickCallAgain = {},
         onClickDateRange = {},
-        onClickFavorite = {}
     )
 }

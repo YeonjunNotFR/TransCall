@@ -42,18 +42,10 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
-    fun onClickCallAgain(userId: String) {
-
-    }
-
     fun onClickDateRange(dateRange: DateRange) {
         intent {
             reduce { state.copy(selectedDateRange = dateRange) }
         }
-    }
-
-    fun onClickFavorite() {
-
     }
 
     private fun onInit() {
@@ -92,7 +84,7 @@ class HistoryViewModel @Inject constructor(
 
     private fun groupByDate(historyList: List<CallHistory>): Map<String, ImmutableList<CallHistory>> {
         return historyList
-            .groupBy { it.startedAtEpochSeconds.toUiDateString(DateFormatPatterns.DATE_ONLY) }
+            .groupBy { it.startedAt.toUiDateString(DateFormatPatterns.DATE_ONLY) }
             .mapValues { it.value.toImmutableList() }
     }
 

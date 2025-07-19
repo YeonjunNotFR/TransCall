@@ -8,18 +8,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,7 +33,6 @@ import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.history.CallHistoryItem
 import com.youhajun.transcall.core.ui.components.history.DateRangeRow
 import com.youhajun.transcall.core.ui.util.DateFormatPatterns
-import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -55,62 +52,49 @@ internal fun HistoryRoute(
 
     HistoryScreen(
         state = state,
-        onClickCallAgain = viewModel::onClickCallAgain,
         onClickDateRange = viewModel::onClickDateRange,
-        onClickFavorite = viewModel::onClickFavorite
     )
 }
 
 @Composable
 internal fun HistoryScreen(
     state: HistoryState,
-    onClickCallAgain: (String) -> Unit,
-    onClickFavorite: () -> Unit,
     onClickDateRange: (DateRange) -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Colors.FFB2F2FF)
-            .padding(horizontal = 16.dp),
+            .background(Colors.FFE5EDF5)
+            .padding(horizontal = 12.dp),
     ) {
         VerticalSpacer(8.dp)
 
-        HistoryHeader(onClickFavorite)
+        HistoryHeader()
 
-        VerticalSpacer(16.dp)
+        VerticalSpacer(8.dp)
 
         HistoryBody(
             callHistoryMap = state.callHistoryDateMap,
             selectedDateRange = state.selectedDateRange,
-            onClickCallAgain = onClickCallAgain,
             onClickDateRange = onClickDateRange
         )
     }
 }
 
 @Composable
-private fun HistoryHeader(
-    onClickFavorite: () -> Unit,
-) {
+private fun HistoryHeader() {
     Row(
         modifier = Modifier.padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-
         Text(
             text = stringResource(R.string.screen_title_history),
             modifier = Modifier.weight(1f),
             color = Colors.Black,
-            style = Typography.displayMedium
-        )
-
-        Icon(
-            modifier = Modifier
-                .noRippleClickable(onClick = onClickFavorite)
-                .size(28.dp),
-            painter = painterResource(R.drawable.ic_home),
-            contentDescription = null
+            style = Typography.titleLarge.copy(
+                fontWeight = FontWeight.W600,
+            ),
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -120,10 +104,10 @@ private fun ColumnScope.HistoryBody(
     selectedDateRange: DateRange,
     onClickDateRange: (DateRange) -> Unit,
     callHistoryMap: ImmutableMap<String, ImmutableList<CallHistory>>,
-    onClickCallAgain: (String) -> Unit,
 ) {
     DateRangeRow(
         selectedDateRange = selectedDateRange,
+        indicatorColor = Colors.FF60A5FA,
         onClick = onClickDateRange,
     )
 
@@ -131,14 +115,12 @@ private fun ColumnScope.HistoryBody(
 
     CallHistoryLazyColumn(
         callHistoryMap = callHistoryMap,
-        onClickCallAgain = onClickCallAgain
     )
 }
 
 @Composable
 private fun ColumnScope.CallHistoryLazyColumn(
     callHistoryMap: ImmutableMap<String, ImmutableList<CallHistory>>,
-    onClickCallAgain: (String) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -174,8 +156,7 @@ private fun ColumnScope.CallHistoryLazyColumn(
                 ) {
                     CallHistoryItem(
                         callHistory = callHistory,
-                        dateFormat = DateFormatPatterns.TIME_ONLY,
-                        onClickCallAgain = onClickCallAgain
+                        createdAtDateFormat = DateFormatPatterns.TIME_ONLY,
                     )
 
                     if (isLast) {
