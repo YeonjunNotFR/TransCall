@@ -99,6 +99,7 @@ class CallForegroundService : Service() {
     private val _messageFlow = MutableSharedFlow<CallingMessage>(replay = 1, extraBufferCapacity = 50)
 
     private var webRtcManager: WebRtcSessionManager? = null
+    private var myLanguageType: LanguageType = LanguageType.ENGLISH
 
     private val callServiceContract = object : CallServiceContract {
         override val mediaUsersFlow: StateFlow<List<CallMediaUser>> = _mediaUsersFlow.asStateFlow()
@@ -114,6 +115,7 @@ class CallForegroundService : Service() {
 
         override fun setMicEnabled(enabled: Boolean) {
             webRtcManager?.setMicEnabled(enabled)
+            if(enabled) sttStart(myLanguageType) else sttManager.stop()
         }
 
         override fun setMuteEnable(enabled: Boolean) {
@@ -242,7 +244,8 @@ class CallForegroundService : Service() {
         serviceScope.launch {
             callConnectUseCase(roomCode).collect {
                 when(val type = it.type) {
-                    is StageMessageType.Signaling -> callingStart(type.isCaller, myInfo.language)
+                    is StageMessageType.Signaling -> webRtcManager?.start(type.isCaller)
+                    is StageMessageType.Calling -> sttStart(myInfo.language)
                     is CallingMessageType.LeftResponse -> {
                         if(type.userId == myInfo.userId) callClose()
                     }
@@ -253,9 +256,9 @@ class CallForegroundService : Service() {
         }
     }
 
-    private fun callingStart(isCaller: Boolean, myLanguage: LanguageType) {
-        webRtcManager?.start(isCaller)
-        val myLocale = Locale.forLanguageTag(myLanguage.code)
+    private fun sttStart(language: LanguageType) {
+        myLanguageType = language
+        val myLocale = Locale.forLanguageTag(language.code)
         sttManager.start(myLocale)
     }
 

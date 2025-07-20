@@ -35,7 +35,7 @@ internal fun WaitingScreenPreview() {
                     Participant(
                         userId = "1",
                         displayName = "User 1",
-                        imageUrl = null,
+                        imageUrl = "",
                         language = LanguageType.ENGLISH
                     ),
                 ),
@@ -88,13 +88,13 @@ internal fun CallingScreenFloatingType() {
                     Participant(
                         userId = "1",
                         displayName = "User 1",
-                        imageUrl = null,
+                        imageUrl = "",
                         language = LanguageType.ENGLISH
                     ),
                     Participant(
                         userId = "2",
                         displayName = "User 2",
-                        imageUrl = null,
+                        imageUrl = "",
                         language = LanguageType.ENGLISH
                     )
                 ),
@@ -121,7 +121,7 @@ internal fun CallingScreenFloatingType() {
                     participant = Participant(
                         userId = "1",
                         displayName = "User 1",
-                        imageUrl = null,
+                        imageUrl = "",
                         language = LanguageType.ENGLISH
                     ),
                     mediaUser = LocalMediaUser(
@@ -147,7 +147,7 @@ internal fun CallingScreenFloatingType() {
                     participant = Participant(
                         userId = "2",
                         displayName = "User 2",
-                        imageUrl = null,
+                        imageUrl = "",
                         language = LanguageType.ENGLISH
                     ),
                     mediaUser = RemoteMediaUser(
@@ -264,7 +264,7 @@ internal fun CallingScreenGridType() {
         Participant(
             userId = index.toString(),
             displayName = "User $index",
-            imageUrl = null,
+            imageUrl = "",
             language = LanguageType.ENGLISH
         )
     }.toImmutableList()
