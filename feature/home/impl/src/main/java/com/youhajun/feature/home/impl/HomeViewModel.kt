@@ -51,10 +51,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onClickCallAgain(userId: String) {
-
-    }
-
     fun onClickHistoryMore() {
         intent {
             postSideEffect(HomeSideEffect.Navigation(

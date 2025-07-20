@@ -18,7 +18,7 @@ internal fun HomePreview() {
             myInfo = MyInfo(
                 userId = "1234567890",
                 displayName = "John Doe",
-                imageUrl = null,
+                imageUrl = "https://example.com/profile.jpg",
                 membershipPlan = MembershipPlan.Free,
                 remainTime = RemainTime(
                     remainingSeconds = 3600,
@@ -30,52 +30,79 @@ internal fun HomePreview() {
             callHistoryPreviewMaxSize = 3,
             callHistoryList = persistentListOf(
                 CallHistory(
-                    callId = "1234567890",
-                    partner = Participant(
-                        userId = "67890",
-                        displayName = "John Doe",
-                        imageUrl = "https://example.com/image.jpg",
-                        language = LanguageType.ENGLISH
+                    historyId = "12345",
+                    title = "Sample Call History Title",
+                    summary = "This is a sample call history summary that is quite long and should be truncated if it exceeds the maximum line limit.",
+                    participants = persistentListOf(
+                        Participant(
+                            userId = "67890",
+                            displayName = "John Doe dwaafwojfdkawdkadwkd dawkawd akwdkaw dawkd wa dwakd",
+                            imageUrl = "https://example.com/image.jpg",
+                            language = LanguageType.ENGLISH
+                        )
                     ),
-                    startedAtEpochSeconds = 0,
-                    durationSeconds = 3600,
+                    startedAt = 1633072800L,
+                    endedAt = 1633076400L,
+                    durationSeconds = 12001,
+                    memo = "",
+                    isLiked = false
                 ),
                 CallHistory(
-                    callId = "0987654321",
-                    partner = Participant(
-                        userId = "54321",
-                        displayName = "Jane Smith",
-                        imageUrl = null,
-                        language = LanguageType.ENGLISH
+                    historyId = "12346",
+                    title = "Sample Call History Title",
+                    summary = "This is a sample call history summary that is quite long and should be truncated if it exceeds the maximum line limit.",
+                    participants = persistentListOf(
+                        Participant(
+                            userId = "67890",
+                            displayName = "John Doe dwaafwojfdkawdkadwkd dawkawd akwdkaw dawkd wa dwakd",
+                            imageUrl = "https://example.com/image.jpg",
+                            language = LanguageType.ENGLISH
+                        )
                     ),
-                    startedAtEpochSeconds = 0,
-                    durationSeconds = 7200
+                    startedAt = 1633072800L,
+                    endedAt = 1633076400L,
+                    durationSeconds = 12001,
+                    memo = "",
+                    isLiked = false
                 ),
                 CallHistory(
-                    callId = "1122334455",
-                    partner = Participant(
-                        userId = "9988776655",
-                        displayName = "Alice Johnson",
-                        imageUrl = null,
-                        language = LanguageType.ENGLISH
+                    historyId = "12347",
+                    title = "Sample Call History Title",
+                    summary = "This is a sample call history summary that is quite long and should be truncated if it exceeds the maximum line limit.",
+                    participants = persistentListOf(
+                        Participant(
+                            userId = "67890",
+                            displayName = "John Doe dwaafwojfdkawdkadwkd dawkawd akwdkaw dawkd wa dwakd",
+                            imageUrl = "https://example.com/image.jpg",
+                            language = LanguageType.ENGLISH
+                        )
                     ),
-                    startedAtEpochSeconds = 0,
-                    durationSeconds = 1800
+                    startedAt = 1633072800L,
+                    endedAt = 1633076400L,
+                    durationSeconds = 12001,
+                    memo = "",
+                    isLiked = false
                 ),
                 CallHistory(
-                    callId = "5566778899",
-                    partner = Participant(
-                        userId = "2233445566",
-                        displayName = "Bob Brown",
-                        imageUrl = null,
-                        language = LanguageType.ENGLISH
+                    historyId = "12348",
+                    title = "Sample Call History Title",
+                    summary = "This is a sample call history summary that is quite long and should be truncated if it exceeds the maximum line limit.",
+                    participants = persistentListOf(
+                        Participant(
+                            userId = "67890",
+                            displayName = "John Doe dwaafwojfdkawdkadwkd dawkawd akwdkaw dawkd wa dwakd",
+                            imageUrl = "https://example.com/image.jpg",
+                            language = LanguageType.ENGLISH
+                        )
                     ),
-                    startedAtEpochSeconds = 0,
-                    durationSeconds = 5400
-                )
+                    startedAt = 1633072800L,
+                    endedAt = 1633076400L,
+                    durationSeconds = 12001,
+                    memo = "",
+                    isLiked = false
+                ),
             ),
         ),
-        onClickCallAgain = {},
         onClickHistoryMore = {},
         onClickStartCall = {},
         onClickJoinCall = {}

@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -64,7 +65,6 @@ internal fun HomeRoute(
 
     HomeScreen(
         state = state,
-        onClickCallAgain = viewModel::onClickCallAgain,
         onClickHistoryMore = viewModel::onClickHistoryMore,
         onClickStartCall = viewModel::onClickStartCall,
         onClickJoinCall = viewModel::onClickJoinCall,
@@ -81,7 +81,6 @@ internal fun HomeRoute(
 @Composable
 internal fun HomeScreen(
     state: HomeState,
-    onClickCallAgain: (String) -> Unit,
     onClickHistoryMore: () -> Unit,
     onClickStartCall: () -> Unit,
     onClickJoinCall: () -> Unit,
@@ -138,7 +137,6 @@ internal fun HomeScreen(
                 .fillMaxWidth(),
             previewMaxSize = state.callHistoryPreviewMaxSize,
             callHistoryList = state.callHistoryList,
-            onClickCallAgain = onClickCallAgain,
             onClickHistoryMore = onClickHistoryMore,
             onClickStartCall = onClickStartCall,
             onClickJoinCall = onClickJoinCall
@@ -156,7 +154,7 @@ private fun HomeHeader(
     ) {
         Image(
             modifier = Modifier
-                .size(36.dp),
+                .size(28.dp),
             painter = painterResource(R.drawable.ic_home),
             contentDescription = null
         )
@@ -167,13 +165,9 @@ private fun HomeHeader(
             text = stringResource(R.string.app_name),
             modifier = Modifier.weight(1f),
             color = Colors.Black,
-            style = Typography.displayMedium
-        )
-
-        Icon(
-            modifier = Modifier.size(28.dp),
-            painter = painterResource(R.drawable.ic_home),
-            contentDescription = null
+            style = Typography.titleLarge.copy(
+                fontWeight = FontWeight.W600
+            )
         )
     }
 }
@@ -184,12 +178,8 @@ private fun ProfileCard(
     myInfo: MyInfo
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                Brush.horizontalGradient(
-                    listOf(Colors.PrimaryLight, Colors.FF50A7F3)
-                ),
+        modifier = modifier.background(
+                Brush.horizontalGradient(listOf(Colors.PrimaryLight, Colors.FF50A7F3)),
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(horizontal = 12.dp, vertical = 16.dp),
@@ -197,7 +187,8 @@ private fun ProfileCard(
     ) {
         CircleAsyncImage(
             imageUrl = myInfo.imageUrl,
-            size = 68.dp
+            size = 68.dp,
+            placeholder = painterResource(R.drawable.ic_person)
         )
 
         HorizontalSpacer(12.dp)
@@ -238,7 +229,6 @@ private fun HomeBody(
     modifier: Modifier,
     previewMaxSize: Int,
     callHistoryList: ImmutableList<CallHistory>,
-    onClickCallAgain: (String) -> Unit,
     onClickHistoryMore: () -> Unit,
     onClickStartCall: () -> Unit,
     onClickJoinCall: () -> Unit,
@@ -280,7 +270,6 @@ private fun HomeBody(
 
         CallHistorySection(
             callHistoryList = callHistoryList,
-            onClickCallAgain = onClickCallAgain,
             onClickHistoryMore = onClickHistoryMore,
             previewMaxSize = previewMaxSize
         )
@@ -291,13 +280,12 @@ private fun HomeBody(
 @Composable
 private fun ColumnScope.CallHistorySection(
     callHistoryList: ImmutableList<CallHistory>,
-    onClickCallAgain: (String) -> Unit,
     onClickHistoryMore: () -> Unit,
     previewMaxSize: Int,
 ) {
     callHistoryList.take(previewMaxSize).forEach { call ->
-        key(call.callId) {
-            CallHistoryItem(call, onClickCallAgain = onClickCallAgain)
+        key(call.historyId) {
+            CallHistoryItem(call)
 
             VerticalSpacer(8.dp)
         }
