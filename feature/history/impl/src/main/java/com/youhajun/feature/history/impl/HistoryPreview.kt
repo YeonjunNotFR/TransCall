@@ -1,5 +1,6 @@
 package com.youhajun.feature.history.impl
 
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.youhajun.core.model.LanguageType
@@ -27,8 +28,8 @@ internal fun HistoryPreview() {
                                 language = LanguageType.ENGLISH
                             )
                         ),
-                        startedAt = 1633072800L,
-                        endedAt = 1633076400L,
+                        startedAtToEpochTime = 1633072800L,
+                        endedAtToEpochTime = 1633076400L,
                         durationSeconds = 12001,
                         memo = "",
                         isLiked = false
@@ -45,8 +46,8 @@ internal fun HistoryPreview() {
                                 language = LanguageType.SPANISH
                             )
                         ),
-                        startedAt = 1633072800L,
-                        endedAt = 1633076400L,
+                        startedAtToEpochTime = 1633072800L,
+                        endedAtToEpochTime = 1633076400L,
                         durationSeconds = 600,
                         memo = "This is a memo for the second call history.",
                         isLiked = true
@@ -65,8 +66,8 @@ internal fun HistoryPreview() {
                                 language = LanguageType.SPANISH
                             )
                         ),
-                        startedAt = 1633072800L,
-                        endedAt = 1633076400L,
+                        startedAtToEpochTime = 1633072800L,
+                        endedAtToEpochTime = 1633076400L,
                         durationSeconds = 300,
                         memo = "This is a memo for the third call history.",
                         isLiked = false
@@ -74,6 +75,7 @@ internal fun HistoryPreview() {
                 )
             ),
         ),
+        historyListState = rememberLazyListState(),
         onClickDateRange = {},
     )
 }

@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +34,7 @@ import com.youhajun.transcall.core.ui.components.LazyBackgroundColumn
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.history.CallHistoryItem
 import com.youhajun.transcall.core.ui.components.history.DateRangeRow
+import com.youhajun.transcall.core.ui.components.paging.PagingComp
 import com.youhajun.transcall.core.ui.util.DateFormatPatterns
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -50,8 +53,12 @@ internal fun HistoryRoute(
         }
     }
 
+    val lazyListState = rememberLazyListState()
+    PagingComp(lazyListState, onLoadMore = viewModel::onHistoryNextPage)
+
     HistoryScreen(
         state = state,
+        historyListState = lazyListState,
         onClickDateRange = viewModel::onClickDateRange,
     )
 }
@@ -59,6 +66,7 @@ internal fun HistoryRoute(
 @Composable
 internal fun HistoryScreen(
     state: HistoryState,
+    historyListState: LazyListState,
     onClickDateRange: (DateRange) -> Unit,
 ) {
     Column(
@@ -74,6 +82,7 @@ internal fun HistoryScreen(
         VerticalSpacer(8.dp)
 
         HistoryBody(
+            historyListState = historyListState,
             callHistoryMap = state.callHistoryDateMap,
             selectedDateRange = state.selectedDateRange,
             onClickDateRange = onClickDateRange
@@ -101,6 +110,7 @@ private fun HistoryHeader() {
 
 @Composable
 private fun ColumnScope.HistoryBody(
+    historyListState: LazyListState,
     selectedDateRange: DateRange,
     onClickDateRange: (DateRange) -> Unit,
     callHistoryMap: ImmutableMap<String, ImmutableList<CallHistory>>,
@@ -115,14 +125,17 @@ private fun ColumnScope.HistoryBody(
 
     CallHistoryLazyColumn(
         callHistoryMap = callHistoryMap,
+        state = historyListState
     )
 }
 
 @Composable
 private fun ColumnScope.CallHistoryLazyColumn(
     callHistoryMap: ImmutableMap<String, ImmutableList<CallHistory>>,
+    state: LazyListState,
 ) {
     LazyColumn(
+        state = state,
         modifier = Modifier
             .fillMaxWidth()
             .weight(1f),

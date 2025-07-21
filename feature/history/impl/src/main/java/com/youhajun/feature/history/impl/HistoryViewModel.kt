@@ -2,10 +2,10 @@ package com.youhajun.feature.history.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youhajun.core.model.calling.CallHistory
 import com.youhajun.core.model.DateRange
-import com.youhajun.core.model.pagination.OffsetPageRequest
-import com.youhajun.core.model.pagination.OffsetPagingState
+import com.youhajun.core.model.calling.CallHistory
+import com.youhajun.core.model.pagination.CursorPageRequest
+import com.youhajun.core.model.pagination.CursorPagingState
 import com.youhajun.domain.history.usecase.GetHistoryListUseCase
 import com.youhajun.transcall.core.ui.util.DateFormatPatterns
 import com.youhajun.transcall.core.ui.util.toUiDateString
@@ -31,9 +31,8 @@ class HistoryViewModel @Inject constructor(
         onInit()
     }
 
-    private var pagingState = OffsetPagingState(
-        request = OffsetPageRequest(offset = 0, limit = CALL_HISTORY_SIZE_PER_PAGE),
-        isLastPage = false
+    private var historyPagingState = CursorPagingState(
+        request = CursorPageRequest(first = CALL_HISTORY_SIZE_PER_PAGE)
     )
 
     fun onHistoryNextPage() {
@@ -55,12 +54,15 @@ class HistoryViewModel @Inject constructor(
     }
 
     private suspend fun getHistoryList() {
-        if (pagingState.canLoadMore()) return
-        getHistoryListUseCase(pagingState.request).onSuccess { historyList ->
-            val newHistoryMap = groupByDate(historyList.data)
+        if (historyPagingState.canLoadMore()) return
+        val isFirstCall = historyPagingState.isFirstCall()
+        getHistoryListUseCase(historyPagingState.request).onSuccess {
+            historyPagingState = historyPagingState.next(it)
+        }.map { it.edges.map { it.node } }.onSuccess {
+            val newHistoryMap = groupByDate(it)
             val oldHistoryMap = container.stateFlow.value.callHistoryDateMap
-            val mergedMap = if(pagingState.isFirstCall()) newHistoryMap else getMergedHistoryMap(oldHistoryMap, newHistoryMap)
-            pagingState = pagingState.next(historyList)
+            val mergedMap = if(isFirstCall) newHistoryMap else getMergedHistoryMap(oldHistoryMap, newHistoryMap)
+
             intent {
                 reduce { state.copy(callHistoryDateMap = mergedMap.toImmutableMap()) }
             }
@@ -84,7 +86,7 @@ class HistoryViewModel @Inject constructor(
 
     private fun groupByDate(historyList: List<CallHistory>): Map<String, ImmutableList<CallHistory>> {
         return historyList
-            .groupBy { it.startedAt.toUiDateString(DateFormatPatterns.DATE_ONLY) }
+            .groupBy { it.startedAtToEpochTime.toUiDateString(DateFormatPatterns.DATE_ONLY) }
             .mapValues { it.value.toImmutableList() }
     }
 
