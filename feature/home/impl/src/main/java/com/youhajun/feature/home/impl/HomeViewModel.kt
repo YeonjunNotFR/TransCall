@@ -3,7 +3,7 @@ package com.youhajun.feature.home.impl
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.youhajun.core.model.pagination.OffsetPageRequest
+import com.youhajun.core.model.pagination.CursorPageRequest
 import com.youhajun.core.route.NavigationEvent
 import com.youhajun.domain.history.usecase.GetHistoryListUseCase
 import com.youhajun.domain.room.usecase.CreateRoomUseCase
@@ -92,14 +92,11 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun getHistoryList() {
-        val request = OffsetPageRequest(
-            offset = 0,
-            limit = CALL_HISTORY_PREVIEW_MAX_SIZE + 1
-        )
-
+        val request = CursorPageRequest(first = 3)
         getHistoryListUseCase(request).onSuccess { historyList ->
+            val histories = historyList.edges.map { it.node }.toImmutableList()
             intent {
-                reduce { state.copy(callHistoryList = historyList.data.toImmutableList()) }
+                reduce { state.copy(callHistoryList = histories) }
             }
         }
     }

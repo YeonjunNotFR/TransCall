@@ -23,7 +23,6 @@ internal fun HomePreview() {
                 remainTime = RemainTime(
                     remainingSeconds = 3600,
                     resetAtEpochSeconds = 0,
-                    dailyLimitSeconds = null
                 ),
                 language = LanguageType.ENGLISH
             ),
@@ -41,8 +40,8 @@ internal fun HomePreview() {
                             language = LanguageType.ENGLISH
                         )
                     ),
-                    startedAt = 1633072800L,
-                    endedAt = 1633076400L,
+                    startedAtToEpochTime = 1633072800L,
+                    endedAtToEpochTime = 1633076400L,
                     durationSeconds = 12001,
                     memo = "",
                     isLiked = false
@@ -59,8 +58,8 @@ internal fun HomePreview() {
                             language = LanguageType.ENGLISH
                         )
                     ),
-                    startedAt = 1633072800L,
-                    endedAt = 1633076400L,
+                    startedAtToEpochTime = 1633072800L,
+                    endedAtToEpochTime = 1633076400L,
                     durationSeconds = 12001,
                     memo = "",
                     isLiked = false
@@ -77,8 +76,8 @@ internal fun HomePreview() {
                             language = LanguageType.ENGLISH
                         )
                     ),
-                    startedAt = 1633072800L,
-                    endedAt = 1633076400L,
+                    startedAtToEpochTime = 1633072800L,
+                    endedAtToEpochTime = 1633076400L,
                     durationSeconds = 12001,
                     memo = "",
                     isLiked = false
@@ -95,8 +94,8 @@ internal fun HomePreview() {
                             language = LanguageType.ENGLISH
                         )
                     ),
-                    startedAt = 1633072800L,
-                    endedAt = 1633076400L,
+                    startedAtToEpochTime = 1633072800L,
+                    endedAtToEpochTime = 1633076400L,
                     durationSeconds = 12001,
                     memo = "",
                     isLiked = false
