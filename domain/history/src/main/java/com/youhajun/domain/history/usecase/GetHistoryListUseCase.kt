@@ -2,8 +2,8 @@ package com.youhajun.domain.history.usecase
 
 import com.youhajun.core.model.calling.CallHistory
 import com.youhajun.core.model.filter.DateRangeFilter
-import com.youhajun.core.model.pagination.OffsetPage
-import com.youhajun.core.model.pagination.OffsetPageRequest
+import com.youhajun.core.model.pagination.CursorPage
+import com.youhajun.core.model.pagination.CursorPageRequest
 import com.youhajun.domain.history.HistoryRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,9 +13,9 @@ class GetHistoryListUseCase @Inject constructor(
     private val repository: HistoryRepository
 ) {
     suspend operator fun invoke(
-        request: OffsetPageRequest,
+        request: CursorPageRequest,
         range: DateRangeFilter? = null
-    ): Result<OffsetPage<CallHistory>> {
+    ): Result<CursorPage<CallHistory>> {
         return repository.getHistoryList(request, range)
     }
 }
