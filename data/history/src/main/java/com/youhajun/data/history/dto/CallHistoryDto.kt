@@ -17,10 +17,10 @@ internal data class CallHistoryDto(
     val memo: String = "",
     @SerialName("isLiked")
     val isLiked: Boolean = false,
-    @SerialName("startedAt")
-    val startedAt: Long = 0,
-    @SerialName("endedAt")
-    val endedAt: Long = 0,
+    @SerialName("startedAtToEpochTime")
+    val startedAtToEpochTime: Long = 0,
+    @SerialName("endedAtToEpochTime")
+    val endedAtToEpochTime: Long = 0,
     @SerialName("durationSeconds")
     val durationSeconds: Int = 0,
     @SerialName("participants")
@@ -30,8 +30,8 @@ internal data class CallHistoryDto(
         historyId = historyId,
         title = title,
         summary = summary,
-        startedAt = startedAt,
-        endedAt = endedAt,
+        startedAtToEpochTime = startedAtToEpochTime,
+        endedAtToEpochTime = endedAtToEpochTime,
         durationSeconds = durationSeconds,
         participants = participants.map { it.toModel() }.toImmutableList(),
         memo = memo,
