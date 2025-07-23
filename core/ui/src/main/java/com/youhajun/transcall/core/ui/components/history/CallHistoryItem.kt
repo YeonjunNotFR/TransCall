@@ -108,7 +108,7 @@ fun CallHistoryItem(
             HorizontalSpacer(10.dp)
 
             Text(
-                text = callHistory.startedAt.toUiDateString(createdAtDateFormat),
+                text = callHistory.startedAtToEpochTime.toUiDateString(createdAtDateFormat),
                 color = Colors.Gray700,
                 style = Typography.bodySmall,
                 modifier = Modifier.alignByBaseline()
@@ -173,8 +173,8 @@ private fun CallHistoryFullDateItemPreview() {
                     language = LanguageType.ENGLISH
                 )
             ),
-            startedAt = 1633072800L,
-            endedAt = 1633076400L,
+            startedAtToEpochTime = 1633072800L,
+            endedAtToEpochTime = 1633076400L,
             durationSeconds = 12001,
             memo = "coapepock",
             isLiked = true
