@@ -1,10 +1,9 @@
 package com.youhajun.core.model
 
 data class RemainTime(
-    val remainingSeconds: Int = 0,
+    val remainingSeconds: Long = 0,
     val resetAtEpochSeconds: Long = 0,
-    val dailyLimitSeconds: Int? = null
 ) {
-    val remainingMinutes: Int
+    val remainingMinutes: Long
         get() = remainingSeconds / 60
 }

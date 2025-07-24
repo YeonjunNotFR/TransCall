@@ -9,8 +9,8 @@ data class CallHistory(
     val memo: String,
     val summary: String,
     val isLiked: Boolean,
-    val startedAt: Long,
-    val endedAt: Long,
+    val startedAtToEpochTime: Long,
+    val endedAtToEpochTime: Long,
     val durationSeconds: Int,
     val participants: ImmutableList<Participant>,
 )
