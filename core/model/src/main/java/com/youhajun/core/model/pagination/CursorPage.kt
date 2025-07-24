@@ -1,17 +1,17 @@
 package com.youhajun.core.model.pagination
 
 data class CursorPage<T>(
-    val edges: List<Node<T>> = emptyList(),
-    val pageInfo: PageInfo? = null,
-    val totalCount: Int? = null
+    val edges: List<Node<T>>,
+    val pageInfo: PageInfo,
+    val totalCount: Int
 )
 
 data class Node<T>(
-    val node: T? = null,
-    val cursor: String? = null
+    val node: T,
+    val cursor: String
 )
 
 data class PageInfo(
-    val hasNextPage: Boolean? = null,
-    val nextCursor: String? = null
+    val hasNextPage: Boolean,
+    val nextCursor: String
 )
