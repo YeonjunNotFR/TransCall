@@ -28,11 +28,5 @@ enum class MainTab(
             entries.firstOrNull { entry ->
                 hierarchy.any { it.hasRoute(entry.route::class) }
             }
-
-        fun find(route: TransCallRoute): MainTab? =
-            entries.firstOrNull { it.route == route }
-
-        operator fun contains(route: TransCallRoute): Boolean =
-            entries.any { it.route == route }
     }
 }
