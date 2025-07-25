@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
@@ -49,6 +49,7 @@ fun MultipleCircleProfileImage(
                 model = url,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
+                error = painterResource(id = R.drawable.ic_person),
                 placeholder = painterResource(id = R.drawable.ic_person),
                 modifier = Modifier
                     .noRippleClickable { onClick(index) }

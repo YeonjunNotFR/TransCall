@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
@@ -57,6 +57,7 @@ fun DefaultVideoPlaceHolder(
         AsyncImage(
             model = participant?.imageUrl,
             contentDescription = null,
+            error = painterResource(id = R.drawable.ic_person),
             placeholder = painterResource(id = R.drawable.ic_person),
             modifier = Modifier
                 .fillMaxWidth(0.6f)
