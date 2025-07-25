@@ -11,13 +11,15 @@ data class CursorPageDto<T>(
     @SerialName("edges")
     val edges: List<NodeDto<T>> = emptyList(),
     @SerialName("pageInfo")
-    val pageInfo: PageInfoDto? = null,
+    val pageInfo: PageInfoDto = PageInfoDto(),
     @SerialName("totalCount")
-    val totalCount: Int? = null
+    val totalCount: Int = -1
 ) {
     fun <M> toModel(mapper: (T) -> M): CursorPage<M> = CursorPage(
-        edges = edges.map { Node(it.node?.let(mapper), it.cursor) },
-        pageInfo = pageInfo?.let { PageInfo(it.hasNextPage, it.nextCursor) },
+        edges = edges.mapNotNull { nodeDto ->
+            nodeDto.node?.let { Node(node = mapper(it), cursor = nodeDto.cursor) }
+        },
+        pageInfo = PageInfo(pageInfo.hasNextPage, pageInfo.nextCursor),
         totalCount = totalCount
     )
 }
@@ -27,13 +29,13 @@ data class NodeDto<T>(
     @SerialName("node")
     val node: T? = null,
     @SerialName("cursor")
-    val cursor: String? = null
+    val cursor: String = ""
 )
 
 @Serializable
 data class PageInfoDto(
     @SerialName("hasNextPage")
-    val hasNextPage: Boolean? = null,
+    val hasNextPage: Boolean = false,
     @SerialName("nextCursor")
-    val nextCursor: String? = null
+    val nextCursor: String = ""
 )
