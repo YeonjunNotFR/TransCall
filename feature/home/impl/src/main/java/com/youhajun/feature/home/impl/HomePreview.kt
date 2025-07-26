@@ -107,3 +107,27 @@ internal fun HomePreview() {
         onClickJoinCall = {}
     )
 }
+
+@Preview(showBackground = true)
+@Composable
+internal fun HomePreviewEmpty() {
+    HomeScreen(
+        state = HomeState(
+            myInfo = MyInfo(
+                userId = "1234567890",
+                displayName = "John Doe",
+                imageUrl = "https://example.com/profile.jpg",
+                membershipPlan = MembershipPlan.Free,
+                remainTime = RemainTime(
+                    remainingSeconds = 3600,
+                    resetAtEpochSeconds = 0,
+                ),
+                language = LanguageType.ENGLISH
+            ),
+            callHistoryPreviewMaxSize = 3,
+        ),
+        onClickHistoryMore = {},
+        onClickStartCall = {},
+        onClickJoinCall = {}
+    )
+}

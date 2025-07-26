@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -21,7 +23,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,13 +36,13 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
 import com.youhajun.core.model.calling.CallHistory
 import com.youhajun.core.model.user.MyInfo
 import com.youhajun.core.route.NavigationEvent
-import com.youhajun.transcall.core.ui.components.CircleAsyncImage
 import com.youhajun.transcall.core.ui.components.FilledActionButton
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.MembershipBadge
@@ -85,7 +89,11 @@ internal fun HomeScreen(
     onClickStartCall: () -> Unit,
     onClickJoinCall: () -> Unit,
 ) {
-    ConstraintLayout(modifier = Modifier.fillMaxSize().background(Colors.White)) {
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Colors.White)
+    ) {
         val (background, topRow, profileCenter, profileCard, bodyColumn) = createRefs()
 
         Box(
@@ -178,17 +186,23 @@ private fun ProfileCard(
     myInfo: MyInfo
 ) {
     Row(
-        modifier = modifier.background(
+        modifier = modifier
+            .background(
                 Brush.horizontalGradient(listOf(Colors.PrimaryLight, Colors.FF50A7F3)),
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(horizontal = 12.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CircleAsyncImage(
-            imageUrl = myInfo.imageUrl,
-            size = 68.dp,
-            placeholder = painterResource(R.drawable.ic_person)
+        AsyncImage(
+            model = myInfo.imageUrl,
+            contentDescription = null,
+            placeholder = painterResource(R.drawable.ic_person),
+            error = painterResource(R.drawable.ic_person),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(68.dp)
         )
 
         HorizontalSpacer(12.dp)
@@ -268,11 +282,27 @@ private fun HomeBody(
 
         VerticalSpacer(8.dp)
 
-        CallHistorySection(
-            callHistoryList = callHistoryList,
-            onClickHistoryMore = onClickHistoryMore,
-            previewMaxSize = previewMaxSize
-        )
+        if (callHistoryList.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .background(Colors.Gray100, shape = RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.home_call_history_empty),
+                    color = Colors.Gray500,
+                    style = Typography.bodyLarge
+                )
+            }
+        } else {
+            CallHistorySection(
+                callHistoryList = callHistoryList,
+                onClickHistoryMore = onClickHistoryMore,
+                previewMaxSize = previewMaxSize
+            )
+        }
     }
 }
 
@@ -293,7 +323,9 @@ private fun ColumnScope.CallHistorySection(
 
     if (callHistoryList.size > previewMaxSize) {
         Row(
-            modifier = Modifier.align(Alignment.End).noRippleClickable(onClick = onClickHistoryMore),
+            modifier = Modifier
+                .align(Alignment.End)
+                .noRippleClickable(onClick = onClickHistoryMore),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -319,4 +351,10 @@ private fun ColumnScope.CallHistorySection(
 @Preview(showBackground = false)
 private fun HomePreviewMirror() {
     HomePreview()
+}
+
+@Composable
+@Preview(showBackground = false)
+private fun HomePreviewEmptyMirror() {
+    HomePreviewEmpty()
 }

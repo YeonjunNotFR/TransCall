@@ -8,6 +8,7 @@ import com.youhajun.core.route.NavigationEvent
 import com.youhajun.domain.history.usecase.GetHistoryListUseCase
 import com.youhajun.domain.room.usecase.CreateRoomUseCase
 import com.youhajun.domain.room.usecase.JoinRoomUseCase
+import com.youhajun.domain.user.usecase.GetMyInfoUseCase
 import com.youhajun.feature.history.api.HistoryNavRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -23,14 +24,13 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
+    private val getMyInfoUseCase: GetMyInfoUseCase,
     private val createRoomUseCase: CreateRoomUseCase,
     private val joinRoomUseCase: JoinRoomUseCase,
     private val getHistoryListUseCase: GetHistoryListUseCase,
 ) : ContainerHost<HomeState, HomeSideEffect>, ViewModel() {
 
-    override val container: Container<HomeState, HomeSideEffect> = container(HomeState(
-        callHistoryPreviewMaxSize = CALL_HISTORY_PREVIEW_MAX_SIZE,
-    )) {
+    override val container: Container<HomeState, HomeSideEffect> = container(HomeState(callHistoryPreviewMaxSize = CALL_HISTORY_PREVIEW_MAX_SIZE,)) {
         onInit()
     }
 
@@ -53,12 +53,7 @@ class HomeViewModel @Inject constructor(
 
     fun onClickHistoryMore() {
         intent {
-            postSideEffect(HomeSideEffect.Navigation(
-                NavigationEvent.NavigateBottomBar(
-                    route = HistoryNavRoute.HistoryList,
-                    launchSingleTop = true
-                )
-            ))
+            postSideEffect(HomeSideEffect.Navigation(NavigationEvent.NavigateBottomBar(route = HistoryNavRoute.HistoryList, launchSingleTop = true)))
         }
     }
 
@@ -86,17 +81,24 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun onInit() {
-        viewModelScope.launch {
-            getHistoryList()
-        }
+        getHistoryList()
+        getMyInfo()
     }
 
-    private suspend fun getHistoryList() {
+    private fun getHistoryList() = viewModelScope.launch {
         val request = CursorPageRequest(first = 3)
         getHistoryListUseCase(request).onSuccess { historyList ->
             val histories = historyList.edges.map { it.node }.toImmutableList()
             intent {
                 reduce { state.copy(callHistoryList = histories) }
+            }
+        }
+    }
+
+    private fun getMyInfo() = viewModelScope.launch {
+        getMyInfoUseCase().onSuccess {
+            intent {
+                reduce { state.copy(myInfo = it) }
             }
         }
     }
