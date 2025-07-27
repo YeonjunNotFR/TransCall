@@ -13,6 +13,7 @@ dependencies {
     implementation(projects.domain.user)
     implementation(projects.core.network)
     implementation(projects.core.model)
+    implementation(projects.core.datastore)
     implementation(libs.bundles.ktor)
     implementation(libs.bundles.dataStore)
     implementation(libs.kotlinx.collections.immutable)
