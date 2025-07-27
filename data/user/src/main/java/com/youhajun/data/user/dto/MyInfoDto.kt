@@ -24,6 +24,7 @@ internal data class MyInfoDto(
     fun toModel(): MyInfo = MyInfo(
         userId = userId,
         displayName = displayName,
+        imageUrl = imageUrl ?: "",
         language = LanguageType.fromCode(language),
         membershipPlan = MembershipPlan.fromId(membershipPlan),
         remainTime = remainTime.toModel(),

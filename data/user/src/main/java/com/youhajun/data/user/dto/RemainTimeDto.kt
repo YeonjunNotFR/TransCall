@@ -7,15 +7,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class RemainTimeDto(
     @SerialName("remainingSeconds")
-    val remainingSeconds: Int = 0,
+    val remainingSeconds: Long = 0,
     @SerialName("resetAtEpochSeconds")
     val resetAtEpochSeconds: Long = 0,
-    @SerialName("dailyLimitSeconds")
-    val dailyLimitSeconds: Int? = null
 ) {
     fun toModel(): RemainTime = RemainTime(
         remainingSeconds = remainingSeconds,
         resetAtEpochSeconds = resetAtEpochSeconds,
-        dailyLimitSeconds = dailyLimitSeconds,
     )
 }

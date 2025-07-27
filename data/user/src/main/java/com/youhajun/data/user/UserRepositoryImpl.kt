@@ -5,7 +5,8 @@ import com.youhajun.domain.user.UserRepository
 import javax.inject.Inject
 
 internal class UserRepositoryImpl @Inject constructor(
-    private val remote: UserRemoteDataSource
+    private val remote: UserRemoteDataSource,
+    private val local: UserLocalDataSource
 ): UserRepository {
     override suspend fun getMyInfo(): Result<MyInfo> = runCatching {
         remote.getMyInfo().toModel()

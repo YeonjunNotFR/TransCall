@@ -1,5 +1,7 @@
 package com.youhajun.data.user.di
 
+import com.youhajun.data.user.UserLocalDataSource
+import com.youhajun.data.user.UserLocalDataSourceImpl
 import com.youhajun.data.user.UserRemoteDataSource
 import com.youhajun.data.user.UserRemoteDataSourceImpl
 import com.youhajun.data.user.UserRepositoryImpl
@@ -19,6 +21,12 @@ internal interface UserDataModule {
     fun bindUserRemoteDataSource(
         remote: UserRemoteDataSourceImpl
     ): UserRemoteDataSource
+
+    @Singleton
+    @Binds
+    fun bindUserLocalDataSource(
+        local: UserLocalDataSourceImpl
+    ): UserLocalDataSource
 
     @Singleton
     @Binds
