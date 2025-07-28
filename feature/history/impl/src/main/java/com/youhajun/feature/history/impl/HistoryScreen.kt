@@ -117,7 +117,6 @@ private fun ColumnScope.HistoryBody(
 ) {
     DateRangeRow(
         selectedDateRange = selectedDateRange,
-        indicatorColor = Colors.FF60A5FA,
         onClick = onClickDateRange,
     )
 
