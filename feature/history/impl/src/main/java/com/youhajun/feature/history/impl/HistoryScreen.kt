@@ -141,7 +141,7 @@ private fun ColumnScope.CallHistoryLazyColumn(
             .weight(1f),
     ) {
         callHistoryMap.forEach { (date, callHistories) ->
-            stickyHeader {
+            stickyHeader(key = date) {
                 LazyBackgroundColumn(
                     isFirst = true,
                     isLast = false,
@@ -159,7 +159,10 @@ private fun ColumnScope.CallHistoryLazyColumn(
                 }
             }
 
-            itemsIndexed(callHistories) { idx, callHistory ->
+            itemsIndexed(
+                items = callHistories,
+                key = { index, callHistory -> callHistory.historyId }
+            ) { idx, callHistory ->
                 val isLast = idx == callHistories.lastIndex
 
                 LazyBackgroundColumn(

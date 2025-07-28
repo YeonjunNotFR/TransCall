@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,20 +46,22 @@ fun MultipleCircleProfileImage(
 
     Row(modifier = modifier) {
         imageUrls.take(visibleCount).forEachIndexed { index, url ->
-            AsyncImage(
-                model = url,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                error = painterResource(id = R.drawable.ic_person),
-                placeholder = painterResource(id = R.drawable.ic_person),
-                modifier = Modifier
-                    .noRippleClickable { onClick(index) }
-                    .zIndex(index.toFloat())
-                    .offset(x = (-index * overlap))
-                    .size(circleSize)
-                    .clip(CircleShape)
-                    .border(circleBorderWidth, circleBorderColor, CircleShape)
-            )
+            key(index) {
+                AsyncImage(
+                    model = url,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(id = R.drawable.ic_person),
+                    placeholder = painterResource(id = R.drawable.ic_person),
+                    modifier = Modifier
+                        .noRippleClickable { onClick(index) }
+                        .zIndex(index.toFloat())
+                        .offset(x = (-index * overlap))
+                        .size(circleSize)
+                        .clip(CircleShape)
+                        .border(circleBorderWidth, circleBorderColor, CircleShape)
+                )
+            }
         }
 
         if (overflowCount > 0) {

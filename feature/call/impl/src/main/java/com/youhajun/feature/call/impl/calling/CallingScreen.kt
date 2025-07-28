@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -315,21 +316,25 @@ private fun CallingGridScreenType(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             val columns = if (callUserUiList.size <= 2) 1 else GRID_COLUMN_COUNT
-            callUserUiList.chunked(columns).forEach { rowUsers ->
-                Row(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    rowUsers.forEach { user ->
-                        Box(modifier = Modifier
+            callUserUiList.chunked(columns).forEachIndexed { idx, rowUsers ->
+                key("row_$idx") {
+                    Row(
+                        modifier = Modifier
                             .weight(1f)
-                            .fillMaxHeight()) {
-                            CallingGridTypeTile(
-                                callUserUiModel = user,
-                                onDoubleTapGrid = onDoubleTapGrid
-                            )
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        rowUsers.forEach { user ->
+                            key(user.mediaKey) {
+                                Box(modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()) {
+                                    CallingGridTypeTile(
+                                        callUserUiModel = user,
+                                        onDoubleTapGrid = onDoubleTapGrid
+                                    )
+                                }
+                            }
                         }
                     }
                 }
