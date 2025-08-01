@@ -49,8 +49,8 @@ import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.modifier.bottomBorder
 import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import com.youhajun.transcall.core.ui.components.room.RoomVisibilityRow
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentSetOf
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
@@ -109,6 +109,7 @@ internal fun CreateRoomScreen(
             selectedMaxParticipantCount = state.selectedMaxParticipantCount,
             selectVisibility = state.selectedRoomVisibility,
             tags = state.tags,
+            maxTagCount = state.maxTagCount,
             onTitleInputTextChanged = onTitleInputTextChanged,
             onTagInputTextChanged = onTagInputTextChanged,
             onClickParticipantCount = onClickParticipantCount,
@@ -160,7 +161,8 @@ private fun ColumnScope.CreateRoomBody(
     maxParticipantCount: Int,
     selectedMaxParticipantCount: Int,
     selectVisibility: RoomVisibility,
-    tags: ImmutableList<String>,
+    tags: ImmutableSet<String>,
+    maxTagCount: Int,
     onTitleInputTextChanged: (TextFieldValue) -> Unit,
     onTagInputTextChanged: (TextFieldValue) -> Unit,
     onClickParticipantCount: (Int) -> Unit,
@@ -203,6 +205,7 @@ private fun ColumnScope.CreateRoomBody(
         TagSection(
             tags = tags,
             tagTextField = tagTextField,
+            maxTagCount = maxTagCount,
             onTagInputTextChanged = onTagInputTextChanged,
             onTagInsert = onTagInsert,
             onTagDelete = onTagDelete
@@ -350,14 +353,15 @@ private fun VisibilitySection(
 
 @Composable
 private fun TagSection(
-    tags: ImmutableList<String>,
+    tags: ImmutableSet<String>,
     tagTextField: TextFieldValue,
+    maxTagCount: Int,
     onTagInputTextChanged: (TextFieldValue) -> Unit,
     onTagInsert: () -> Unit,
     onTagDelete: (String) -> Unit
 ) {
     Text(
-        text = stringResource(R.string.create_room_tag_text),
+        text = stringResource(R.string.create_room_tag_text, maxTagCount),
         style = Typography.bodyMedium,
         fontWeight = FontWeight.W600,
         color = Colors.Black,
@@ -467,7 +471,8 @@ private fun CreateRoomPreview() {
             maxParticipantCount = 8,
             selectedMaxParticipantCount = 2,
             selectedRoomVisibility = RoomVisibility.PUBLIC,
-            tags = persistentListOf("Tag1", "Tag2")
+            tags = persistentSetOf("Tag1", "Tag2"),
+            maxTagCount = 8,
         ),
         titleTextField = TextFieldValue("Room Title"),
         tagTextField = TextFieldValue("Tag1, Tag2"),
