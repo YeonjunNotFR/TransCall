@@ -70,7 +70,7 @@ internal fun HomeRoute(
     HomeScreen(
         state = state,
         onClickHistoryMore = viewModel::onClickHistoryMore,
-        onClickStartCall = viewModel::onClickStartCall,
+        onClickCreateRoom = viewModel::onClickCreateRoom,
         onClickJoinCall = viewModel::onClickJoinCall,
     )
 
@@ -86,7 +86,7 @@ internal fun HomeRoute(
 internal fun HomeScreen(
     state: HomeState,
     onClickHistoryMore: () -> Unit,
-    onClickStartCall: () -> Unit,
+    onClickCreateRoom: () -> Unit,
     onClickJoinCall: () -> Unit,
 ) {
     ConstraintLayout(
@@ -146,7 +146,7 @@ internal fun HomeScreen(
             previewMaxSize = state.callHistoryPreviewMaxSize,
             callHistoryList = state.callHistoryList,
             onClickHistoryMore = onClickHistoryMore,
-            onClickStartCall = onClickStartCall,
+            onClickCreateRoom = onClickCreateRoom,
             onClickJoinCall = onClickJoinCall
         )
     }
@@ -244,7 +244,7 @@ private fun HomeBody(
     previewMaxSize: Int,
     callHistoryList: ImmutableList<CallHistory>,
     onClickHistoryMore: () -> Unit,
-    onClickStartCall: () -> Unit,
+    onClickCreateRoom: () -> Unit,
     onClickJoinCall: () -> Unit,
 ) {
     Column(
@@ -257,7 +257,7 @@ private fun HomeBody(
             contentColor = Colors.White,
             paddingValues = PaddingValues(12.dp),
             iconSize = 34.dp,
-            onClick = onClickStartCall,
+            onClick = onClickCreateRoom,
         )
 
         VerticalSpacer(12.dp)

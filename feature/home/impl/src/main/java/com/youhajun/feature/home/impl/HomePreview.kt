@@ -103,7 +103,7 @@ internal fun HomePreview() {
             ),
         ),
         onClickHistoryMore = {},
-        onClickStartCall = {},
+        onClickCreateRoom = {},
         onClickJoinCall = {}
     )
 }
@@ -127,7 +127,7 @@ internal fun HomePreviewEmpty() {
             callHistoryPreviewMaxSize = 3,
         ),
         onClickHistoryMore = {},
-        onClickStartCall = {},
+        onClickCreateRoom = {},
         onClickJoinCall = {}
     )
 }

@@ -10,6 +10,7 @@ import com.youhajun.domain.room.usecase.CreateRoomUseCase
 import com.youhajun.domain.room.usecase.JoinRoomUseCase
 import com.youhajun.domain.user.usecase.GetMyInfoUseCase
 import com.youhajun.feature.history.api.HistoryNavRoute
+import com.youhajun.room.api.RoomNavRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -25,7 +26,6 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getMyInfoUseCase: GetMyInfoUseCase,
-    private val createRoomUseCase: CreateRoomUseCase,
     private val joinRoomUseCase: JoinRoomUseCase,
     private val getHistoryListUseCase: GetHistoryListUseCase,
 ) : ContainerHost<HomeState, HomeSideEffect>, ViewModel() {
@@ -34,14 +34,10 @@ class HomeViewModel @Inject constructor(
         onInit()
     }
 
-    fun onClickStartCall() {
-        viewModelScope.launch {
-            createRoomUseCase()
-                .onSuccess { roomInfo ->
-                    intent {
-                        postSideEffect(HomeSideEffect.GoToCall(roomInfo.code))
-                    }
-                }
+    fun onClickCreateRoom() {
+        val event = NavigationEvent.Navigate(route = RoomNavRoute.CreateRoom, launchSingleTop = true)
+        intent {
+            postSideEffect(HomeSideEffect.Navigation(event))
         }
     }
 
@@ -52,8 +48,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onClickHistoryMore() {
+        val event = NavigationEvent.NavigateBottomBar(route = HistoryNavRoute.HistoryList, launchSingleTop = true)
         intent {
-            postSideEffect(HomeSideEffect.Navigation(NavigationEvent.NavigateBottomBar(route = HistoryNavRoute.HistoryList, launchSingleTop = true)))
+            postSideEffect(HomeSideEffect.Navigation(event))
         }
     }
 
