@@ -14,6 +14,7 @@ import com.youhajun.feature.auth.impl.navigation.loginNavGraph
 import com.youhajun.feature.history.impl.navigation.historyNavGraph
 import com.youhajun.feature.home.api.HomeNavRoute
 import com.youhajun.feature.home.impl.navigation.homeNavGraph
+import com.youhajun.feature.impl.navigation.roomNavGraph
 import com.youhajun.feature.splash.api.SplashNavRoute
 import com.youhajun.feature.splash.impl.navigation.splashNavGraph
 
@@ -44,5 +45,6 @@ private fun NavGraphBuilder.mainNestedGraph(onNavigationEvent: (NavigationEvent)
     navigation<MainNavRoute.MainNestedGraph>(startDestination = HomeNavRoute.Home) {
         homeNavGraph(onNavigationEvent)
         historyNavGraph(onNavigationEvent)
+        roomNavGraph(onNavigationEvent)
     }
 }

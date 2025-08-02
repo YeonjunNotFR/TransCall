@@ -139,6 +139,7 @@ private fun RowScope.CenterTabItem(
                     clip = false
                 )
                 .background(Colors.FF98AAFE, CircleShape)
+                .noRippleClickable { onClick(tab) },
         ) {
             Icon(
                 modifier = Modifier
@@ -151,7 +152,7 @@ private fun RowScope.CenterTabItem(
         }
         
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().noRippleClickable { onClick(tab) },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
