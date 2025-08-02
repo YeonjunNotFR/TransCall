@@ -24,6 +24,8 @@ dependencies {
     implementation(projects.feature.history.api)
     implementation(projects.feature.history.impl)
     implementation(projects.feature.call.api)
+    implementation(projects.feature.room.api)
+    implementation(projects.feature.room.impl)
     implementation(projects.domain.auth)
 
     implementation(libs.kotlinx.serialization.json)
