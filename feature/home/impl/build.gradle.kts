@@ -10,6 +10,7 @@ android {
 
 dependencies {
     implementation(projects.feature.home.api)
+    implementation(projects.feature.room.api)
     implementation(projects.feature.history.api)
     implementation(projects.domain.user)
     implementation(projects.domain.room)
