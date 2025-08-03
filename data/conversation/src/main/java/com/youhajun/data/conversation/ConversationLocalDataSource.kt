@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 internal interface ConversationLocalDataSource {
-    fun observeConversations(roomCode: String, afterTimestamp: Long): Flow<List<ConversationEntity>>
-    fun observeRecentConversation(roomCode: String): Flow<ConversationEntity>
+    fun observeConversations(roomId: String, afterTimestamp: Long): Flow<List<ConversationEntity>>
+    fun observeRecentConversation(roomId: String): Flow<ConversationEntity>
     suspend fun upsertConversation(conversation: ConversationEntity)
     suspend fun upsertConversations(conversations: List<ConversationEntity>)
 }
@@ -16,12 +16,12 @@ internal class ConversationLocalDataSourceImpl @Inject constructor(
     private val dao: ConversationDao
 ) : ConversationLocalDataSource {
 
-    override fun observeConversations(roomCode: String, afterTimestamp: Long): Flow<List<ConversationEntity>> {
-        return dao.observeConversations(roomCode, afterTimestamp)
+    override fun observeConversations(roomId: String, afterTimestamp: Long): Flow<List<ConversationEntity>> {
+        return dao.observeConversations(roomId, afterTimestamp)
     }
 
-    override fun observeRecentConversation(roomCode: String): Flow<ConversationEntity> {
-        return dao.observeRecentConversation(roomCode)
+    override fun observeRecentConversation(roomId: String): Flow<ConversationEntity> {
+        return dao.observeRecentConversation(roomId)
     }
 
     override suspend fun upsertConversations(conversations: List<ConversationEntity>) {

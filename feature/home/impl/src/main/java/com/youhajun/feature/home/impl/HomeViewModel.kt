@@ -66,9 +66,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onClickJoinBottomSheetConfirm(roomCode: String) {
+    fun onClickJoinBottomSheetConfirm(roomId: String) {
         viewModelScope.launch {
-            joinRoomUseCase(roomCode)
+            joinRoomUseCase(roomId)
                 .onSuccess { roomInfo ->
                     intent {
                         postSideEffect(HomeSideEffect.GoToCall(roomInfo.code))

@@ -10,7 +10,7 @@ import javax.inject.Singleton
 class ObserveRecentConversation @Inject constructor(
     private val repository: ConversationRepository
 ) {
-    operator fun invoke(roomCode: String): Flow<Conversation> {
-        return repository.observeRecentConversation(roomCode)
+    operator fun invoke(roomId: String): Flow<Conversation> {
+        return repository.observeRecentConversation(roomId)
     }
 }

@@ -15,8 +15,8 @@ internal class ConversationRepositoryImpl @Inject constructor(
     private val local: ConversationLocalDataSource,
 ) : ConversationRepository {
 
-    override fun connect(roomCode: String): Flow<ConversationMessage> =
-        remote.connect(roomCode).map { it.toModel() }
+    override fun connect(roomId: String): Flow<ConversationMessage> =
+        remote.connect(roomId).map { it.toModel() }
 
     override suspend fun send(message: ConversationMessage) {
         remote.send(message.toDto())
@@ -26,12 +26,12 @@ internal class ConversationRepositoryImpl @Inject constructor(
         remote.close()
     }
 
-    override fun observeConversations(roomCode: String, afterTimestamp: Long): Flow<List<Conversation>> {
-        return local.observeConversations(roomCode, afterTimestamp).map { it.map { it.toModel() } }
+    override fun observeConversations(roomId: String, afterTimestamp: Long): Flow<List<Conversation>> {
+        return local.observeConversations(roomId, afterTimestamp).map { it.map { it.toModel() } }
     }
 
-    override fun observeRecentConversation(roomCode: String): Flow<Conversation> {
-        return local.observeRecentConversation(roomCode).map { it.toModel() }
+    override fun observeRecentConversation(roomId: String): Flow<Conversation> {
+        return local.observeRecentConversation(roomId).map { it.toModel() }
     }
 
     override suspend fun upsertConversation(conversation: Conversation) {

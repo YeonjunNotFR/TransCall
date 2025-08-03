@@ -4,7 +4,7 @@ import com.youhajun.core.model.LanguageType
 
 sealed interface ConversationMessageType {
     data class SttMessage(
-        val roomCode: String,
+        val roomId: String,
         val text: String,
         val languageType: LanguageType,
     ): ConversationMessageType

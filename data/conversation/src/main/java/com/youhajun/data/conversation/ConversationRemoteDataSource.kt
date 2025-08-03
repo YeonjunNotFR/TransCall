@@ -19,18 +19,17 @@ import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import javax.inject.Inject
 
 internal interface ConversationRemoteDataSource {
-    fun connect(roomCode: String): Flow<ConversationMessageDto>
+    fun connect(roomId: String): Flow<ConversationMessageDto>
     suspend fun send(message: ConversationMessageDto)
     suspend fun close()
 
-    suspend fun getConversationList(request: CursorPageRequest, roomCode: String): CursorPageDto<ConversationDto>
+    suspend fun getConversationList(request: CursorPageRequest, roomId: String): CursorPageDto<ConversationDto>
 }
 
 internal class ConversationRemoteDataSourceImpl @Inject constructor(
@@ -40,8 +39,8 @@ internal class ConversationRemoteDataSourceImpl @Inject constructor(
 
     private var session: WebSocketSession? = null
 
-    override fun connect(roomCode: String): Flow<ConversationMessageDto> = flow {
-        wsClient.webSocket(urlString = ConversationEndpoint.Conversation(roomCode).path) {
+    override fun connect(roomId: String): Flow<ConversationMessageDto> = flow {
+        wsClient.webSocket(urlString = ConversationEndpoint.Conversation(roomId).path) {
             session = this
 
             for (frame in incoming) {
@@ -63,8 +62,8 @@ internal class ConversationRemoteDataSourceImpl @Inject constructor(
         session = null
     }
 
-    override suspend fun getConversationList(request: CursorPageRequest, roomCode: String): CursorPageDto<ConversationDto> {
-        return restClient.get(ConversationEndpoint.List(roomCode).path) {
+    override suspend fun getConversationList(request: CursorPageRequest, roomId: String): CursorPageDto<ConversationDto> {
+        return restClient.get(ConversationEndpoint.List(roomId).path) {
             parametersFrom(request)
         }.body()
     }

@@ -4,7 +4,7 @@ import com.youhajun.core.model.LanguageType
 
 data class Conversation(
     val id: String,
-    val roomCode: String,
+    val roomId: String,
     val senderInfo: SenderInfo,
     val originText: String,
     val transText: String?,

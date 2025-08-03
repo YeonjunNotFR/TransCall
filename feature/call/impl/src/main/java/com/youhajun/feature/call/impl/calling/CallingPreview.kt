@@ -102,7 +102,7 @@ internal fun CallingScreenFloatingType() {
             ),
             recentConversation = Conversation(
                 id = "1",
-                roomCode = "123456",
+                roomId = "123456",
                 senderInfo = SenderInfo(
                     senderId = "1",
                     displayName = "User 1",
@@ -283,7 +283,7 @@ internal fun CallingScreenGridType() {
             callMediaUsers = callMediaUserList,
             recentConversation = Conversation(
                 id = "1",
-                roomCode = "123456",
+                roomId = "123456",
                 senderInfo = SenderInfo(
                     senderId = "1",
                     displayName = "User 1",

@@ -11,8 +11,8 @@ internal class CallingRepositoryImpl @Inject constructor(
     private val remote: CallingDataSource
 ) : CallingRepository {
 
-    override fun connect(roomCode: String): Flow<CallingMessage> =
-        remote.connect(roomCode).map { it.toModel() }
+    override fun connect(roomId: String): Flow<CallingMessage> =
+        remote.connect(roomId).map { it.toModel() }
 
     override suspend fun send(message: CallingMessage) {
         remote.send(message.toDto())

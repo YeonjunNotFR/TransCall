@@ -14,8 +14,8 @@ internal sealed interface ConversationDataDto {
     @Serializable
     @SerialName("sttMessage")
     data class SttMessageDto(
-        @SerialName("roomCode")
-        val roomCode: String,
+        @SerialName("roomId")
+        val roomId: String,
         @SerialName("text")
         val text: String,
         @SerialName("languageType")
@@ -24,7 +24,7 @@ internal sealed interface ConversationDataDto {
 
     fun toModel(): ConversationMessageType = when (this) {
         is SttMessageDto -> ConversationMessageType.SttMessage(
-            roomCode = roomCode,
+            roomId = roomId,
             text = text,
             languageType = languageType
         )
@@ -34,13 +34,13 @@ internal sealed interface ConversationDataDto {
 
 internal fun ConversationMessageType.toDto(): ConversationDataDto = when (this) {
     is ConversationMessageType.SttMessage -> ConversationDataDto.SttMessageDto(
-        roomCode = roomCode,
+        roomId = roomId,
         text = text,
         languageType = languageType
     )
     is Conversation -> ConversationDto(
         id = id,
-        roomCode = roomCode,
+        roomId = roomId,
         senderInfo = senderInfo.toDto(),
         originText = originText,
         transText = transText,

@@ -26,12 +26,16 @@ class CallingViewModel @Inject constructor(
     private val observeRecentConversation: ObserveRecentConversation
 ) : ContainerHost<CallingState, CallingSideEffect>, ViewModel() {
 
+    companion object {
+        const val INTENT_KEY_ROOM_ID = "room_id"
+    }
+
     override val container: Container<CallingState, CallingSideEffect> = container(CallingState()) {
         onInit()
     }
 
-    private val roomCode: String by lazy {
-        checkNotNull(savedStateHandle["roomCode"]) { "roomCode is required" }
+    private val roomId: String by lazy {
+        checkNotNull(savedStateHandle[INTENT_KEY_ROOM_ID])
     }
 
     private var callServiceContract: CallServiceContract? = null
@@ -116,7 +120,7 @@ class CallingViewModel @Inject constructor(
 
     private fun getRoomInfo() {
         viewModelScope.launch {
-            getRoomInfoUseCase(roomCode).onSuccess {
+            getRoomInfoUseCase(roomId).onSuccess {
                 intent {
                     reduce {
                         state.copy(roomInfo = it)
@@ -128,7 +132,7 @@ class CallingViewModel @Inject constructor(
 
     private fun recentConversationCollect() {
         viewModelScope.launch {
-            observeRecentConversation(roomCode).collect { conversation ->
+            observeRecentConversation(roomId).collect { conversation ->
                 intent {
                     reduce {
                         state.copy(recentConversation = conversation)

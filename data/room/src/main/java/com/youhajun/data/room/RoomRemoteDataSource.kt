@@ -10,11 +10,11 @@ import io.ktor.client.request.post
 import javax.inject.Inject
 
 internal interface RoomRemoteDataSource {
-    suspend fun createRoom(): RoomInfoDto
-    suspend fun joinRoom(roomCode: String): RoomInfoDto
-    suspend fun leaveRoom(roomCode: String)
-    suspend fun deleteRoom(roomCode: String)
-    suspend fun getRoomInfo(roomCode: String): RoomInfoDto
+    suspend fun createRoom(request: CreateRoomRequestDto): String
+    suspend fun joinRoom(roomId: String): RoomInfoDto
+    suspend fun leaveRoom(roomId: String)
+    suspend fun deleteRoom(roomId: String)
+    suspend fun getRoomInfo(roomId: String): RoomInfoDto
 }
 
 internal class RoomRemoteDataSourceImpl @Inject constructor(
@@ -25,19 +25,19 @@ internal class RoomRemoteDataSourceImpl @Inject constructor(
         return client.post(RoomEndpoint.Create.path).body()
     }
 
-    override suspend fun joinRoom(roomCode: String): RoomInfoDto {
-        return client.post(RoomEndpoint.Join(roomCode).path).body()
+    override suspend fun joinRoom(roomId: String): RoomInfoDto {
+        return client.post(RoomEndpoint.Join(roomId).path).body()
     }
 
-    override suspend fun deleteRoom(roomCode: String) {
-        return client.delete(RoomEndpoint.Delete(roomCode).path).body()
+    override suspend fun deleteRoom(roomId: String) {
+        return client.delete(RoomEndpoint.Delete(roomId).path).body()
     }
 
-    override suspend fun getRoomInfo(roomCode: String): RoomInfoDto {
-        return client.get(RoomEndpoint.Info(roomCode).path).body()
+    override suspend fun getRoomInfo(roomId: String): RoomInfoDto {
+        return client.get(RoomEndpoint.Info(roomId).path).body()
     }
 
-    override suspend fun leaveRoom(roomCode: String) {
-        return client.post(RoomEndpoint.Leave(roomCode).path).body()
+    override suspend fun leaveRoom(roomId: String) {
+        return client.post(RoomEndpoint.Leave(roomId).path).body()
     }
 }

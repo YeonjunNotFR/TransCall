@@ -8,7 +8,7 @@ import javax.inject.Singleton
 class DeleteRoomUseCase @Inject constructor(
     private val repository: RoomRepository
 ) {
-    suspend operator fun invoke(roomCode: String): Result<Unit> {
-        return repository.deleteRoom(roomCode)
+    suspend operator fun invoke(roomId: String): Result<Unit> {
+        return repository.deleteRoom(roomId)
     }
 }

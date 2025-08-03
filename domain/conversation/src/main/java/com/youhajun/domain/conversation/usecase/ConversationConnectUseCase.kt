@@ -13,8 +13,8 @@ import javax.inject.Singleton
 class ConversationConnectUseCase @Inject constructor(
     private val repository: ConversationRepository
 ) {
-    operator fun invoke(roomCode: String): Flow<ConversationMessage> {
-        return repository.connect(roomCode).onEach {
+    operator fun invoke(roomId: String): Flow<ConversationMessage> {
+        return repository.connect(roomId).onEach {
             when(val type = it.type) {
                 is Conversation -> {
                     repository.upsertConversation(type)

@@ -8,7 +8,7 @@ import javax.inject.Singleton
 class LeaveRoomUseCase @Inject constructor(
     private val repository: RoomRepository
 ) {
-    suspend operator fun invoke(roomCode: String): Result<Unit> {
-        return repository.leaveRoom(roomCode)
+    suspend operator fun invoke(roomId: String): Result<Unit> {
+        return repository.leaveRoom(roomId)
     }
 }

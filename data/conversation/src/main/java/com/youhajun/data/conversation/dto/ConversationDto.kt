@@ -10,8 +10,8 @@ import kotlinx.serialization.Serializable
 internal data class ConversationDto(
     @SerialName("id")
     val id: String,
-    @SerialName("roomCode")
-    val roomCode: String,
+    @SerialName("roomId")
+    val roomId: String,
     @SerialName("senderInfo")
     val senderInfo: SenderInfoDto,
     @SerialName("originText")
@@ -25,7 +25,7 @@ internal data class ConversationDto(
 ): ConversationDataDto {
     override fun toModel(): Conversation = Conversation(
         id = id,
-        roomCode = roomCode,
+        roomId = roomId,
         senderInfo = senderInfo.toModel(),
         originText = originText,
         transText = transText,

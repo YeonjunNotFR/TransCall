@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class ConversationEntity(
     @PrimaryKey
     val id: String,
-    val roomCode: String,
+    val roomId: String,
     @Embedded(prefix = "sender_")
     val senderInfo: SenderInfoEntity,
     val originText: String,

@@ -17,14 +17,13 @@ import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import javax.inject.Inject
 
 internal interface CallingDataSource {
-    fun connect(roomCode: String): Flow<CallingMessageDto>
+    fun connect(roomId: String): Flow<CallingMessageDto>
     suspend fun send(message: CallingMessageDto)
     suspend fun close()
 }
@@ -35,8 +34,8 @@ internal class CallingDataSourceImpl @Inject constructor(
 
     private var session: WebSocketSession? = null
 
-    override fun connect(roomCode: String): Flow<CallingMessageDto> = flow {
-        client.webSocket(urlString = CallingEndpoint.Calling(roomCode).path) {
+    override fun connect(roomId: String): Flow<CallingMessageDto> = flow {
+        client.webSocket(urlString = CallingEndpoint.Calling(roomId).path) {
             session = this
 
             for (frame in incoming) {

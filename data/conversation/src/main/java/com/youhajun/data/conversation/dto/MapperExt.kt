@@ -9,7 +9,7 @@ import com.youhajun.core.model.conversation.SenderInfo
 internal fun ConversationEntity.toModel(): Conversation {
     return Conversation(
         id = id,
-        roomCode = roomCode,
+        roomId = roomId,
         senderInfo = senderInfo.toModel(),
         originText = originText,
         transText = transText,
@@ -20,7 +20,7 @@ internal fun ConversationEntity.toModel(): Conversation {
 
 internal fun Conversation.toEntity(): ConversationEntity = ConversationEntity(
     id = id,
-    roomCode = roomCode,
+    roomId = roomId,
     senderInfo = senderInfo.toEntity(),
     originText = originText,
     transText = transText,

@@ -31,7 +31,7 @@ import javax.inject.Inject
 class CallActivity : AppCompatActivity() {
 
     companion object {
-        const val INTENT_KEY_ROOM_CODE = "room_code"
+        const val INTENT_KEY_ROOM_ID = "room_id"
     }
 
     @Inject
@@ -60,8 +60,8 @@ class CallActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val roomCode = intent.getStringExtra(INTENT_KEY_ROOM_CODE) ?: throw IllegalArgumentException("Room code is required")
-        startCallService(roomCode)
+        val roomId = intent.getStringExtra(INTENT_KEY_ROOM_ID) ?: throw IllegalArgumentException("Room code is required")
+        startCallService(roomId)
 
         setContent {
             TransCallTheme {
@@ -74,7 +74,7 @@ class CallActivity : AppCompatActivity() {
                     NavHost(
                         modifier = Modifier.fillMaxSize(),
                         navController = navigator,
-                        startDestination = CallNavRoute.Calling(roomCode)
+                        startDestination = CallNavRoute.Calling(roomId)
                     ) {
                         callNavGraph(navigationEventHandler::handleNavigationEvent)
                     }
@@ -83,12 +83,10 @@ class CallActivity : AppCompatActivity() {
         }
     }
 
-    private fun startCallService(roomCode: String) {
-        val foregroundServiceIntent = callIntentFactory.startCallService(this, roomCode)
+    private fun startCallService(roomId: String) {
+        val foregroundServiceIntent = callIntentFactory.getCallServiceIntent(this, roomId)
         ContextCompat.startForegroundService(this, foregroundServiceIntent)
-
-        val bindServiceIntent = callIntentFactory.callService(this)
-        bindService(bindServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+        bindService(foregroundServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
 

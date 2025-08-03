@@ -10,7 +10,7 @@ import javax.inject.Singleton
 class CallConnectUseCase @Inject constructor(
     private val repository: CallingRepository,
 ) {
-    operator fun invoke(roomCode: String): Flow<CallingMessage> {
-        return repository.connect(roomCode)
+    operator fun invoke(roomId: String): Flow<CallingMessage> {
+        return repository.connect(roomId)
     }
 }
