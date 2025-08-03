@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -69,12 +70,9 @@ private fun RoomVisibilityItem(
     isSelected: Boolean,
 ) {
     val selectedContentColor = if (isSelected) Colors.White else Colors.FF8C8D8B
-    val selectedBackgroundColor = if (isSelected) Colors.FFFF5724 else Colors.TRANSPARENT
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(selectedBackgroundColor),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
@@ -82,7 +80,7 @@ private fun RoomVisibilityItem(
         Icon(
             modifier = Modifier.size(16.dp),
             tint = selectedContentColor,
-            painter = painterResource(id = R.drawable.ic_clock),
+            painter = getIconResource(roomVisibility),
             contentDescription = null
         )
 
@@ -94,6 +92,15 @@ private fun RoomVisibilityItem(
             style = Typography.bodyMedium.copy(fontWeight = FontWeight.W700),
         )
     }
+}
+
+@Composable
+private fun getIconResource(roomVisibility: RoomVisibility): Painter {
+    val res = when (roomVisibility) {
+        RoomVisibility.PUBLIC -> R.drawable.ic_public
+        RoomVisibility.PRIVATE -> R.drawable.ic_private
+    }
+    return painterResource(res)
 }
 
 @Composable
