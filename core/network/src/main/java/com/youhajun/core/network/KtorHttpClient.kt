@@ -31,6 +31,7 @@ internal class KtorHttpClient @Inject constructor(
 ) {
 
     fun createHttps(baseUrl: String): HttpClient = HttpClient(OkHttp) {
+        expectSuccess = true
         install(Logging) {
             level = LogLevel.ALL
             logger = object : Logger {
