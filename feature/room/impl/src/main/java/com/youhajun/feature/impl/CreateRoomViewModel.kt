@@ -6,11 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.youhajun.core.model.room.CreateRoomRequest
 import com.youhajun.core.model.room.RoomVisibility
 import com.youhajun.core.route.NavigationEvent
 import com.youhajun.domain.room.usecase.CreateRoomUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -26,6 +29,8 @@ class CreateRoomViewModel @Inject constructor(
 ) : ContainerHost<CreateRoomState, CreateRoomSideEffect>, ViewModel() {
 
     companion object {
+        private const val MAX_TITLE_LENGTH = 20
+        private const val MAX_TAG_LENGTH = 10
         private const val MAX_PARTICIPANT_COUNT = 8
         private const val MAX_TAG_COUNT = 8
     }
@@ -36,11 +41,25 @@ class CreateRoomViewModel @Inject constructor(
     var tagInput: TextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
 
-    override val container: Container<CreateRoomState, CreateRoomSideEffect> = container(CreateRoomState(
-        maxParticipantCount = MAX_PARTICIPANT_COUNT,
-        maxTagCount = MAX_TAG_COUNT,
-    )) {
-        onInit()
+    override val container: Container<CreateRoomState, CreateRoomSideEffect> = container(
+        CreateRoomState(
+            maxParticipantCount = MAX_PARTICIPANT_COUNT,
+            maxTagCount = MAX_TAG_COUNT,
+        )
+    )
+
+    fun onPermissionGranted() {
+        viewModelScope.launch {
+            val request = getCreateRoomRequest()
+            createRoomUseCase(request).onSuccess { roomId ->
+                intent {
+                    postSideEffect(CreateRoomSideEffect.GoToCall(roomId))
+                    postSideEffect(CreateRoomSideEffect.Navigation(
+                        NavigationEvent.NavigateBack
+                    ))
+                }
+            }
+        }
     }
 
     fun onClickBack() {
@@ -50,10 +69,12 @@ class CreateRoomViewModel @Inject constructor(
     }
 
     fun onTitleInputTextChanged(text: TextFieldValue) {
+        if(text.text.length > MAX_TITLE_LENGTH) return
         titleInput = text
     }
 
     fun onTagInputTextChanged(text: TextFieldValue) {
+        if(text.text.length > MAX_TAG_LENGTH) return
         tagInput = text
     }
 
@@ -71,7 +92,7 @@ class CreateRoomViewModel @Inject constructor(
 
     fun onTagInsert() {
         intent {
-            if (tagInput.text.isBlank() || MAX_TAG_COUNT >= state.tags.size) return@intent
+            if (tagInput.text.isBlank() || MAX_TAG_COUNT <= state.tags.size) return@intent
 
             val newTags = state.tags.toMutableSet().apply {
                 add(tagInput.text)
@@ -91,10 +112,17 @@ class CreateRoomViewModel @Inject constructor(
     }
 
     fun onClickCreateRoom() {
-
+        intent {
+            postSideEffect(CreateRoomSideEffect.PermissionCheck)
+        }
     }
 
-    private fun onInit() {
-
+    private fun getCreateRoomRequest(): CreateRoomRequest = container.stateFlow.value.run {
+        CreateRoomRequest(
+            title = titleInput.text,
+            maxParticipantCount = selectedMaxParticipantCount,
+            visibility = selectedRoomVisibility,
+            tags = tags,
+        )
     }
 }

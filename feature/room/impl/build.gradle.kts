@@ -10,8 +10,10 @@ android {
 
 dependencies {
     implementation(projects.feature.room.api)
+    implementation(projects.feature.call.api)
     implementation(projects.domain.room)
     implementation(projects.core.ui)
+    implementation(projects.core.permission)
     implementation(projects.core.design)
     implementation(projects.core.model)
     implementation(projects.core.route)
