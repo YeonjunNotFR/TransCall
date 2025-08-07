@@ -1,6 +1,8 @@
 package com.youhajun.data.room
 
+import com.youhajun.core.model.room.CreateRoomRequest
 import com.youhajun.core.model.room.RoomInfo
+import com.youhajun.data.room.dto.toDto
 import com.youhajun.domain.room.RoomRepository
 import javax.inject.Inject
 
@@ -8,8 +10,8 @@ internal class RoomRepositoryImpl @Inject constructor(
     private val remote: RoomRemoteDataSource
 ): RoomRepository {
 
-    override suspend fun createRoom(): Result<RoomInfo> = runCatching {
-        remote.createRoom().toModel()
+    override suspend fun createRoom(request: CreateRoomRequest): Result<String> = runCatching {
+        remote.createRoom(request.toDto())
     }
 
     override suspend fun joinRoom(roomId: String): Result<RoomInfo> = runCatching {
