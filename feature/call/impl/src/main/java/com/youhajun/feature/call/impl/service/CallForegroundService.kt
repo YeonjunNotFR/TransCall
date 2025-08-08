@@ -93,13 +93,19 @@ class CallForegroundService : Service() {
     lateinit var callIntentFactory: CallIntentFactory
 
     private var currentRoomId: String? = null
-    private val serviceScope = CoroutineScope(SupervisorJob() + ioDispatcher)
+    private var serviceScope: CoroutineScope? = null
 
     private val _mediaUsersFlow = MutableStateFlow<List<CallMediaUser>>(emptyList())
     private val _messageFlow = MutableSharedFlow<CallingMessage>(replay = 1, extraBufferCapacity = 50)
 
     private var webRtcManager: WebRtcSessionManager? = null
     private var myLanguageType: LanguageType = LanguageType.ENGLISH
+
+    override fun onCreate() {
+        super.onCreate()
+
+        serviceScope = CoroutineScope(SupervisorJob() + ioDispatcher)
+    }
 
     private val callServiceContract = object : CallServiceContract {
         override val mediaUsersFlow: StateFlow<List<CallMediaUser>> = _mediaUsersFlow.asStateFlow()
@@ -135,7 +141,7 @@ class CallForegroundService : Service() {
         }
 
         override fun callingLeft() {
-            serviceScope.launch {
+            serviceScope?.launch {
                 callingSendUseCase(CallingMessageType.LeftRequest)
             }
         }
@@ -143,19 +149,19 @@ class CallForegroundService : Service() {
 
     private val webRtcSignalingClient = object : SignalingClient {
         override fun sendOffer(offer: SignalingMessage.Offer) {
-            serviceScope.launch {
+            serviceScope?.launch {
                 callingSendUseCase(offer.toCallingMessage())
             }
         }
 
         override fun sendAnswer(answer: SignalingMessage.Answer) {
-            serviceScope.launch {
+            serviceScope?.launch {
                 callingSendUseCase(answer.toCallingMessage())
             }
         }
 
         override fun sendIceCandidate(candidate: SignalingMessage.IceCandidate) {
-            serviceScope.launch {
+            serviceScope?.launch {
                 callingSendUseCase(candidate.toCallingMessage())
             }
         }
@@ -188,24 +194,37 @@ class CallForegroundService : Service() {
         return START_REDELIVER_INTENT
     }
 
-    private fun createNotification(roomCode: String): Notification {
+    private fun handleAction(intent: Intent?) {
+        when (intent?.action) {
+            INTENT_ACTION_CALL_LEFT -> {
+                serviceScope?.launch {
+                    callingSendUseCase(CallingMessageType.LeftRequest)
+                }
+            }
+            else -> Unit
+        }
+    }
+
+    private fun createNotification(roomId: String): Notification {
         callNotificationHandler.registerChannel()
         return callNotificationHandler.getCallingNotification(
-            openIntent = callIntentFactory.goToCallActivity(this, roomCode),
-            endIntent = callIntentFactory.callService(this)
+            openIntent = callIntentFactory.getCallActivityIntent(this, roomId).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            },
+            endIntent = callIntentFactory.getCallServiceIntent(this, roomId)
         )
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
-        serviceScope.cancel()
+        serviceScope?.cancel()
         sttManager.stop()
         sttManager.destroy()
         webRtcManager?.dispose()
     }
 
-    private fun initCalling(roomId: String) = serviceScope.launch {
+    private fun initCalling(roomId: String) = serviceScope?.launch {
         getMyInfoUseCase().onSuccess { user ->
             webRtcManager = webRtcFactory.create(webRtcSignalingClient, user.userId)
             callMediaUsersCollect()
@@ -218,7 +237,7 @@ class CallForegroundService : Service() {
     }
 
     private fun callMediaUsersCollect() {
-        serviceScope.launch {
+        serviceScope?.launch {
             webRtcManager?.mediaUsersFlow?.collect {
                 _mediaUsersFlow.value = it
             }
@@ -226,7 +245,7 @@ class CallForegroundService : Service() {
     }
 
     private fun sttResultCollect(language: LanguageType) {
-        serviceScope.launch {
+        serviceScope?.launch {
             sttManager.resultFlow.collect { result ->
                 if (result is SttResult.Final) {
                     val roomId = currentRoomId ?: return@collect
@@ -238,11 +257,13 @@ class CallForegroundService : Service() {
     }
 
     private fun conversationConnecting(roomId: String) {
-        conversationConnectUseCase(roomId).launchIn(serviceScope)
+        serviceScope?.launch {
+            conversationConnectUseCase(roomId)
+        }
     }
 
     private fun callConnecting(roomId: String, myInfo: MyInfo) {
-        serviceScope.launch {
+        serviceScope?.launch {
             callConnectUseCase(roomId).collect {
                 when(val type = it.type) {
                     is StageMessageType.Signaling -> webRtcManager?.start(type.isCaller)
@@ -264,7 +285,7 @@ class CallForegroundService : Service() {
     }
 
     private fun callClose() {
-        serviceScope.launch {
+        serviceScope?.launch {
             webRtcManager?.dispose()
             callCloseUseCase()
             conversationCloseUseCase()

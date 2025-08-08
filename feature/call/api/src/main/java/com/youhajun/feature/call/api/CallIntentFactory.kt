@@ -2,9 +2,13 @@ package com.youhajun.feature.call.api
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.runtime.staticCompositionLocalOf
 
 interface CallIntentFactory {
-    fun goToCallActivity(context: Context, roomCode: String): Intent
-    fun startCallService(context: Context, roomCode: String): Intent
-    fun callService(context: Context): Intent
+    fun getCallActivityIntent(context: Context, roomId: String): Intent
+    fun getCallServiceIntent(context: Context, roomId: String): Intent
+}
+
+val LocalCallIntentFactory = staticCompositionLocalOf<CallIntentFactory> {
+    error("No GoogleAuthManager provided")
 }

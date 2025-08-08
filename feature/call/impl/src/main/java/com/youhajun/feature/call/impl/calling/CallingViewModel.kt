@@ -3,8 +3,10 @@ package com.youhajun.feature.call.impl.calling
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.youhajun.domain.conversation.usecase.ObserveRecentConversation
 import com.youhajun.domain.room.usecase.RoomInfoUseCase
+import com.youhajun.feature.call.api.CallNavRoute
 import com.youhajun.feature.call.impl.model.CallControlAction
 import com.youhajun.feature.call.impl.model.CallUserUiModel
 import com.youhajun.feature.call.impl.model.CallingScreenType
@@ -26,16 +28,12 @@ class CallingViewModel @Inject constructor(
     private val observeRecentConversation: ObserveRecentConversation
 ) : ContainerHost<CallingState, CallingSideEffect>, ViewModel() {
 
-    companion object {
-        const val INTENT_KEY_ROOM_ID = "room_id"
-    }
-
     override val container: Container<CallingState, CallingSideEffect> = container(CallingState()) {
         onInit()
     }
 
     private val roomId: String by lazy {
-        checkNotNull(savedStateHandle[INTENT_KEY_ROOM_ID])
+        savedStateHandle.toRoute<CallNavRoute.Calling>().roomId
     }
 
     private var callServiceContract: CallServiceContract? = null
