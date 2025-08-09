@@ -1,6 +1,6 @@
 package com.youhajun.core.model.calling
 
-import com.youhajun.core.model.room.Participant
+import com.youhajun.core.model.room.CurrentParticipant
 import kotlinx.collections.immutable.ImmutableList
 
 data class CallHistory(
@@ -12,5 +12,5 @@ data class CallHistory(
     val startedAtToEpochTime: Long,
     val endedAtToEpochTime: Long,
     val durationSeconds: Int,
-    val participants: ImmutableList<Participant>,
+    val currentParticipants: ImmutableList<CurrentParticipant>,
 )

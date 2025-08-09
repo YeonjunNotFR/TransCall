@@ -1,13 +1,15 @@
 package com.youhajun.core.model.room
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentSetOf
 
 data class RoomInfo(
-    val code: String,
-    val name: String = "",
-    val hostId: String = "",
-    val participants: ImmutableList<Participant> = persistentListOf(),
-    val createdAt: Long = 0,
-    val roomType: RoomType = RoomType.CODE_JOIN
+    val roomId: String,
+    val roomCode: String = "",
+    val title: String = "",
+    val maxParticipantCount: Int = 0,
+    val visibility: RoomVisibility = RoomVisibility.PUBLIC,
+    val joinType: RoomJoinType = RoomJoinType.CODE_JOIN,
+    val tags: ImmutableSet<String> = persistentSetOf(),
+    val status: RoomStatus = RoomStatus.WAITING,
 )
