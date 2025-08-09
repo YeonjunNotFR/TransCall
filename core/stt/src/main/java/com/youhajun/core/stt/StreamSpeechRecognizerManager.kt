@@ -9,6 +9,7 @@ import android.speech.SpeechRecognizer
 import com.youhajun.transcall.core.common.DefaultDispatcher
 import com.youhajun.transcall.core.common.MainImmediateDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ServiceScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -21,6 +22,7 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 import javax.inject.Inject
 
+@ServiceScoped
 class StreamSpeechRecognizerManager @Inject constructor(
     @ApplicationContext private val context: Context,
     @MainImmediateDispatcher private val mainDispatcher: CoroutineDispatcher,
