@@ -2,7 +2,6 @@ package com.youhajun.core.network
 
 import android.util.Log
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -14,6 +13,7 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.pingInterval
+import io.ktor.client.request.HttpSendPipeline
 import io.ktor.http.URLProtocol
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
@@ -56,7 +56,7 @@ internal class KtorHttpClient @Inject constructor(
                 refreshTokens {
                     tokenRefresher.refreshTokens(this@refreshTokens).onSuccess {
                         val refreshToken = it.refreshToken
-                        if(refreshToken != null) tokenProvider.saveTokens(it.accessToken, refreshToken)
+                        if (refreshToken != null) tokenProvider.saveTokens(it.accessToken, refreshToken)
                     }.onFailure {
                         tokenProvider.deleteTokens()
                     }.getOrNull()
@@ -91,32 +91,35 @@ internal class KtorHttpClient @Inject constructor(
         }
     }
 
-    fun createWss(baseUrl: String): HttpClient {
-        return HttpClient(CIO) {
-            install(WebSockets) {
-                pingInterval = 20000.milliseconds
-                contentConverter = KotlinxWebsocketSerializationConverter(Json)
-            }
+    fun createWss(baseUrl: String): HttpClient = HttpClient(OkHttp) {
+        install(WebSockets) {
+            pingInterval = 20000.milliseconds
+            contentConverter = KotlinxWebsocketSerializationConverter(Json)
+        }
 
-            install(Logging) {
-                level = LogLevel.ALL
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        if (BuildConfig.DEBUG) Log.d("Ktor", message)
-                    }
+        install(Logging) {
+            level = LogLevel.ALL
+            logger = object : Logger {
+                override fun log(message: String) {
+                    if (BuildConfig.DEBUG) Log.d("Ktor", message)
                 }
             }
+        }
 
-            defaultRequest {
-                url {
-                    protocol = URLProtocol.WSS
-                    host = baseUrl
-                }
+        defaultRequest {
+            url {
+                protocol = URLProtocol.WSS
+                host = baseUrl
             }
+        }
 
-            engine {
-                requestTimeout = 60000
-                maxConnectionsCount = 10
+        install("tokenInterceptor") {
+            sendPipeline.intercept(HttpSendPipeline.Before) {
+                val accessToken = tokenProvider.getAccessToken()
+                if (!accessToken.isNullOrBlank()) {
+                    context.url.parameters.append("token", accessToken)
+                }
+                proceed()
             }
         }
     }
