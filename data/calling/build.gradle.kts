@@ -11,6 +11,7 @@ android {
 dependencies {
     implementation(projects.domain.calling)
     implementation(projects.data.common)
+    implementation(projects.data.room)
     implementation(projects.core.network)
     implementation(projects.core.model)
     implementation(libs.bundles.ktor)
