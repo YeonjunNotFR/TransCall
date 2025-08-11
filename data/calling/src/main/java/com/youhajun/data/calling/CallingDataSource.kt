@@ -1,15 +1,34 @@
 package com.youhajun.data.calling
 
+import android.util.Log
+import com.youhajun.core.network.BuildConfig
 import com.youhajun.core.network.di.WebSocketHttpClient
-import com.youhajun.data.calling.dto.CallingDataDto
-import com.youhajun.data.calling.dto.CallingMessageDto
-import com.youhajun.data.calling.dto.StageDataDto
-import com.youhajun.data.calling.dto.ConnectDataDto
-import com.youhajun.data.calling.dto.JoinedDataDto
-import com.youhajun.data.calling.dto.LeftResponseDto
-import com.youhajun.data.calling.dto.SignalingDataDto
+import com.youhajun.data.calling.dto.ClientMessageDto
+import com.youhajun.data.calling.dto.ServerMessageDto
+import com.youhajun.data.calling.dto.payload.ChangedRoomDto
+import com.youhajun.data.calling.dto.payload.CompleteIceCandidateDto
+import com.youhajun.data.calling.dto.payload.ConnectedRoomDto
+import com.youhajun.data.calling.dto.payload.JoinRoomPublisherDto
+import com.youhajun.data.calling.dto.payload.JoinRoomSubscriberDto
+import com.youhajun.data.calling.dto.payload.JoinedRoomPublisherDto
+import com.youhajun.data.calling.dto.payload.OnIceCandidateDto
+import com.youhajun.data.calling.dto.payload.OnNewPublisherDto
+import com.youhajun.data.calling.dto.payload.PublisherAnswerDto
+import com.youhajun.data.calling.dto.payload.PublisherOfferDto
+import com.youhajun.data.calling.dto.payload.RequestPayloadDto
+import com.youhajun.data.calling.dto.payload.ResponsePayloadDto
+import com.youhajun.data.calling.dto.payload.SignalingIceCandidateDto
+import com.youhajun.data.calling.dto.payload.SttMessageDto
+import com.youhajun.data.calling.dto.payload.SttStartDto
+import com.youhajun.data.calling.dto.payload.SubscriberAnswerDto
+import com.youhajun.data.calling.dto.payload.SubscriberOfferDto
+import com.youhajun.data.calling.dto.payload.SubscriberUpdateDto
+import com.youhajun.data.calling.dto.payload.TranslationMessageDto
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.client.request.parameter
+import io.ktor.http.URLProtocol
+import io.ktor.http.path
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
@@ -23,8 +42,8 @@ import kotlinx.serialization.modules.polymorphic
 import javax.inject.Inject
 
 internal interface CallingDataSource {
-    fun connect(roomId: String): Flow<CallingMessageDto>
-    suspend fun send(message: CallingMessageDto)
+    fun connect(roomId: String): Flow<ServerMessageDto>
+    suspend fun send(message: ClientMessageDto)
     suspend fun close()
 }
 
@@ -34,21 +53,32 @@ internal class CallingDataSourceImpl @Inject constructor(
 
     private var session: WebSocketSession? = null
 
-    override fun connect(roomId: String): Flow<CallingMessageDto> = flow {
-        client.webSocket(urlString = CallingEndpoint.Calling(roomId).path) {
+    override fun connect(roomId: String): Flow<ServerMessageDto> = flow {
+        client.webSocket(
+            request = {
+                url {
+                    protocol = URLProtocol.WSS
+                    path(CallingEndpoint.Calling.path)
+                }
+                parameter("roomId", roomId)
+            }
+        ) {
             session = this
 
             for (frame in incoming) {
                 if (frame is Frame.Text) {
-                    val dto = signalingJson.decodeFromString<CallingMessageDto>(frame.readText())
+                    val text = frame.readText()
+                    if (BuildConfig.DEBUG) Log.d("WebSocket", "Received: $text")
+                    val dto = signalingJson.decodeFromString<ServerMessageDto>(text)
                     emit(dto)
                 }
             }
         }
     }
 
-    override suspend fun send(message: CallingMessageDto) {
+    override suspend fun send(message: ClientMessageDto) {
         val json = signalingJson.encodeToString(message)
+        if (BuildConfig.DEBUG) Log.d("WebSocket","Sending: $json")
         session?.send(Frame.Text(json))
     }
 
@@ -59,24 +89,34 @@ internal class CallingDataSourceImpl @Inject constructor(
 
     companion object {
         private val signalingJson: Json = Json {
-            serializersModule = SerializersModule {
-                polymorphic(CallingDataDto::class) {
-                    classDiscriminator = "type"
-                    subclass(SignalingDataDto.OfferDto::class, SignalingDataDto.OfferDto.serializer())
-                    subclass(SignalingDataDto.AnswerDto::class, SignalingDataDto.AnswerDto.serializer())
-                    subclass(SignalingDataDto.CandidateDto::class, SignalingDataDto.CandidateDto.serializer())
-                    subclass(JoinedDataDto::class, JoinedDataDto.serializer())
-                    subclass(LeftResponseDto::class, LeftResponseDto.serializer())
-                    subclass(ConnectDataDto::class, ConnectDataDto.serializer())
-                    subclass(StageDataDto.ErrorDto::class, StageDataDto.ErrorDto.serializer())
-                    subclass(StageDataDto.WaitingDto::class, StageDataDto.WaitingDto.serializer())
-                    subclass(StageDataDto.SignalingDto::class, StageDataDto.SignalingDto.serializer())
-                    subclass(StageDataDto.CallingDto::class, StageDataDto.CallingDto.serializer())
-                    subclass(StageDataDto.EndedDto::class, StageDataDto.EndedDto.serializer())
-                }
-            }
             ignoreUnknownKeys = true
             encodeDefaults = true
+            serializersModule = SerializersModule {
+                polymorphic(ResponsePayloadDto::class) {
+                    classDiscriminator = "action"
+                    subclass(JoinedRoomPublisherDto::class, JoinedRoomPublisherDto.serializer())
+                    subclass(PublisherAnswerDto::class, PublisherAnswerDto.serializer())
+                    subclass(SubscriberOfferDto::class, SubscriberOfferDto.serializer())
+                    subclass(OnIceCandidateDto::class, OnIceCandidateDto.serializer())
+                    subclass(OnNewPublisherDto::class, OnNewPublisherDto.serializer())
+                    subclass(ConnectedRoomDto::class, ConnectedRoomDto.serializer())
+                    subclass(ChangedRoomDto::class, ChangedRoomDto.serializer())
+                    subclass(SttStartDto::class, SttStartDto.serializer())
+                    subclass(TranslationMessageDto::class, TranslationMessageDto.serializer())
+                }
+
+                polymorphic(RequestPayloadDto::class) {
+                    classDiscriminator = "action"
+                    subclass(JoinRoomPublisherDto::class, JoinRoomPublisherDto.serializer())
+                    subclass(PublisherOfferDto::class, PublisherOfferDto.serializer())
+                    subclass(JoinRoomSubscriberDto::class, JoinRoomSubscriberDto.serializer())
+                    subclass(SubscriberAnswerDto::class, SubscriberAnswerDto.serializer())
+                    subclass(SubscriberUpdateDto::class, SubscriberUpdateDto.serializer())
+                    subclass(SignalingIceCandidateDto::class, SignalingIceCandidateDto.serializer())
+                    subclass(SttMessageDto::class, SttMessageDto.serializer())
+                    subclass(CompleteIceCandidateDto::class, CompleteIceCandidateDto.serializer())
+                }
+            }
         }
     }
 }
