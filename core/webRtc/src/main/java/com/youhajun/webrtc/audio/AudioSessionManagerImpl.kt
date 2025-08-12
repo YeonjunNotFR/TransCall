@@ -1,17 +1,15 @@
 package com.youhajun.webrtc.audio
 
 import com.youhajun.transcall.core.common.IoDispatcher
+import com.youhajun.webrtc.Config
 import com.youhajun.webrtc.model.AudioDeviceType
 import com.youhajun.webrtc.model.CallAudioStream
-import com.youhajun.webrtc.Config
 import com.youhajun.webrtc.model.LocalAudioEvent
 import com.youhajun.webrtc.model.LocalAudioStream
 import com.youhajun.webrtc.model.MediaContentType
 import com.youhajun.webrtc.model.MediaMessage
 import com.youhajun.webrtc.model.RemoteAudioStream
 import com.youhajun.webrtc.peer.StreamPeerConnectionFactory
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -23,9 +21,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import org.webrtc.AudioTrack
 import org.webrtc.MediaConstraints
+import javax.inject.Inject
 
-class AudioSessionManagerImpl @AssistedInject constructor(
-    @Assisted private val localUserId: String,
+internal class AudioSessionManagerImpl @Inject constructor(
     private val peerConnectionFactory: StreamPeerConnectionFactory,
     private val audioDeviceController: AudioDeviceController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -39,7 +37,7 @@ class AudioSessionManagerImpl @AssistedInject constructor(
     }
 
     private val localAudioTrack: AudioTrack by lazy {
-        val trackId = Config.getAudioTrackId(localUserId, MediaContentType.CAMERA)
+        val trackId = Config.getAudioTrackId(MediaContentType.DEFAULT)
         peerConnectionFactory.makeAudioTrack(source = audioSource, trackId = trackId)
     }
 
@@ -50,13 +48,14 @@ class AudioSessionManagerImpl @AssistedInject constructor(
     private val _localAudioEvent: MutableSharedFlow<LocalAudioEvent> = MutableSharedFlow(extraBufferCapacity = 1)
     override val localAudioEvent: SharedFlow<LocalAudioEvent> = _localAudioEvent.asSharedFlow()
 
-    override fun startAudio(): AudioTrack {
+    override fun startAudio(localUserId: String): AudioTrack {
+        audioDeviceChangeCollect(localUserId)
         return localAudioTrack.also {
             val localStream = LocalAudioStream(
                 userId = localUserId,
                 audioTrack = localAudioTrack,
                 isMicEnabled = localAudioTrack.enabled(),
-                mediaContentType = MediaContentType.CAMERA
+                mediaContentType = MediaContentType.DEFAULT.type
             )
             audioStreamStore.upsert(localStream)
             audioDeviceController.start()
@@ -70,9 +69,9 @@ class AudioSessionManagerImpl @AssistedInject constructor(
         audioSource.dispose()
     }
 
-    override fun setMicEnabled(enabled: Boolean) {
+    override fun setMicEnabled(localUserId: String, enabled: Boolean) {
         localAudioTrack.setEnabled(enabled)
-        audioStreamStore.update(localUserId, MediaContentType.CAMERA) {
+        audioStreamStore.update(localUserId, MediaContentType.DEFAULT) {
             (it as LocalAudioStream).copy(
                 isMicEnabled = enabled
             )
@@ -111,7 +110,8 @@ class AudioSessionManagerImpl @AssistedInject constructor(
     }
 
     override fun setAudioStateChange(state: MediaMessage.AudioStateChange) {
-        audioStreamStore.update(state.userId, state.mediaContentType) {
+        val mediaType = MediaContentType.fromType(state.mediaContentType)
+        audioStreamStore.update(state.userId, mediaType) {
             (it as RemoteAudioStream).copy(
                 isMicEnabled = state.isMicEnabled,
                 isSpeaking = state.isSpeaking
@@ -143,13 +143,13 @@ class AudioSessionManagerImpl @AssistedInject constructor(
         }
     }
 
-    init {
+    private fun audioDeviceChangeCollect(localUserId: String) {
         scope.launch {
-            audioDeviceController.audioDeviceState.collect {
-                audioStreamStore.update(localUserId, MediaContentType.CAMERA) {
+            audioDeviceController.audioDeviceState.collect { state ->
+                audioStreamStore.update(localUserId, MediaContentType.DEFAULT) {
                     (it as LocalAudioStream).copy(
-                        selectedDevice = it.selectedDevice,
-                        availableDevices = it.availableDevices
+                        selectedDevice = state.selectedDevice,
+                        availableDevices = state.availableDevices
                     )
                 }
             }

@@ -11,20 +11,15 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.webrtc.AudioTrack
 
-interface AudioSessionManager {
+internal interface AudioSessionManager {
     val audioStreamsFlow: StateFlow<List<CallAudioStream>>
     val localAudioEvent: SharedFlow<LocalAudioEvent>
-    fun startAudio(): AudioTrack
+    fun startAudio(localUserId: String): AudioTrack
     fun dispose()
-    fun setMicEnabled(enabled: Boolean)
+    fun setMicEnabled(localUserId: String, enabled: Boolean)
     fun setMuteEnable(enabled: Boolean)
     fun setOutputEnable(userId: String, mediaContentType: MediaContentType, enabled: Boolean)
     fun selectAudioDevice(deviceType: AudioDeviceType)
     fun setAudioStateChange(state: MediaMessage.AudioStateChange)
     fun addRemoteAudioTrack(remoteAudio: RemoteAudioStream)
-
-    @AssistedFactory
-    interface Factory {
-        fun create(localUserId: String): AudioSessionManagerImpl
-    }
 }

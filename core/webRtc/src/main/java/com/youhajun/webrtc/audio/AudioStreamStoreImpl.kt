@@ -34,7 +34,7 @@ internal class AudioStreamStoreImpl @Inject constructor() : AudioStreamStore {
         transform: (CallAudioStream) -> CallAudioStream
     ) {
         _audioStreamsFlow.update { list ->
-            list.map { if (it.key == userId + mediaContentType) transform(it) else it }
+            list.map { if (it.key == userId + mediaContentType.type) transform(it) else it }
         }
     }
 }
