@@ -2,6 +2,7 @@ package com.youhajun.webrtc.peer
 
 import android.content.Context
 import android.os.Build
+import com.youhajun.webrtc.model.toRtpCodec
 import kotlinx.coroutines.CoroutineScope
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
@@ -11,6 +12,7 @@ import org.webrtc.HardwareVideoEncoderFactory
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
+import org.webrtc.MediaStreamTrack
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.RtpTransceiver
@@ -22,108 +24,129 @@ import org.webrtc.audio.JavaAudioDeviceModule
 import javax.inject.Inject
 
 class StreamPeerConnectionFactory @Inject constructor(
-  private val context: Context,
-  private val eglBaseContext: EglBase.Context
+    private val context: Context,
+    private val eglBaseContext: EglBase.Context
 ) {
 
-  private val videoDecoderFactory by lazy {
-    DefaultVideoDecoderFactory(eglBaseContext)
-  }
+    private val videoDecoderFactory by lazy {
+        DefaultVideoDecoderFactory(eglBaseContext)
+    }
 
-  private val videoEncoderFactory by lazy {
-    val hardwareEncoder = HardwareVideoEncoderFactory(eglBaseContext, true, true)
-    SimulcastVideoEncoderFactory(hardwareEncoder, SoftwareVideoEncoderFactory())
-  }
+    private val videoEncoderFactory by lazy {
+        val hardwareEncoder = HardwareVideoEncoderFactory(eglBaseContext, true, true)
+        SimulcastVideoEncoderFactory(hardwareEncoder, SoftwareVideoEncoderFactory())
+    }
 
-  private val iceServerUrls = listOf(
-    "stun:stun.l.google.com:19302",
-    "stun:stun1.l.google.com:19302",
-    "stun:stun2.l.google.com:19302",
-    "stun:stun3.l.google.com:19302",
-    "stun:stun4.l.google.com:19302",
-  )
+    private val factory by lazy {
+        PeerConnectionFactory.initialize(
+            PeerConnectionFactory.InitializationOptions.builder(context)
+                .createInitializationOptions(),
+        )
 
-  private val iceServers: List<PeerConnection.IceServer> by lazy {
-    listOf(PeerConnection.IceServer.builder(iceServerUrls).createIceServer())
-  }
+        PeerConnectionFactory.builder()
+            .setVideoDecoderFactory(videoDecoderFactory)
+            .setVideoEncoderFactory(videoEncoderFactory)
+            .setAudioDeviceModule(
+                JavaAudioDeviceModule
+                    .builder(context)
+                    .setUseHardwareAcousticEchoCanceler(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    .setUseHardwareNoiseSuppressor(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    .createAudioDeviceModule().also {
+                        it.setMicrophoneMute(false)
+                        it.setSpeakerMute(false)
+                    },
+            )
+            .createPeerConnectionFactory()
+    }
 
-  val rtcConfig = PeerConnection.RTCConfiguration(iceServers).apply {
-    sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
-  }
+    private val localVideoCapabilitiesCodecs by lazy {
+        factory.getRtpSenderCapabilities(MediaStreamTrack.MediaType.MEDIA_TYPE_VIDEO).codecs.map {
+            it.toRtpCodec()
+        }
+    }
 
-  private val factory by lazy {
-    PeerConnectionFactory.initialize(
-      PeerConnectionFactory.InitializationOptions.builder(context)
-        .createInitializationOptions(),
-    )
+    private val localAudioCapabilitiesCodecs by lazy {
+        factory.getRtpSenderCapabilities(MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO).codecs.map {
+            it.toRtpCodec()
+        }
+    }
 
-    PeerConnectionFactory.builder()
-      .setVideoDecoderFactory(videoDecoderFactory)
-      .setVideoEncoderFactory(videoEncoderFactory)
-      .setAudioDeviceModule(
-        JavaAudioDeviceModule
-          .builder(context)
-          .setUseHardwareAcousticEchoCanceler(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-          .setUseHardwareNoiseSuppressor(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-          .createAudioDeviceModule().also {
-            it.setMicrophoneMute(false)
-            it.setSpeakerMute(false)
-          },
-      )
-      .createPeerConnectionFactory()
-  }
+    private val iceServers: List<PeerConnection.IceServer> by lazy {
+        listOf(PeerConnection.IceServer.builder(iceServerUrls).createIceServer())
+    }
 
-  fun makePeerConnection(
-    coroutineScope: CoroutineScope,
-    configuration: PeerConnection.RTCConfiguration,
-    type: StreamPeerType,
-    mediaConstraints: MediaConstraints,
-    onStreamAdded: ((MediaStream) -> Unit)? = null,
-    onNegotiationNeeded: ((StreamPeerConnection, StreamPeerType) -> Unit)? = null,
-    onIceCandidateRequest: ((IceCandidate, StreamPeerType) -> Unit)? = null,
-    onTrack: ((RtpTransceiver?) -> Unit)? = null,
-  ): StreamPeerConnection {
-    val peerConnection = StreamPeerConnection(
-      coroutineScope = coroutineScope,
-      type = type,
-      mediaConstraints = mediaConstraints,
-      onStreamAdded = onStreamAdded,
-      onNegotiationNeeded = onNegotiationNeeded,
-      onIceCandidate = onIceCandidateRequest,
-      onTrack = onTrack,
-    )
-    val connection = makePeerConnectionInternal(
-      configuration = configuration,
-      observer = peerConnection,
-    )
-    return peerConnection.apply { initialize(connection) }
-  }
+    private val rtcConfig: PeerConnection.RTCConfiguration by lazy {
+        PeerConnection.RTCConfiguration(iceServers).apply {
+            sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
+            iceTransportsType = PeerConnection.IceTransportsType.ALL
+        }
+    }
 
-  private fun makePeerConnectionInternal(
-    configuration: PeerConnection.RTCConfiguration,
-    observer: PeerConnection.Observer?,
-  ): PeerConnection {
-    return requireNotNull(
-      factory.createPeerConnection(
-        configuration,
-        observer,
-      ),
-    )
-  }
+    fun makePeerConnection(
+        coroutineScope: CoroutineScope,
+        type: StreamPeerType,
+        mediaConstraints: MediaConstraints,
+        onStreamAdded: ((MediaStream) -> Unit)? = null,
+        onNegotiationNeeded: ((StreamPeerConnection, StreamPeerType) -> Unit)? = null,
+        onIceCandidateRequest: ((IceCandidate?, Long) -> Unit)? = null,
+        onTrack: ((RtpTransceiver?) -> Unit)? = null,
+    ): StreamPeerConnection {
 
-  fun makeVideoSource(isScreencast: Boolean): VideoSource =
-    factory.createVideoSource(isScreencast)
+        val peerConnection = StreamPeerConnection(
+            coroutineScope = coroutineScope,
+            type = type,
+            mediaConstraints = mediaConstraints,
+            onStreamAdded = onStreamAdded,
+            onNegotiationNeeded = onNegotiationNeeded,
+            onIceCandidate = onIceCandidateRequest,
+            onTrack = onTrack,
+        )
+        val connection = makePeerConnectionInternal(
+            configuration = rtcConfig,
+            observer = peerConnection,
+        )
+        return peerConnection.apply { initialize(connection) }
+    }
 
-  fun makeVideoTrack(
-    source: VideoSource,
-    trackId: String,
-  ): VideoTrack = factory.createVideoTrack(trackId, source)
+    private fun makePeerConnectionInternal(
+        configuration: PeerConnection.RTCConfiguration,
+        observer: PeerConnection.Observer?,
+    ): PeerConnection {
+        return requireNotNull(
+            factory.createPeerConnection(
+                configuration,
+                observer,
+            ),
+        )
+    }
 
-  fun makeAudioSource(constraints: MediaConstraints = MediaConstraints()): AudioSource =
-    factory.createAudioSource(constraints)
+    fun makeVideoSource(isScreencast: Boolean): VideoSource =
+        factory.createVideoSource(isScreencast)
 
-  fun makeAudioTrack(
-    source: AudioSource,
-    trackId: String,
-  ): AudioTrack = factory.createAudioTrack(trackId, source)
+    fun makeVideoTrack(
+        source: VideoSource,
+        trackId: String,
+    ): VideoTrack = factory.createVideoTrack(trackId, source)
+
+    fun makeAudioSource(constraints: MediaConstraints = MediaConstraints()): AudioSource =
+        factory.createAudioSource(constraints)
+
+    fun makeAudioTrack(
+        source: AudioSource,
+        trackId: String,
+    ): AudioTrack = factory.createAudioTrack(trackId, source)
+
+    fun getVideoCodec(): String? {
+        return localVideoCapabilitiesCodecs.firstOrNull()?.mimeType
+    }
+
+    fun getAudioCodec(): String? {
+        return localAudioCapabilitiesCodecs.firstOrNull()?.mimeType
+    }
+
+    companion object {
+        private val iceServerUrls = listOf(
+            "stun:stun.l.google.com:3478",
+        )
+    }
 }

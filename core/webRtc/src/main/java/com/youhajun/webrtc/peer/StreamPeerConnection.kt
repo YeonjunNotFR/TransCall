@@ -23,254 +23,269 @@ import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 
 class StreamPeerConnection(
-  private val coroutineScope: CoroutineScope,
-  private val type: StreamPeerType,
-  private val mediaConstraints: MediaConstraints,
-  private val onStreamAdded: ((MediaStream) -> Unit)?,
-  private val onNegotiationNeeded: ((StreamPeerConnection, StreamPeerType) -> Unit)?,
-  private val onIceCandidate: ((IceCandidate, StreamPeerType) -> Unit)?,
-  private val onTrack: ((RtpTransceiver?) -> Unit)?,
+    private val coroutineScope: CoroutineScope,
+    private val type: StreamPeerType,
+    private val mediaConstraints: MediaConstraints,
+    private val onStreamAdded: ((MediaStream) -> Unit)?,
+    private val onNegotiationNeeded: ((StreamPeerConnection, StreamPeerType) -> Unit)?,
+    private val onIceCandidate: ((IceCandidate?, Long) -> Unit)?,
+    private val onTrack: ((RtpTransceiver?) -> Unit)?,
 ) : PeerConnection.Observer {
 
-  private val typeTag = type.name
+    private val typeTag = type.name
 
-  /**
-   * The wrapped connection for all the WebRTC communication.
-   */
-  lateinit var connection: PeerConnection
-    private set
+    /**
+     * The wrapped connection for all the WebRTC communication.
+     */
+    lateinit var connection: PeerConnection
+        private set
 
-  /**
-   * Used to manage the stats observation lifecycle.
-   */
-  private var statsJob: Job? = null
+    val audioMid: String?
+        get() = connection.transceivers.firstOrNull { it.mediaType == MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO }?.mid
+    val videoMid: String?
+        get() = connection.transceivers.firstOrNull { it.mediaType == MediaStreamTrack.MediaType.MEDIA_TYPE_VIDEO }?.mid
 
-  /**
-   * Used to pool together and store [IceCandidate]s before consuming them.
-   */
-  private val pendingIceMutex = Mutex()
-  private val pendingIceCandidates = mutableListOf<IceCandidate>()
+    private var _handleId: Long? = null
+    val handleId: Long
+        get() = _handleId ?: error("handleId not initialized yet")
 
-  /**
-   * Contains stats events for observation.
-   */
-  private val statsFlow: MutableStateFlow<RTCStatsReport?> = MutableStateFlow(null)
+    fun setHandleId(handleId: Long) {
+        _handleId = handleId
+    }
 
-  /**
-   * Initialize a [StreamPeerConnection] using a WebRTC [PeerConnection].
-   *
-   * @param peerConnection The connection that holds audio and video tracks.
-   */
-  fun initialize(peerConnection: PeerConnection) {
-    this.connection = peerConnection
-  }
+    /**
+     * Used to manage the stats observation lifecycle.
+     */
+    private var statsJob: Job? = null
 
-  /**
-   * Used to create an offer whenever there's a negotiation that we need to process on the
-   * publisher side.
-   *
-   * @return [Result] wrapper of the [SessionDescription] for the publisher.
-   */
-  suspend fun createOffer(): Result<SessionDescription> {
-    return createSessionDescription { connection.createOffer(it, mediaConstraints) }
-  }
+    /**
+     * Used to pool together and store [IceCandidate]s before consuming them.
+     */
+    private val pendingIceMutex = Mutex()
+    private val pendingRemoteIceCandidates = mutableListOf<IceCandidate>()
 
-  /**
-   * Used to create an answer whenever there's a subscriber offer.
-   *
-   * @return [Result] wrapper of the [SessionDescription] for the subscriber.
-   */
-  suspend fun createAnswer(): Result<SessionDescription> {
-    return createSessionDescription { connection.createAnswer(it, mediaConstraints) }
-  }
+    /**
+     * Contains stats events for observation.
+     */
+    private val statsFlow: MutableStateFlow<RTCStatsReport?> = MutableStateFlow(null)
 
-  /**
-   * Used to set up the SDP on underlying connections and to add [pendingIceCandidates] to the
-   * connection for listening.
-   *
-   * @param sessionDescription That contains the remote SDP.
-   * @return An empty [Result], if the operation has been successful or not.
-   */
-  suspend fun setRemoteDescription(sessionDescription: SessionDescription): Result<Unit> {
-    return suspendSdpObserver {
-      connection.setRemoteDescription(
-        it,
-        SessionDescription(
-          sessionDescription.type,
-          sessionDescription.description.mungeCodecs(),
-        ),
-      )
-    }.also {
-      pendingIceMutex.withLock {
-        pendingIceCandidates.forEach { iceCandidate ->
-          connection.addRtcIceCandidate(iceCandidate)
+    /**
+     * Initialize a [StreamPeerConnection] using a WebRTC [PeerConnection].
+     *
+     * @param peerConnection The connection that holds audio and video tracks.
+     */
+    fun initialize(peerConnection: PeerConnection) {
+        this.connection = peerConnection
+    }
+
+    /**
+     * Used to create an offer whenever there's a negotiation that we need to process on the
+     * publisher side.
+     *
+     * @return [Result] wrapper of the [SessionDescription] for the publisher.
+     */
+    suspend fun createOffer(): Result<SessionDescription> {
+        return createSessionDescription { connection.createOffer(it, mediaConstraints) }
+    }
+
+    /**
+     * Used to create an answer whenever there's a subscriber offer.
+     *
+     * @return [Result] wrapper of the [SessionDescription] for the subscriber.
+     */
+    suspend fun createAnswer(): Result<SessionDescription> {
+        return createSessionDescription { connection.createAnswer(it, mediaConstraints) }
+    }
+
+    /**
+     * Used to set up the SDP on underlying connections and to add [pendingIceCandidates] to the
+     * connection for listening.
+     *
+     * @param sessionDescription That contains the remote SDP.
+     * @return An empty [Result], if the operation has been successful or not.
+     */
+    suspend fun setRemoteDescription(sessionDescription: SessionDescription): Result<Unit> {
+        return suspendSdpObserver {
+            connection.setRemoteDescription(
+                it,
+                SessionDescription(
+                    sessionDescription.type,
+                    sessionDescription.description.mungeCodecs(),
+                ),
+            )
+        }.also {
+            pendingIceMutex.withLock {
+                pendingRemoteIceCandidates.forEach { iceCandidate ->
+                    connection.addRtcIceCandidate(iceCandidate)
+                }
+                pendingRemoteIceCandidates.clear()
+            }
         }
-        pendingIceCandidates.clear()
-      }
     }
-  }
 
-  /**
-   * Sets the local description for a connection either for the subscriber or publisher based on
-   * the flow.
-   *
-   * @param sessionDescription That contains the subscriber or publisher SDP.
-   * @return An empty [Result], if the operation has been successful or not.
-   */
-  suspend fun setLocalDescription(sessionDescription: SessionDescription): Result<Unit> {
-    val sdp = SessionDescription(
-      sessionDescription.type,
-      sessionDescription.description.mungeCodecs(),
-    )
-    return suspendSdpObserver { connection.setLocalDescription(it, sdp) }
-  }
-
-  /**
-   * Adds an [IceCandidate] to the underlying [connection] if it's already been set up, or stores
-   * it for later consumption.
-   *
-   * @param iceCandidate To process and add to the connection.
-   * @return An empty [Result], if the operation has been successful or not.
-   */
-  suspend fun addIceCandidate(iceCandidate: IceCandidate): Result<Unit> {
-    pendingIceMutex.withLock {
-      return if (connection.remoteDescription == null) {
-        pendingIceCandidates.add(iceCandidate)
-        Result.failure(RuntimeException("RemoteDescription is not set"))
-      } else {
-        connection.addRtcIceCandidate(iceCandidate)
-      }
+    /**
+     * Sets the local description for a connection either for the subscriber or publisher based on
+     * the flow.
+     *
+     * @param sessionDescription That contains the subscriber or publisher SDP.
+     * @return An empty [Result], if the operation has been successful or not.
+     */
+    suspend fun setLocalDescription(sessionDescription: SessionDescription): Result<Unit> {
+        val sdp = SessionDescription(
+            sessionDescription.type,
+            sessionDescription.description.mungeCodecs(),
+        )
+        return suspendSdpObserver { connection.setLocalDescription(it, sdp) }
     }
-  }
 
-  /**
-   * Peer connection listeners.
-   */
-
-  /**
-   * Triggered whenever there's a new [RtcIceCandidate] for the call. Used to update our tracks
-   * and subscriptions.
-   *
-   * @param candidate The new candidate.
-   */
-  override fun onIceCandidate(candidate: IceCandidate?) {
-    if (candidate == null) return
-
-    onIceCandidate?.invoke(candidate, type)
-  }
-
-  /**
-   * Triggered whenever there's a new [MediaStream] that was added to the connection.
-   *
-   * @param stream The stream that contains audio or video.
-   */
-  override fun onAddStream(stream: MediaStream?) {
-    if (stream != null) {
-      onStreamAdded?.invoke(stream)
+    /**
+     * Adds an [IceCandidate] to the underlying [connection] if it's already been set up, or stores
+     * it for later consumption.
+     *
+     * @param iceCandidate To process and add to the connection.
+     * @return An empty [Result], if the operation has been successful or not.
+     */
+    suspend fun addIceCandidate(iceCandidate: IceCandidate): Result<Unit> {
+        pendingIceMutex.withLock {
+            return if (connection.remoteDescription == null) {
+                pendingRemoteIceCandidates.add(iceCandidate)
+                Result.failure(RuntimeException("RemoteDescription is not set"))
+            } else {
+                connection.addRtcIceCandidate(iceCandidate)
+            }
+        }
     }
-  }
 
-  /**
-   * Triggered whenever there's a new [MediaStream] or [MediaStreamTrack] that's been added
-   * to the call. It contains all audio and video tracks for a given session.
-   *
-   * @param receiver The receiver of tracks.
-   * @param mediaStreams The streams that were added containing their appropriate tracks.
-   */
-  override fun onAddTrack(receiver: RtpReceiver?, mediaStreams: Array<out MediaStream>?) {
-    mediaStreams?.forEach { mediaStream ->
-      mediaStream.audioTracks?.forEach { remoteAudioTrack ->
-        remoteAudioTrack.setEnabled(true)
-      }
-      onStreamAdded?.invoke(mediaStream)
+    /**
+     * Peer connection listeners.
+     */
+
+    /**
+     * Triggered whenever there's a new [RtcIceCandidate] for the call. Used to update our tracks
+     * and subscriptions.
+     *
+     * @param candidate The new candidate.
+     */
+    override fun onIceCandidate(candidate: IceCandidate?) {
+        coroutineScope.launch {
+            pendingIceMutex.withLock {
+                onIceCandidate?.invoke(candidate, handleId)
+            }
+        }
     }
-  }
 
-  /**
-   * Triggered whenever there's a new negotiation needed for the active [PeerConnection].
-   */
-  override fun onRenegotiationNeeded() {
-    onNegotiationNeeded?.invoke(this, type)
-  }
-
-  /**
-   * Triggered whenever a [MediaStream] was removed.
-   *
-   * @param stream The stream that was removed from the connection.
-   */
-  override fun onRemoveStream(stream: MediaStream?) {}
-
-  /**
-   * Triggered when the connection state changes.  Used to start and stop the stats observing.
-   *
-   * @param newState The new state of the [PeerConnection].
-   */
-  override fun onIceConnectionChange(newState: PeerConnection.IceConnectionState?) {
-    when (newState) {
-      PeerConnection.IceConnectionState.CLOSED,
-      PeerConnection.IceConnectionState.FAILED,
-      PeerConnection.IceConnectionState.DISCONNECTED,
-      -> statsJob?.cancel()
-
-      PeerConnection.IceConnectionState.CONNECTED -> statsJob = observeStats()
-      else -> Unit
+    /**
+     * Triggered whenever there's a new [MediaStream] that was added to the connection.
+     *
+     * @param stream The stream that contains audio or video.
+     */
+    override fun onAddStream(stream: MediaStream?) {
+        if (stream != null) {
+            onStreamAdded?.invoke(stream)
+        }
     }
-  }
 
-  /**
-   * @return The [RTCStatsReport] for the active connection.
-   */
-  fun getStats(): StateFlow<RTCStatsReport?> {
-    return statsFlow
-  }
-
-  /**
-   * Observes the local connection stats and emits it to [statsFlow] that users can consume.
-   */
-  private fun observeStats() = coroutineScope.launch {
-    while (isActive) {
-      delay(10_000L)
-      connection.getStats {
-        statsFlow.value = it
-      }
+    /**
+     * Triggered whenever there's a new [MediaStream] or [MediaStreamTrack] that's been added
+     * to the call. It contains all audio and video tracks for a given session.
+     *
+     * @param receiver The receiver of tracks.
+     * @param mediaStreams The streams that were added containing their appropriate tracks.
+     */
+    override fun onAddTrack(receiver: RtpReceiver?, mediaStreams: Array<out MediaStream>?) {
+        mediaStreams?.forEach { mediaStream ->
+            mediaStream.audioTracks?.forEach { remoteAudioTrack ->
+                remoteAudioTrack.setEnabled(true)
+            }
+            onStreamAdded?.invoke(mediaStream)
+        }
     }
-  }
 
-  override fun onTrack(transceiver: RtpTransceiver?) {
-    onTrack?.invoke(transceiver)
-  }
+    /**
+     * Triggered whenever there's a new negotiation needed for the active [PeerConnection].
+     */
+    override fun onRenegotiationNeeded() {
+        onNegotiationNeeded?.invoke(this, type)
+    }
 
-  override fun onRemoveTrack(receiver: RtpReceiver?) {
-  }
+    /**
+     * Triggered whenever a [MediaStream] was removed.
+     *
+     * @param stream The stream that was removed from the connection.
+     */
+    override fun onRemoveStream(stream: MediaStream?) {}
 
-  override fun onSignalingChange(newState: PeerConnection.SignalingState?) {
-  }
+    /**
+     * Triggered when the connection state changes.  Used to start and stop the stats observing.
+     *
+     * @param newState The new state of the [PeerConnection].
+     */
+    override fun onIceConnectionChange(newState: PeerConnection.IceConnectionState?) {
+        when (newState) {
+            PeerConnection.IceConnectionState.CLOSED,
+            PeerConnection.IceConnectionState.FAILED,
+            PeerConnection.IceConnectionState.DISCONNECTED,
+                -> statsJob?.cancel()
 
-  override fun onIceConnectionReceivingChange(receiving: Boolean) {
-  }
+            PeerConnection.IceConnectionState.CONNECTED -> statsJob = observeStats()
+            else -> Unit
+        }
+    }
 
-  override fun onIceGatheringChange(newState: PeerConnection.IceGatheringState?) {
-  }
+    /**
+     * @return The [RTCStatsReport] for the active connection.
+     */
+    fun getStats(): StateFlow<RTCStatsReport?> {
+        return statsFlow
+    }
 
-  override fun onIceCandidatesRemoved(iceCandidates: Array<out org.webrtc.IceCandidate>?) {
-  }
+    /**
+     * Observes the local connection stats and emits it to [statsFlow] that users can consume.
+     */
+    private fun observeStats() = coroutineScope.launch {
+        while (isActive) {
+            delay(10_000L)
+            connection.getStats {
+                statsFlow.value = it
+            }
+        }
+    }
 
-  override fun onIceCandidateError(event: IceCandidateErrorEvent?) {
-  }
+    override fun onTrack(transceiver: RtpTransceiver?) {
+        onTrack?.invoke(transceiver)
+    }
 
-  override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {
-  }
+    override fun onRemoveTrack(receiver: RtpReceiver?) {
+    }
 
-  override fun onSelectedCandidatePairChanged(event: CandidatePairChangeEvent?) {
-  }
+    override fun onSignalingChange(newState: PeerConnection.SignalingState?) {
+    }
 
-  override fun onDataChannel(channel: DataChannel?): Unit = Unit
+    override fun onIceConnectionReceivingChange(receiving: Boolean) {
+    }
 
-  override fun toString(): String =
-    "StreamPeerConnection(type='$typeTag', constraints=$mediaConstraints)"
+    override fun onIceGatheringChange(newState: PeerConnection.IceGatheringState?) {
+    }
 
-  private fun String.mungeCodecs(): String {
-    return this.replace("vp9", "VP9")
-      .replace("vp8", "VP8").replace("h264", "H264")
-  }
+    override fun onIceCandidatesRemoved(iceCandidates: Array<out org.webrtc.IceCandidate>?) {
+    }
+
+    override fun onIceCandidateError(event: IceCandidateErrorEvent?) {
+    }
+
+    override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {
+    }
+
+    override fun onSelectedCandidatePairChanged(event: CandidatePairChangeEvent?) {
+    }
+
+    override fun onDataChannel(channel: DataChannel?): Unit = Unit
+
+    override fun toString(): String =
+        "StreamPeerConnection(type='$typeTag', constraints=$mediaConstraints)"
+
+    private fun String.mungeCodecs(): String {
+        return this.replace("vp9", "VP9")
+            .replace("vp8", "VP8").replace("h264", "H264")
+    }
 }
