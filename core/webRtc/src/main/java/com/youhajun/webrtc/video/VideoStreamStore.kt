@@ -4,7 +4,7 @@ import com.youhajun.webrtc.model.CallVideoStream
 import com.youhajun.webrtc.model.MediaContentType
 import kotlinx.coroutines.flow.StateFlow
 
-interface VideoStreamStore {
+internal interface VideoStreamStore {
     val videoStreamsFlow: StateFlow<List<CallVideoStream>>
 
     fun upsert(stream: CallVideoStream)

@@ -28,7 +28,7 @@ internal class VideoStreamStoreImpl @Inject constructor() : VideoStreamStore {
         transform: (CallVideoStream) -> CallVideoStream
     ) {
         _videoStreamsFlow.update { list ->
-            list.map { if (it.key == userId + mediaContentType) transform(it) else it }
+            list.map { if (it.key == userId + mediaContentType.type) transform(it) else it }
         }
     }
 }
