@@ -7,25 +7,36 @@ import com.youhajun.webrtc.model.AudioDeviceType
 import com.youhajun.webrtc.model.CallAudioStream
 import com.youhajun.webrtc.model.CallMediaUser
 import com.youhajun.webrtc.model.CallVideoStream
-import com.youhajun.webrtc.Config
+import com.youhajun.webrtc.model.CompleteIceCandidate
+import com.youhajun.webrtc.model.IceCandidate
+import com.youhajun.webrtc.model.JoinRoomPublisher
+import com.youhajun.webrtc.model.JoinRoomSubscriber
+import com.youhajun.webrtc.model.JoinedRoomPublisher
 import com.youhajun.webrtc.model.LocalAudioStream
 import com.youhajun.webrtc.model.LocalMediaUser
 import com.youhajun.webrtc.model.LocalVideoEvent
 import com.youhajun.webrtc.model.LocalVideoStream
 import com.youhajun.webrtc.model.MediaContentType
-import com.youhajun.webrtc.model.MediaMessage
+import com.youhajun.webrtc.model.OnIceCandidate
+import com.youhajun.webrtc.model.OnNewPublisher
+import com.youhajun.webrtc.model.PublisherAnswer
+import com.youhajun.webrtc.model.PublisherFeedResponse
+import com.youhajun.webrtc.model.PublisherOffer
 import com.youhajun.webrtc.model.RemoteAudioStream
 import com.youhajun.webrtc.model.RemoteMediaUser
 import com.youhajun.webrtc.model.RemoteVideoStream
-import com.youhajun.webrtc.model.SignalingMessage
+import com.youhajun.webrtc.model.SignalingIceCandidate
+import com.youhajun.webrtc.model.SubscriberAnswer
+import com.youhajun.webrtc.model.SubscriberMidMapper
+import com.youhajun.webrtc.model.SubscriberOffer
+import com.youhajun.webrtc.model.SubscriberUpdate
 import com.youhajun.webrtc.model.TrackType
+import com.youhajun.webrtc.model.VideoRoomHandleInfo
+import com.youhajun.webrtc.model.toMidMap
 import com.youhajun.webrtc.peer.StreamPeerConnection
 import com.youhajun.webrtc.peer.StreamPeerConnectionFactory
 import com.youhajun.webrtc.peer.StreamPeerType
 import com.youhajun.webrtc.video.VideoSessionManager
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -35,34 +46,30 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import org.webrtc.AudioTrack
-import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.SessionDescription
 import org.webrtc.VideoTrack
-import java.util.UUID
+import javax.inject.Inject
 
-class WebRtcSessionManagerImpl @AssistedInject constructor(
-    @Assisted private val localUserId: String,
-    @Assisted private val signalingClient: SignalingClient,
+internal class WebRtcSessionManagerImpl @Inject constructor(
+    private val signalingClient: SignalingClient,
     private val peerConnectionFactory: StreamPeerConnectionFactory,
-    audioFactory: AudioSessionManager.Factory,
-    videoFactory: VideoSessionManager.Factory,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val audioManager: AudioSessionManager,
+    private val videoManager: VideoSessionManager,
 ) : WebRtcSessionManager {
 
+    private lateinit var localUserId: String
     private val sessionScope = CoroutineScope(SupervisorJob() + ioDispatcher)
-    private val audioManager: AudioSessionManager = audioFactory.create(localUserId)
-    private val videoManager: VideoSessionManager = videoFactory.create(localUserId)
-    private val pendingIce = mutableListOf<IceCandidate>()
-    private var offerArrived = CompletableDeferred<Unit>()
-    private var currentSessionId: String? = null
+    private var privateId: Long? = null
+    private val midMapper: MutableMap<String, SubscriberMidMapper> = mutableMapOf()
 
     private val _mediaUsersFlow = combine(
         audioManager.audioStreamsFlow,
         videoManager.videoStreamsFlow
     ) { audioStreams, videoStreams -> combineMediaUsers(audioStreams, videoStreams) }
+
     override val mediaUsersFlow: StateFlow<List<CallMediaUser>> = _mediaUsersFlow.stateIn(
         scope = sessionScope,
         started = SharingStarted.Eagerly,
@@ -78,35 +85,46 @@ class WebRtcSessionManagerImpl @AssistedInject constructor(
         )
     }
 
-    private val peerConnection: StreamPeerConnection by lazy {
+    private val publisherPeerConnection: StreamPeerConnection by lazy {
         peerConnectionFactory.makePeerConnection(
             coroutineScope = sessionScope,
-            configuration = peerConnectionFactory.rtcConfig,
+            type = StreamPeerType.PUBLISHER,
+            mediaConstraints = mediaConstraints,
+            onIceCandidateRequest = { iceCandidate, handleId ->
+                if(iceCandidate == null) sendCompleteIceCandidate(handleId)
+                else sendIceCandidate(handleId, iceCandidate.toWebRtcCandidate())
+            },
+            onNegotiationNeeded = { peer, _ ->
+
+            }
+        )
+    }
+
+    private val subscriberPeerConnection: StreamPeerConnection by lazy {
+        peerConnectionFactory.makePeerConnection(
+            coroutineScope = sessionScope,
             type = StreamPeerType.SUBSCRIBER,
             mediaConstraints = mediaConstraints,
-            onIceCandidateRequest = { iceCandidate, _ ->
-                sendIceCandidate(iceCandidate)
-            },
             onTrack = { rtpTransceiver ->
-                rtpTransceiver?.receiver?.track()?.id()
                 val track = rtpTransceiver?.receiver?.track() ?: return@makePeerConnection
-                val (trackType, userId, type) = Config.getParsedTrackId(track.id())
-                when(TrackType.fromString(trackType)) {
+                val mapper = midMapper[rtpTransceiver.mid] ?: return@makePeerConnection
+                when (mapper.trackType) {
                     TrackType.VIDEO -> {
                         val videoTrack = track as VideoTrack
                         val remoteVideo = RemoteVideoStream(
-                            userId = userId,
-                            mediaContentType = MediaContentType.valueOf(type),
+                            userId = mapper.userId,
+                            mediaContentType = mapper.mediaContentType.type,
                             videoTrack = videoTrack,
                             isVideoEnable = videoTrack.enabled()
                         )
                         videoManager.addRemoteVideoTrack(remoteVideo)
                     }
+
                     TrackType.AUDIO -> {
                         val audioTrack = track as AudioTrack
                         val remoteAudio = RemoteAudioStream(
-                            userId = userId,
-                            mediaContentType = MediaContentType.valueOf(type),
+                            userId = mapper.userId,
+                            mediaContentType = mapper.mediaContentType.type,
                             audioTrack = audioTrack,
                             isMicEnabled = audioTrack.enabled(),
                         )
@@ -114,17 +132,28 @@ class WebRtcSessionManagerImpl @AssistedInject constructor(
                     }
                 }
             },
+            onIceCandidateRequest = { iceCandidate, handleId ->
+                if(iceCandidate == null) sendCompleteIceCandidate(handleId)
+                else sendIceCandidate(handleId, iceCandidate.toWebRtcCandidate())
+            },
         )
     }
 
-    override fun start(isCaller: Boolean) {
-        val streamIdList = listOf(Config.getStreamId(localUserId))
-        val cameraTrack = videoManager.startCamera()
-        val audioTrack = audioManager.startAudio()
-        peerConnection.connection.addTrack(cameraTrack, streamIdList)
-        peerConnection.connection.addTrack(audioTrack, streamIdList)
+    private val peerConnectionList: List<StreamPeerConnection> by lazy {
+        listOf(publisherPeerConnection, subscriberPeerConnection)
+    }
 
-        signalingStart(isCaller)
+    override fun start(localUserId: String, videoRoomHandleInfo: VideoRoomHandleInfo) {
+        this.localUserId = localUserId
+        setVideoRoomHandleInfo(videoRoomHandleInfo)
+        val cameraTrack = videoManager.startCamera(localUserId)
+        val audioTrack = audioManager.startAudio(localUserId)
+        publisherPeerConnection.connection.addTrack(cameraTrack)
+        publisherPeerConnection.connection.addTrack(audioTrack)
+
+        sessionScope.launch {
+            sendJoinPublisher(publisherPeerConnection.handleId, MediaContentType.DEFAULT)
+        }
     }
 
     override fun dispose() {
@@ -133,105 +162,44 @@ class WebRtcSessionManagerImpl @AssistedInject constructor(
         sessionScope.cancel()
     }
 
-    override fun flipCamera() = videoManager.flipCamera()
+    override fun flipCamera() = videoManager.flipCamera(localUserId)
+
     override fun setCameraEnabled(enabled: Boolean) {
         sessionScope.launch {
-            videoManager.setCameraEnabled(enabled)
+            videoManager.setCameraEnabled(localUserId, enabled)
         }
     }
 
     override fun selectAudioDevice(deviceType: AudioDeviceType) = audioManager.selectAudioDevice(deviceType)
-    override fun setMicEnabled(enabled: Boolean) = audioManager.setMicEnabled(enabled)
+
+    override fun setMicEnabled(enabled: Boolean) = audioManager.setMicEnabled(localUserId, enabled)
+
     override fun setMuteEnable(enabled: Boolean) = audioManager.setMuteEnable(enabled)
-    override fun setOutputEnable(userId: String, mediaContentType: MediaContentType, enabled: Boolean) =
-        audioManager.setOutputEnable(userId, mediaContentType, enabled)
 
-    private fun signalingStart(isCaller: Boolean) {
-        sessionScope.launch {
-            when {
-                isCaller -> sendOffer()
-                else -> {
-                    val arrived = withTimeoutOrNull(10000) { offerArrived.await() }
-                    if (arrived == null) sendOffer()
-                }
-            }
-        }
+    override fun setOutputEnable(userId: String, mediaContentType: String, enabled: Boolean) =
+        audioManager.setOutputEnable(userId, MediaContentType.fromType(mediaContentType), enabled)
+
+    private fun setVideoRoomHandleInfo(videoRoomHandleInfo: VideoRoomHandleInfo) {
+        publisherPeerConnection.setHandleId(videoRoomHandleInfo.defaultPublisherHandleId)
+        subscriberPeerConnection.setHandleId(videoRoomHandleInfo.subscriberHandleId)
     }
 
-    private suspend fun sendOffer() {
-        val sessionId = currentSessionId ?: makeSessionId()
-        val offer = peerConnection.createOffer().getOrThrow()
-        val result = peerConnection.setLocalDescription(offer)
-        val message = SignalingMessage.Offer(offer.description, sessionId)
-        result.onSuccess {
-            signalingClient.sendOffer(message)
-        }
-    }
-
-    private suspend fun sendAnswer() {
-        val sessionId = currentSessionId ?: return
-        val answer = peerConnection.createAnswer().getOrThrow()
-        val result = peerConnection.setLocalDescription(answer)
-        val message = SignalingMessage.Answer(answer.description, sessionId)
-        result.onSuccess {
-            signalingClient.sendAnswer(message)
-        }
-    }
-
-    private fun sendIceCandidate(iceCandidate: IceCandidate) {
-        val sessionId = currentSessionId ?: return
-        val message = SignalingMessage.IceCandidate(
+    private fun sendIceCandidate(handleId: Long, iceCandidate: IceCandidate) {
+        val message = SignalingIceCandidate(
             sdpMid = iceCandidate.sdpMid,
             sdpMLineIndex = iceCandidate.sdpMLineIndex,
             candidate = iceCandidate.sdp,
-            sessionId = sessionId
+            handleId = handleId
         )
-        signalingClient.sendIceCandidate(message)
-    }
-
-    private suspend fun handleOffer(sdp: String, sessionId: String) {
-        currentSessionId = sessionId
-        peerConnection.setRemoteDescription(
-            SessionDescription(SessionDescription.Type.OFFER, sdp)
-        ).onSuccess {
-            offerArrived.complete(Unit)
-            pendingIce.forEach { peerConnection.addIceCandidate(it) }
-            pendingIce.clear()
-            sendAnswer()
-        }
-    }
-
-    private suspend fun handleAnswer(sdp: String, sessionId: String) {
-        if (currentSessionId != sessionId) return
-        peerConnection.setRemoteDescription(
-            SessionDescription(SessionDescription.Type.ANSWER, sdp)
-        )
-    }
-
-    private suspend fun handleIceCandidate(candidate: SignalingMessage.IceCandidate) {
-        if (currentSessionId != candidate.sessionId) return
-        val iceCandidate =
-            IceCandidate(candidate.sdpMid, candidate.sdpMLineIndex, candidate.candidate)
-        if (peerConnection.connection.remoteDescription != null) {
-            peerConnection.addIceCandidate(iceCandidate)
-        } else {
-            pendingIce += iceCandidate
-        }
-    }
-
-    private fun makeSessionId(): String {
-        return UUID.randomUUID().toString().also {
-            currentSessionId = it
-        }
-    }
-
-    private fun restartNegotiation() {
         sessionScope.launch {
-            peerConnection.connection.close()
-            pendingIce.clear()
-            offerArrived = CompletableDeferred()
-            currentSessionId = null
-            sendOffer()
+            signalingClient.sendSignalingRequest(message)
+        }
+    }
+
+    private fun sendCompleteIceCandidate(handleId: Long) {
+        val message = CompleteIceCandidate(handleId = handleId)
+        sessionScope.launch {
+            signalingClient.sendSignalingRequest(message)
         }
     }
 
@@ -254,43 +222,140 @@ class WebRtcSessionManagerImpl @AssistedInject constructor(
                     videoStream = video,
                     audioStream = audio
                 )
+
                 audio is RemoteAudioStream && video is RemoteVideoStream -> RemoteMediaUser(
                     userId = audio.userId,
                     mediaContentType = audio.mediaContentType,
                     videoStream = video,
                     audioStream = audio
                 )
+
                 else -> null
             }
         }
     }
 
-    init {
-        sessionScope.launch {
-            signalingClient.observeSignalingMsg().collect {
-                when (it) {
-                    is SignalingMessage.Answer -> handleAnswer(it.sdp, it.sessionId)
-                    is SignalingMessage.Offer -> handleOffer(it.sdp, it.sessionId)
-                    is SignalingMessage.IceCandidate -> handleIceCandidate(it)
-                }
+    private suspend fun sendJoinPublisher(handleId: Long, mediaContentType: MediaContentType) {
+        val message = JoinRoomPublisher(handleId = handleId, mediaContentType = mediaContentType.type)
+        signalingClient.sendSignalingRequest(message)
+    }
+
+    private suspend fun sendJoinSubscriber(feeds: List<PublisherFeedResponse>) {
+        if(feeds.isEmpty()) return
+
+        val message = JoinRoomSubscriber(
+            privateId = privateId,
+            feeds = feeds.map { it.toSubscriberFeedRequest() }
+        )
+        signalingClient.sendSignalingRequest(message)
+    }
+
+    private suspend fun sendSubscribeAdd(feeds: List<PublisherFeedResponse>) {
+        if (feeds.isEmpty()) return
+        val message = SubscriberUpdate(
+            subscribeFeeds = feeds.map { it.toSubscriberFeedRequest() },
+            unsubscribeFeeds = emptyList()
+        )
+        signalingClient.sendSignalingRequest(message)
+    }
+
+    private suspend fun sendPublisherOffer(handleId: Long, mediaContentType: String) {
+        val peerConnection = peerConnectionList.first { it.handleId == handleId }
+        val offer = peerConnection.createOffer().getOrThrow()
+        val result = peerConnection.setLocalDescription(offer)
+
+        val videoCodec = peerConnectionFactory.getVideoCodec()
+        val audioCodec = peerConnectionFactory.getAudioCodec()
+        val message = PublisherOffer(
+            offerSdp = offer.description,
+            handleId = handleId,
+            audioCodec = audioCodec,
+            videoCodec = videoCodec,
+            audioMid = peerConnection.audioMid,
+            videoMid = peerConnection.videoMid,
+            mediaContentType = mediaContentType
+        )
+
+        result.onSuccess {
+            signalingClient.sendSignalingRequest(message)
+        }
+    }
+
+    private suspend fun onPublisherAnswer(handleId: Long, answerSdp: String) {
+        peerConnectionList
+            .first { it.handleId == handleId }
+            .setRemoteDescription(SessionDescription(SessionDescription.Type.ANSWER, answerSdp)
+        )
+    }
+
+    private suspend fun onSubscriberOffer(offerSdp: String, handleId: Long) {
+        subscriberPeerConnection.setRemoteDescription(
+            SessionDescription(SessionDescription.Type.OFFER, offerSdp)
+        ).onSuccess {
+            val answer = subscriberPeerConnection.createAnswer().getOrThrow()
+            val result = subscriberPeerConnection.setLocalDescription(answer)
+            val message = SubscriberAnswer(answerSdp = answer.description, handleId = handleId)
+
+            result.onSuccess {
+                signalingClient.sendSignalingRequest(message)
             }
         }
+    }
 
+    private suspend fun onRemoteIceCandidate(handleId: Long, iceCandidate: IceCandidate) {
+        peerConnectionList
+            .first { it.handleId == handleId }
+            .addIceCandidate(iceCandidate.toWebRtcCandidate())
+    }
+
+    init {
         sessionScope.launch {
-            signalingClient.observeMediaMsg().collect {
-                when (it) {
-                    is MediaMessage.AudioStateChange -> audioManager.setAudioStateChange(it)
-                    is MediaMessage.VideoStateChange -> videoManager.setVideoStateChange(it)
+            signalingClient.observeSignalingResponse().collect {
+                when(it) {
+                    is JoinedRoomPublisher -> {
+                        sendPublisherOffer(it.publisherHandleId, it.mediaContentType)
+                        if(it.publisherHandleId == publisherPeerConnection.handleId) {
+                            privateId = it.privateId
+                            sendJoinSubscriber(it.feeds)
+                        }
+                    }
+                    is PublisherAnswer -> onPublisherAnswer(it.publisherHandleId, it.answerSdp)
+                    is SubscriberOffer -> {
+                        midMapper.putAll(it.feeds.toMidMap())
+                        onSubscriberOffer(it.offerSdp, it.subscriberHandleId)
+                    }
+                    is OnIceCandidate -> onRemoteIceCandidate(
+                        handleId = it.handleId,
+                        iceCandidate = IceCandidate(
+                            sdpMid = it.sdpMid,
+                            sdpMLineIndex = it.sdpMLineIndex,
+                            sdp = it.candidate
+                        )
+                    )
+
+                    is OnNewPublisher -> {
+                        if(midMapper.isEmpty()) {
+                            sendJoinSubscriber(it.feeds)
+                        } else {
+                            sendSubscribeAdd(it.feeds)
+                        }
+                    }
                 }
             }
         }
 
         sessionScope.launch {
             videoManager.localVideoEvent.collect {
-                when(it) {
+                when (it) {
                     is LocalVideoEvent.EnabledChanged -> TODO()
                 }
             }
         }
     }
+
+    private fun org.webrtc.IceCandidate.toWebRtcCandidate(): IceCandidate = IceCandidate(
+        sdpMid = sdpMid,
+        sdpMLineIndex = sdpMLineIndex,
+        sdp = sdp
+    )
 }
