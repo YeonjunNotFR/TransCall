@@ -38,7 +38,7 @@ data class SubscriberAnswer(
 data class SignalingIceCandidate(
     val handleId: Long,
     val candidate: String,
-    val sdpMid: String,
+    val sdpMid: String?,
     val sdpMLineIndex: Int,
 ) : SignalingMessageRequest
 
