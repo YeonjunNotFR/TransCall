@@ -105,7 +105,7 @@ internal data class SignalingIceCandidateDto(
     @SerialName("candidate")
     val candidate: String,
     @SerialName("sdpMid")
-    val sdpMid: String,
+    val sdpMid: String?,
     @SerialName("sdpMLineIndex")
     val sdpMLineIndex: Int,
 ) : SignalingRequestDto {
