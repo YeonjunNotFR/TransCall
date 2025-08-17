@@ -1,10 +1,11 @@
 package com.youhajun.domain.calling
 
-import com.youhajun.core.model.calling.CallingMessage
+import com.youhajun.core.model.calling.ClientMessage
+import com.youhajun.core.model.calling.ServerMessage
 import kotlinx.coroutines.flow.Flow
 
 interface CallingRepository {
-    fun connect(roomId: String): Flow<CallingMessage>
-    suspend fun send(message: CallingMessage)
+    fun connect(roomId: String): Flow<ServerMessage>
+    suspend fun send(message: ClientMessage)
     suspend fun close()
 }
