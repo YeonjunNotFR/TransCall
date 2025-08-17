@@ -6,10 +6,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class JoinRoomUseCase @Inject constructor(
+class JoinRoomByCodeUseCase @Inject constructor(
     private val repository: RoomRepository
 ) {
-    suspend operator fun invoke(roomId: String): Result<RoomInfo> {
-        return repository.joinRoom(roomId)
+    suspend operator fun invoke(roomCode: String): Result<RoomInfo> {
+        return repository.joinRoomByCode(roomCode)
     }
 }
