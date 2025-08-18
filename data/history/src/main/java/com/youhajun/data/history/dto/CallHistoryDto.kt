@@ -33,7 +33,7 @@ internal data class CallHistoryDto(
         startedAtToEpochTime = startedAtToEpochTime,
         endedAtToEpochTime = endedAtToEpochTime,
         durationSeconds = durationSeconds,
-        participants = participants.map { it.toModel() }.toImmutableList(),
+        currentParticipants = participants.map { it.toModel() }.toImmutableList(),
         memo = memo,
         isLiked = isLiked,
     )
