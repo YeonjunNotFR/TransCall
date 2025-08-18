@@ -14,8 +14,8 @@ internal class RoomRepositoryImpl @Inject constructor(
         remote.createRoom(request.toDto())
     }
 
-    override suspend fun joinRoom(roomId: String): Result<RoomInfo> = runCatching {
-        remote.joinRoom(roomId).toModel()
+    override suspend fun joinRoomByCode(roomCode: String): Result<RoomInfo> = runCatching {
+        remote.joinRoomByCode(roomCode).toModel()
     }
 
     override suspend fun deleteRoom(roomId: String) = runCatching {

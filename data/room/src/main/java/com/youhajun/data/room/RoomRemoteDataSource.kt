@@ -7,6 +7,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 internal interface RoomRemoteDataSource {
     suspend fun createRoom(request: CreateRoomRequestDto): String
-    suspend fun joinRoom(roomId: String): RoomInfoDto
+    suspend fun joinRoomByCode(roomCode: String): RoomInfoDto
     suspend fun leaveRoom(roomId: String)
     suspend fun deleteRoom(roomId: String)
     suspend fun getRoomInfo(roomId: String): RoomInfoDto
@@ -32,8 +33,10 @@ internal class RoomRemoteDataSourceImpl @Inject constructor(
         }.body()
     }
 
-    override suspend fun joinRoom(roomId: String): RoomInfoDto {
-        return client.post(RoomEndpoint.Join(roomId).path).body()
+    override suspend fun joinRoomByCode(roomCode: String): RoomInfoDto {
+        return client.get(RoomEndpoint.JoinRoomByCode.path) {
+            parameter("roomCode", roomCode)
+        }.body()
     }
 
     override suspend fun deleteRoom(roomId: String) {

@@ -1,32 +1,40 @@
 package com.youhajun.data.room.dto
 
 import com.youhajun.core.model.room.RoomInfo
-import com.youhajun.core.model.room.RoomType
-import kotlinx.collections.immutable.toImmutableList
+import com.youhajun.core.model.room.RoomJoinType
+import com.youhajun.core.model.room.RoomStatus
+import com.youhajun.core.model.room.RoomVisibility
+import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class RoomInfoDto(
-    @SerialName("code")
-    val code: String = "",
-    @SerialName("name")
-    val name: String = "",
-    @SerialName("hostId")
-    val hostId: String = "",
-    @SerialName("participants")
-    val participants: List<ParticipantDto> = emptyList(),
-    @SerialName("createdAt")
-    val createdAt: Long = 0,
-    @SerialName("roomType")
-    val roomType: String = ""
+data class RoomInfoDto(
+    @SerialName("roomId")
+    val roomId: String,
+    @SerialName("roomCode")
+    val roomCode: String = "",
+    @SerialName("title")
+    val title: String = "",
+    @SerialName("maxParticipantCount")
+    val maxParticipantCount: Int = 0,
+    @SerialName("visibility")
+    val visibility: String = "",
+    @SerialName("joinType")
+    val joinType: String = "",
+    @SerialName("tags")
+    val tags: Set<String> = emptySet(),
+    @SerialName("status")
+    val status: String = "",
 ) {
     fun toModel(): RoomInfo = RoomInfo(
-        code = code,
-        name = name,
-        hostId = hostId,
-        participants = participants.map { it.toModel() }.toImmutableList(),
-        createdAt = createdAt,
-        roomType = RoomType.fromType(roomType)
+        roomId = roomId,
+        roomCode = roomCode,
+        title = title,
+        maxParticipantCount = maxParticipantCount,
+        visibility = RoomVisibility.fromType(visibility),
+        joinType = RoomJoinType.fromType(joinType),
+        tags = tags.toImmutableSet(),
+        status = RoomStatus.fromType(status),
     )
 }
