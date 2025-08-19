@@ -5,18 +5,16 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
-import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.youhajun.core.design.TransCallTheme
 import com.youhajun.core.route.rememberNavigationEventHandler
 import com.youhajun.feature.auth.api.GoogleAuthManager
 import com.youhajun.feature.auth.impl.util.LocalGoogleAuthManager
+import com.youhajun.feature.call.api.CallIntentFactory
+import com.youhajun.feature.call.api.LocalCallIntentFactory
 import com.youhajun.feature.main.navigation.MainTab
 import com.youhajun.feature.main.navigation.rememberMainNavigator
-import com.youhajun.transcall.core.ui.components.locals.LocalEglBaseContext
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.collections.immutable.toImmutableList
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -30,10 +28,12 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var googleAuthManager: GoogleAuthManager
 
+    @Inject
+    lateinit var callIntentFactory: CallIntentFactory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         handleIntent(intent)
 
         setContent {
@@ -51,7 +51,8 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 CompositionLocalProvider(
-                    LocalGoogleAuthManager provides googleAuthManager
+                    LocalGoogleAuthManager provides googleAuthManager,
+                    LocalCallIntentFactory provides callIntentFactory
                 ) {
                     MainScreen(
                         navController = navigator,
