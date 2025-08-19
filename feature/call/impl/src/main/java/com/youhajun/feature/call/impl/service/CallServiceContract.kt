@@ -1,16 +1,16 @@
 package com.youhajun.feature.call.impl.service
 
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.youhajun.core.model.calling.CallingMessage
+import com.youhajun.core.model.calling.ServerMessage
+import com.youhajun.core.model.calling.type.MediaContentType
 import com.youhajun.webrtc.model.AudioDeviceType
 import com.youhajun.webrtc.model.CallMediaUser
-import com.youhajun.webrtc.model.MediaContentType
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface CallServiceContract {
     val mediaUsersFlow: StateFlow<List<CallMediaUser>>
-    val messageFlow: SharedFlow<CallingMessage>
+    val messageFlow: SharedFlow<ServerMessage>
 
     fun flipCamera()
     fun setCameraEnabled(enabled: Boolean)
