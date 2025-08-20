@@ -8,10 +8,13 @@ import android.os.IBinder
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.youhajun.core.design.TransCallTheme
@@ -40,7 +43,7 @@ class CallActivity : AppCompatActivity() {
     @Inject
     lateinit var eglBaseContext: EglBase.Context
 
-    private var callServiceContract: CallServiceContract? = null
+    private var callServiceContract: CallServiceContract? by mutableStateOf(null)
     private var isBound = false
 
     private val serviceConnection = object : ServiceConnection {
@@ -59,7 +62,6 @@ class CallActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         val roomId = intent.getStringExtra(INTENT_KEY_ROOM_ID) ?: throw IllegalArgumentException("Room code is required")
         startCallService(roomId)
 
@@ -72,7 +74,7 @@ class CallActivity : AppCompatActivity() {
                     LocalCallServiceContract provides callServiceContract
                 ) {
                     NavHost(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize().safeContentPadding(),
                         navController = navigator,
                         startDestination = CallNavRoute.Calling(roomId)
                     ) {
