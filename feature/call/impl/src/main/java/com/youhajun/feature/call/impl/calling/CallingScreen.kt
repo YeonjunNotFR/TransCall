@@ -42,15 +42,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
-import com.youhajun.core.model.calling.StageMessageType
 import com.youhajun.core.model.conversation.Conversation
-import com.youhajun.core.model.room.RoomType
+import com.youhajun.core.model.room.RoomJoinType
 import com.youhajun.core.route.NavigationEvent
 import com.youhajun.feature.call.impl.component.BottomCallController
 import com.youhajun.feature.call.impl.component.RoomCodeComp
@@ -75,7 +73,7 @@ internal fun CallingRoute(
     val callServiceContract = LocalCallServiceContract.current
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(callServiceContract) {
         viewModel.setCallServiceContract(callServiceContract)
     }
 
@@ -110,37 +108,46 @@ internal fun CallingScreen(
 ) {
     AnimatedContent(
         modifier = Modifier.fillMaxSize(),
-        targetState = state.stageMessageType,
+        targetState = state.callingScreenType,
     ) {
         when (it) {
-            is StageMessageType.Signaling, StageMessageType.Waiting -> WaitingScreenType(
-                roomCode = state.roomInfo.code,
-                myCameraCallUser = state.myCameraCallUser,
-                roomType = state.roomInfo.roomType,
+            is CallingScreenType.Waiting -> WaitingScreenType(
+                roomCode = state.roomInfo.roomCode,
+                myDefaultCallUser = state.myDefaultCallUser,
+                roomJoinType = state.roomInfo.joinType,
                 callControlActionList = state.callControlActionList,
                 onClickCallAction = onClickCallAction,
                 onClickRoomCodeCopy = onClickRoomCodeCopy,
                 onClickRoomCodeShare = onClickRoomCodeShare
             )
-
-            StageMessageType.Calling -> CallingScreenType(
-                screenType = state.callingScreenType,
-                callUserUiList = state.callUserUiModelList,
+            is CallingScreenType.FloatingAndFull -> CallingScreenContainer(
                 recentConversation = state.recentConversation,
                 isShowBottomCallController = state.isShowBottomCallController,
                 callControlActionList = state.callControlActionList,
                 onClickCallAction = onClickCallAction,
                 onTabCallingScreen = onTabCallingScreen,
-                onDoubleTapGrid = onDoubleTapGrid,
-                onDoubleTapFloating = onDoubleTapFloating,
-                onDoubleTapFull = onDoubleTapFull
-            )
+            ) {
+                CallingFloatingScreenType(
+                    floatingScreenType = it,
+                    onDoubleTapFloating = onDoubleTapFloating,
+                    onDoubleTapFull = onDoubleTapFull
+                )
+            }
 
-            StageMessageType.Ended -> SummaryScreenType(
+            is CallingScreenType.Grid -> CallingScreenContainer(
+                recentConversation = state.recentConversation,
+                isShowBottomCallController = state.isShowBottomCallController,
+                callControlActionList = state.callControlActionList,
+                onClickCallAction = onClickCallAction,
+                onTabCallingScreen = onTabCallingScreen,
+            ) {
+                CallingGridScreenType(
+                    callUserUiList = state.callUserUiModelList,
+                    onDoubleTapGrid = onDoubleTapGrid
+                )
+            }
 
-            )
-
-            is StageMessageType.Error -> Unit
+            CallingScreenType.Summary -> SummaryScreenType()
         }
     }
 }
@@ -148,14 +155,14 @@ internal fun CallingScreen(
 @Composable
 private fun WaitingScreenType(
     roomCode: String,
-    myCameraCallUser: CallUserUiModel?,
-    roomType: RoomType,
+    myDefaultCallUser: CallUserUiModel?,
+    roomJoinType: RoomJoinType,
     callControlActionList: ImmutableList<CallControlAction>,
     onClickCallAction: (CallControlAction) -> Unit,
     onClickRoomCodeCopy: () -> Unit,
     onClickRoomCodeShare: () -> Unit,
 ) {
-    val myCameraVideo = myCameraCallUser?.mediaUser?.videoStream
+    val myCameraVideo = myDefaultCallUser?.mediaUser?.videoStream
     val isFrontCamera = myCameraVideo is LocalVideoStream && myCameraVideo.isFrontCamera
 
     Column(
@@ -188,8 +195,8 @@ private fun WaitingScreenType(
                             .fillMaxSize()
                             .background(Colors.SurfaceDark)
                             .padding(24.dp),
-                        isSpeaking = myCameraCallUser?.mediaUser?.audioStream?.isSpeaking ?: false,
-                        participant = myCameraCallUser?.participant,
+                        isSpeaking = myDefaultCallUser?.mediaUser?.audioStream?.isSpeaking ?: false,
+                        currentParticipant = myDefaultCallUser?.currentParticipant,
                         displayNameTextStyle = Typography.displayMedium.copy(
                             fontSize = 40.sp,
                         ),
@@ -201,7 +208,7 @@ private fun WaitingScreenType(
                 }
             )
 
-            if (roomType == RoomType.CODE_JOIN) {
+            if (roomJoinType == RoomJoinType.CODE_JOIN) {
                 VerticalSpacer(28.dp)
 
                 RoomCodeComp(
@@ -238,17 +245,13 @@ private fun WaitingScreenType(
 }
 
 @Composable
-private fun CallingScreenType(
-    screenType: CallingScreenType,
-    callUserUiList: ImmutableList<CallUserUiModel>,
+private fun CallingScreenContainer(
     recentConversation: Conversation?,
     isShowBottomCallController: Boolean,
     callControlActionList: ImmutableList<CallControlAction>,
     onClickCallAction: (CallControlAction) -> Unit,
     onTabCallingScreen: () -> Unit,
-    onDoubleTapGrid: (CallUserUiModel) -> Unit,
-    onDoubleTapFloating: () -> Unit,
-    onDoubleTapFull: () -> Unit
+    container: @Composable () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -267,22 +270,7 @@ private fun CallingScreenType(
                 .fillMaxWidth()
                 .weight(1f),
         ) {
-            when (screenType) {
-                is CallingScreenType.Grid -> {
-                    CallingGridScreenType(
-                        callUserUiList = callUserUiList,
-                        onDoubleTapGrid = onDoubleTapGrid
-                    )
-                }
-
-                is CallingScreenType.FloatingAndFull -> {
-                    CallingFloatingScreenType(
-                        floatingScreenType = screenType,
-                        onDoubleTapFloating = onDoubleTapFloating,
-                        onDoubleTapFull = onDoubleTapFull
-                    )
-                }
-            }
+            container()
 
             SubtitleStack(
                 conversation = recentConversation,
@@ -386,7 +374,7 @@ private fun CallingGridTypeTile(
                     .background(Colors.SurfaceDark)
                     .padding(24.dp),
                 isSpeaking = callUserUiModel.mediaUser.audioStream.isSpeaking,
-                participant = callUserUiModel.participant,
+                currentParticipant = callUserUiModel.currentParticipant,
                 displayNameTextStyle = Typography.displayMedium.copy(
                     fontSize = 20.sp,
                 ),
@@ -432,7 +420,7 @@ private fun CallingFloatingScreenType(
                         .background(Colors.SurfaceDark)
                         .padding(32.dp),
                     isSpeaking = floatingScreenType.fullCallUser.mediaUser.audioStream.isSpeaking,
-                    participant = floatingScreenType.fullCallUser.participant,
+                    currentParticipant = floatingScreenType.fullCallUser.currentParticipant,
                     displayNameTextStyle = Typography.displayMedium.copy(
                         fontSize = 40.sp,
                     ),
@@ -467,7 +455,7 @@ private fun CallingFloatingScreenType(
                         .background(Colors.SurfaceDark)
                         .padding(8.dp),
                     isSpeaking = floatingScreenType.floatingCallUser.mediaUser.audioStream.isSpeaking,
-                    participant = floatingScreenType.floatingCallUser.participant,
+                    currentParticipant = floatingScreenType.floatingCallUser.currentParticipant,
                     displayNameTextStyle = Typography.displaySmall.copy(
                         fontSize = 20.sp
                     ),

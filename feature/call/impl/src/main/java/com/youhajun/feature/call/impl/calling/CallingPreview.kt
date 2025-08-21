@@ -3,25 +3,23 @@ package com.youhajun.feature.call.impl.calling
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.youhajun.core.model.LanguageType
-import com.youhajun.core.model.room.Participant
-import com.youhajun.core.model.room.RoomInfo
-import com.youhajun.core.model.room.RoomType
-import com.youhajun.core.model.calling.StageMessageType
+import com.youhajun.core.model.calling.type.MediaContentType
 import com.youhajun.core.model.conversation.Conversation
 import com.youhajun.core.model.conversation.SenderInfo
+import com.youhajun.core.model.room.CurrentParticipant
+import com.youhajun.core.model.room.RoomInfo
+import com.youhajun.core.model.room.RoomJoinType
 import com.youhajun.feature.call.impl.model.CallUserUiModel
 import com.youhajun.feature.call.impl.model.CallingScreenType
 import com.youhajun.webrtc.model.AudioDeviceType
 import com.youhajun.webrtc.model.LocalAudioStream
 import com.youhajun.webrtc.model.LocalMediaUser
 import com.youhajun.webrtc.model.LocalVideoStream
-import com.youhajun.webrtc.model.MediaContentType
 import com.youhajun.webrtc.model.RemoteAudioStream
 import com.youhajun.webrtc.model.RemoteMediaUser
 import com.youhajun.webrtc.model.RemoteVideoStream
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-
 
 @Preview
 @Composable
@@ -30,35 +28,35 @@ internal fun WaitingScreenPreview() {
         state = CallingState(
             myUserId = "1",
             roomInfo = RoomInfo(
-                code = "123456",
-                participants = persistentListOf(
-                    Participant(
-                        userId = "1",
-                        displayName = "User 1",
-                        imageUrl = "",
-                        language = LanguageType.ENGLISH
-                    ),
+                roomId = "1",
+                roomCode = "123456",
+                joinType = RoomJoinType.CODE_JOIN,
+            ),
+            participants = persistentListOf(
+                CurrentParticipant(
+                    userId = "1",
+                    displayName = "User 1",
+                    imageUrl = "",
+                    language = LanguageType.ENGLISH
                 ),
-                roomType = RoomType.CODE_JOIN
             ),
             isShowBottomCallController = true,
-            stageMessageType = StageMessageType.Waiting,
             callingScreenType = CallingScreenType.Grid,
             callMediaUsers = persistentListOf(
                 LocalMediaUser(
                     userId = "1",
-                    mediaContentType = MediaContentType.CAMERA,
+                    mediaContentType = MediaContentType.DEFAULT.type,
                     videoStream = LocalVideoStream(
                         videoTrack = null,
                         isFrontCamera = true,
                         isVideoEnable = true,
-                        mediaContentType = MediaContentType.CAMERA,
+                        mediaContentType = MediaContentType.DEFAULT.type,
                         userId = "1"
                     ),
                     audioStream = LocalAudioStream(
                         isMicEnabled = true,
                         selectedDevice = AudioDeviceType.NONE,
-                        mediaContentType = MediaContentType.CAMERA,
+                        mediaContentType = MediaContentType.DEFAULT.type,
                         userId = "1",
                         audioTrack = null
                     )
@@ -83,22 +81,17 @@ internal fun CallingScreenFloatingType() {
         state = CallingState(
             myUserId = "1",
             roomInfo = RoomInfo(
-                code = "123456",
-                participants = persistentListOf(
-                    Participant(
-                        userId = "1",
-                        displayName = "User 1",
-                        imageUrl = "",
-                        language = LanguageType.ENGLISH
-                    ),
-                    Participant(
-                        userId = "2",
-                        displayName = "User 2",
-                        imageUrl = "",
-                        language = LanguageType.ENGLISH
-                    )
+                roomId = "1",
+                roomCode = "123456",
+                joinType = RoomJoinType.CODE_JOIN
+            ),
+            participants = persistentListOf(
+                CurrentParticipant(
+                    userId = "1",
+                    displayName = "User 1",
+                    imageUrl = "",
+                    language = LanguageType.ENGLISH
                 ),
-                roomType = RoomType.CODE_JOIN
             ),
             recentConversation = Conversation(
                 id = "1",
@@ -115,10 +108,9 @@ internal fun CallingScreenFloatingType() {
                 timestamp = System.currentTimeMillis()
             ),
             isShowBottomCallController = true,
-            stageMessageType = StageMessageType.Calling,
             callingScreenType = CallingScreenType.FloatingAndFull(
                 floatingCallUser = CallUserUiModel(
-                    participant = Participant(
+                    currentParticipant = CurrentParticipant(
                         userId = "1",
                         displayName = "User 1",
                         imageUrl = "",
@@ -126,25 +118,25 @@ internal fun CallingScreenFloatingType() {
                     ),
                     mediaUser = LocalMediaUser(
                         userId = "1",
-                        mediaContentType = MediaContentType.CAMERA,
+                        mediaContentType = MediaContentType.DEFAULT.type,
                         videoStream = LocalVideoStream(
                             videoTrack = null,
                             isFrontCamera = true,
                             isVideoEnable = true,
-                            mediaContentType = MediaContentType.CAMERA,
+                            mediaContentType = MediaContentType.DEFAULT.type,
                             userId = "1"
                         ),
                         audioStream = LocalAudioStream(
                             isMicEnabled = true,
                             selectedDevice = AudioDeviceType.NONE,
-                            mediaContentType = MediaContentType.CAMERA,
+                            mediaContentType = MediaContentType.DEFAULT.type,
                             userId = "1",
                             audioTrack = null
                         )
                     )
                 ),
                 fullCallUser = CallUserUiModel(
-                    participant = Participant(
+                    currentParticipant = CurrentParticipant(
                         userId = "2",
                         displayName = "User 2",
                         imageUrl = "",
@@ -152,16 +144,16 @@ internal fun CallingScreenFloatingType() {
                     ),
                     mediaUser = RemoteMediaUser(
                         userId = "2",
-                        mediaContentType = MediaContentType.CAMERA,
+                        mediaContentType = MediaContentType.DEFAULT.type,
                         videoStream = RemoteVideoStream(
                             videoTrack = null,
                             isVideoEnable = true,
-                            mediaContentType = MediaContentType.CAMERA,
+                            mediaContentType = MediaContentType.DEFAULT.type,
                             userId = "2"
                         ),
                         audioStream = RemoteAudioStream(
                             isMicEnabled = true,
-                            mediaContentType = MediaContentType.CAMERA,
+                            mediaContentType = MediaContentType.DEFAULT.type,
                             userId = "2",
                             audioTrack = null
                         )
@@ -171,34 +163,34 @@ internal fun CallingScreenFloatingType() {
             callMediaUsers = persistentListOf(
                 LocalMediaUser(
                     userId = "1",
-                    mediaContentType = MediaContentType.CAMERA,
+                    mediaContentType = MediaContentType.DEFAULT.type,
                     videoStream = LocalVideoStream(
                         videoTrack = null,
                         isFrontCamera = true,
                         isVideoEnable = true,
-                        mediaContentType = MediaContentType.CAMERA,
+                        mediaContentType = MediaContentType.DEFAULT.type,
                         userId = "1"
                     ),
                     audioStream = LocalAudioStream(
                         isMicEnabled = true,
                         selectedDevice = AudioDeviceType.NONE,
-                        mediaContentType = MediaContentType.CAMERA,
+                        mediaContentType = MediaContentType.DEFAULT.type,
                         userId = "1",
                         audioTrack = null
                     )
                 ),
                 RemoteMediaUser(
                     userId = "2",
-                    mediaContentType = MediaContentType.CAMERA,
+                    mediaContentType = MediaContentType.DEFAULT.type,
                     videoStream = RemoteVideoStream(
                         videoTrack = null,
                         isVideoEnable = true,
-                        mediaContentType = MediaContentType.CAMERA,
+                        mediaContentType = MediaContentType.DEFAULT.type,
                         userId = "2"
                     ),
                     audioStream = RemoteAudioStream(
                         isMicEnabled = true,
-                        mediaContentType = MediaContentType.CAMERA,
+                        mediaContentType = MediaContentType.DEFAULT.type,
                         userId = "2",
                         audioTrack = null
                     )
@@ -224,18 +216,18 @@ internal fun CallingScreenGridType() {
         if (index == 1) {
             LocalMediaUser(
                 userId = userId,
-                mediaContentType = MediaContentType.CAMERA,
+                mediaContentType = MediaContentType.DEFAULT.type,
                 videoStream = LocalVideoStream(
                     videoTrack = null,
                     isFrontCamera = true,
                     isVideoEnable = true,
-                    mediaContentType = MediaContentType.CAMERA,
+                    mediaContentType = MediaContentType.DEFAULT.type,
                     userId = userId
                 ),
                 audioStream = LocalAudioStream(
                     isMicEnabled = true,
                     selectedDevice = AudioDeviceType.NONE,
-                    mediaContentType = MediaContentType.CAMERA,
+                    mediaContentType = MediaContentType.DEFAULT.type,
                     userId = userId,
                     audioTrack = null
                 )
@@ -243,16 +235,16 @@ internal fun CallingScreenGridType() {
         } else {
             RemoteMediaUser(
                 userId = userId,
-                mediaContentType = MediaContentType.CAMERA,
+                mediaContentType = MediaContentType.DEFAULT.type,
                 videoStream = RemoteVideoStream(
                     videoTrack = null,
                     isVideoEnable = true,
-                    mediaContentType = MediaContentType.CAMERA,
+                    mediaContentType = MediaContentType.DEFAULT.type,
                     userId = userId
                 ),
                 audioStream = RemoteAudioStream(
                     isMicEnabled = true,
-                    mediaContentType = MediaContentType.CAMERA,
+                    mediaContentType = MediaContentType.DEFAULT.type,
                     userId = userId,
                     audioTrack = null
                 )
@@ -260,8 +252,8 @@ internal fun CallingScreenGridType() {
         }
     }.toImmutableList()
 
-    val participantList = (1..callMediaUserSize).map { index ->
-        Participant(
+    val currentParticipantList = (1..callMediaUserSize).map { index ->
+        CurrentParticipant(
             userId = index.toString(),
             displayName = "User $index",
             imageUrl = "",
@@ -273,12 +265,12 @@ internal fun CallingScreenGridType() {
         state = CallingState(
             myUserId = "1",
             roomInfo = RoomInfo(
-                code = "123456",
-                participants = participantList,
-                roomType = RoomType.CODE_JOIN
+                roomId = "1",
+                roomCode = "123456",
+                joinType = RoomJoinType.CODE_JOIN
             ),
+            participants = currentParticipantList,
             isShowBottomCallController = true,
-            stageMessageType = StageMessageType.Calling,
             callingScreenType = CallingScreenType.Grid,
             callMediaUsers = callMediaUserList,
             recentConversation = Conversation(
