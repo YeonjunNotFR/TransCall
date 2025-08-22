@@ -9,12 +9,14 @@ android {
 }
 
 dependencies {
+    implementation(projects.feature.call.api)
     implementation(projects.feature.home.api)
     implementation(projects.feature.room.api)
     implementation(projects.feature.history.api)
     implementation(projects.domain.user)
     implementation(projects.domain.room)
     implementation(projects.domain.history)
+    implementation(projects.core.permission)
     implementation(projects.core.ui)
     implementation(projects.core.design)
     implementation(projects.core.model)
