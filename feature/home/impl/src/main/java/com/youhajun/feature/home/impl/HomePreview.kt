@@ -6,7 +6,7 @@ import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.MembershipPlan
 import com.youhajun.core.model.RemainTime
 import com.youhajun.core.model.calling.CallHistory
-import com.youhajun.core.model.room.Participant
+import com.youhajun.core.model.room.CurrentParticipant
 import com.youhajun.core.model.user.MyInfo
 import kotlinx.collections.immutable.persistentListOf
 
@@ -32,8 +32,8 @@ internal fun HomePreview() {
                     historyId = "12345",
                     title = "Sample Call History Title",
                     summary = "This is a sample call history summary that is quite long and should be truncated if it exceeds the maximum line limit.",
-                    participants = persistentListOf(
-                        Participant(
+                    currentParticipants = persistentListOf(
+                        CurrentParticipant(
                             userId = "67890",
                             displayName = "John Doe dwaafwojfdkawdkadwkd dawkawd akwdkaw dawkd wa dwakd",
                             imageUrl = "https://example.com/image.jpg",
@@ -50,8 +50,8 @@ internal fun HomePreview() {
                     historyId = "12346",
                     title = "Sample Call History Title",
                     summary = "This is a sample call history summary that is quite long and should be truncated if it exceeds the maximum line limit.",
-                    participants = persistentListOf(
-                        Participant(
+                    currentParticipants = persistentListOf(
+                        CurrentParticipant(
                             userId = "67890",
                             displayName = "John Doe dwaafwojfdkawdkadwkd dawkawd akwdkaw dawkd wa dwakd",
                             imageUrl = "https://example.com/image.jpg",
@@ -68,8 +68,8 @@ internal fun HomePreview() {
                     historyId = "12347",
                     title = "Sample Call History Title",
                     summary = "This is a sample call history summary that is quite long and should be truncated if it exceeds the maximum line limit.",
-                    participants = persistentListOf(
-                        Participant(
+                    currentParticipants = persistentListOf(
+                        CurrentParticipant(
                             userId = "67890",
                             displayName = "John Doe dwaafwojfdkawdkadwkd dawkawd akwdkaw dawkd wa dwakd",
                             imageUrl = "https://example.com/image.jpg",
@@ -86,8 +86,8 @@ internal fun HomePreview() {
                     historyId = "12348",
                     title = "Sample Call History Title",
                     summary = "This is a sample call history summary that is quite long and should be truncated if it exceeds the maximum line limit.",
-                    participants = persistentListOf(
-                        Participant(
+                    currentParticipants = persistentListOf(
+                        CurrentParticipant(
                             userId = "67890",
                             displayName = "John Doe dwaafwojfdkawdkadwkd dawkawd akwdkaw dawkd wa dwakd",
                             imageUrl = "https://example.com/image.jpg",

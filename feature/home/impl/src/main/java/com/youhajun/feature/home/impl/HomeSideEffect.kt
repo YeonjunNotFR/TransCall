@@ -6,4 +6,5 @@ sealed class HomeSideEffect {
 
     data class GoToCall(val roomId: String) : HomeSideEffect()
     data class Navigation(val navigationEvent: NavigationEvent) : HomeSideEffect()
+    data object PermissionCheck : HomeSideEffect()
 }

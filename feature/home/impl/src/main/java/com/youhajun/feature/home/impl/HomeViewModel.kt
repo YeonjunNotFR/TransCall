@@ -6,8 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.youhajun.core.model.pagination.CursorPageRequest
 import com.youhajun.core.route.NavigationEvent
 import com.youhajun.domain.history.usecase.GetHistoryListUseCase
-import com.youhajun.domain.room.usecase.CreateRoomUseCase
-import com.youhajun.domain.room.usecase.JoinRoomUseCase
+import com.youhajun.domain.room.usecase.JoinRoomByCodeUseCase
 import com.youhajun.domain.user.usecase.GetMyInfoUseCase
 import com.youhajun.feature.history.api.HistoryNavRoute
 import com.youhajun.room.api.RoomNavRoute
@@ -26,13 +25,15 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getMyInfoUseCase: GetMyInfoUseCase,
-    private val joinRoomUseCase: JoinRoomUseCase,
+    private val joinRoomByCodeUseCase: JoinRoomByCodeUseCase,
     private val getHistoryListUseCase: GetHistoryListUseCase,
 ) : ContainerHost<HomeState, HomeSideEffect>, ViewModel() {
 
     override val container: Container<HomeState, HomeSideEffect> = container(HomeState(callHistoryPreviewMaxSize = CALL_HISTORY_PREVIEW_MAX_SIZE,)) {
         onInit()
     }
+
+    private var pendingJoinRoomCode: String? = null
 
     fun onClickCreateRoom() {
         val event = NavigationEvent.Navigate(route = RoomNavRoute.CreateRoom, launchSingleTop = true)
@@ -42,9 +43,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onClickJoinCall() {
-        intent {
-            reduce { state.copy(isShowJoinBottomSheet = true) }
-        }
+        onChangedJoinBottomSheetVisibility(true)
     }
 
     fun onClickHistoryMore() {
@@ -54,24 +53,30 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onClickJoinBottomSheetCancel() {
+        onChangedJoinBottomSheetVisibility(false)
+    }
+
     fun onChangedJoinBottomSheetVisibility(isVisible: Boolean) {
         intent {
             reduce { state.copy(isShowJoinBottomSheet = isVisible) }
         }
     }
 
-    fun onClickJoinBottomSheetCancel() {
+    fun onClickJoinBottomSheetConfirm(roomCode: String) {
+        pendingJoinRoomCode = roomCode
         intent {
-            reduce { state.copy(isShowJoinBottomSheet = false) }
+            postSideEffect(HomeSideEffect.PermissionCheck)
         }
     }
 
-    fun onClickJoinBottomSheetConfirm(roomId: String) {
+    fun onJoinRoomPermissionGranted() {
+        val roomCode = pendingJoinRoomCode ?: return
         viewModelScope.launch {
-            joinRoomUseCase(roomId)
+            joinRoomByCodeUseCase(roomCode)
                 .onSuccess { roomInfo ->
                     intent {
-                        postSideEffect(HomeSideEffect.GoToCall(roomInfo.code))
+                        postSideEffect(HomeSideEffect.GoToCall(roomInfo.roomId))
                     }
                 }
         }

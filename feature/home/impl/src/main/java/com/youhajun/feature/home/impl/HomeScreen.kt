@@ -1,5 +1,6 @@
 package com.youhajun.feature.home.impl
 
+import android.Manifest
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,7 +44,10 @@ import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
 import com.youhajun.core.model.calling.CallHistory
 import com.youhajun.core.model.user.MyInfo
+import com.youhajun.core.permission.PermissionHandler
+import com.youhajun.core.permission.rememberPermissionRequestController
 import com.youhajun.core.route.NavigationEvent
+import com.youhajun.feature.call.api.LocalCallIntentFactory
 import com.youhajun.transcall.core.ui.components.FilledActionButton
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.MembershipBadge
@@ -51,6 +56,7 @@ import com.youhajun.transcall.core.ui.components.bottomSheet.JoinWithCodeBottomS
 import com.youhajun.transcall.core.ui.components.history.CallHistoryItem
 import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
@@ -59,13 +65,32 @@ internal fun HomeRoute(
     onNavigate: (NavigationEvent) -> Unit
 ) {
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val permissionController = rememberPermissionRequestController()
+    val callIntentFactory = LocalCallIntentFactory.current
 
     viewModel.collectSideEffect {
         when (it) {
             is HomeSideEffect.Navigation -> onNavigate(it.navigationEvent)
-            is HomeSideEffect.GoToCall -> Unit
+            is HomeSideEffect.GoToCall -> {
+                val callIntent = callIntentFactory.getCallActivityIntent(context, it.roomId)
+                context.startActivity(callIntent)
+            }
+            HomeSideEffect.PermissionCheck -> {
+                permissionController.request()
+            }
         }
     }
+
+    PermissionHandler(
+        controller = permissionController,
+        permissions = persistentListOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
+        ),
+        rationaleMessage = stringResource(R.string.permission_rationale_message_camera_and_mic),
+        onPermissionGranted = viewModel::onJoinRoomPermissionGranted
+    )
 
     HomeScreen(
         state = state,
