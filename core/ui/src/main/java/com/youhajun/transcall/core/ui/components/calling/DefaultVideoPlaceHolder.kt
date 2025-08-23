@@ -30,7 +30,7 @@ import com.youhajun.core.design.Typography
 import com.youhajun.core.design.toDisplayIcon
 import com.youhajun.core.design.toDisplayName
 import com.youhajun.core.model.LanguageType
-import com.youhajun.core.model.room.Participant
+import com.youhajun.core.model.room.CurrentParticipant
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.modifier.speakingGlow
@@ -39,7 +39,7 @@ import com.youhajun.transcall.core.ui.components.modifier.speakingGlow
 fun DefaultVideoPlaceHolder(
     modifier: Modifier = Modifier,
     isSpeaking: Boolean,
-    participant: Participant?,
+    currentParticipant: CurrentParticipant?,
     displayNameTextStyle: TextStyle = Typography.displayLarge.copy(
         fontWeight = FontWeight.W800,
     ),
@@ -55,7 +55,7 @@ fun DefaultVideoPlaceHolder(
         verticalArrangement = Arrangement.Center
     ) {
         AsyncImage(
-            model = participant?.imageUrl,
+            model = currentParticipant?.imageUrl,
             contentDescription = null,
             error = painterResource(id = R.drawable.ic_person),
             placeholder = painterResource(id = R.drawable.ic_person),
@@ -70,19 +70,19 @@ fun DefaultVideoPlaceHolder(
         VerticalSpacer(24.dp)
 
         Text(
-            text = participant?.displayName ?: "",
+            text = currentParticipant?.displayName ?: "",
             color = Colors.White,
             style = displayNameTextStyle
         )
 
-        if(participant != null) {
+        if(currentParticipant != null) {
             VerticalSpacer(8.dp)
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(participant.language.toDisplayIcon()),
+                    painter = painterResource(currentParticipant.language.toDisplayIcon()),
                     contentDescription = null,
                     modifier = Modifier.size(languageIconSize)
                 )
@@ -90,7 +90,7 @@ fun DefaultVideoPlaceHolder(
                 HorizontalSpacer(4.dp)
 
                 Text(
-                    text = stringResource(participant.language.toDisplayName()),
+                    text = stringResource(currentParticipant.language.toDisplayName()),
                     color = Colors.Gray500,
                     style = languageTextStyle,
                 )
@@ -105,7 +105,7 @@ private fun VideoPlaceHolderPreview() {
     DefaultVideoPlaceHolder(
         modifier = Modifier.fillMaxSize().background(Colors.SurfaceDark),
         isSpeaking = true,
-        participant = Participant(
+        currentParticipant = CurrentParticipant(
             userId = "1",
             displayName = "John Doe",
             imageUrl = "https://example.com/image.jpg",

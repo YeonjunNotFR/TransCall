@@ -10,18 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,11 +28,10 @@ import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
 import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.calling.CallHistory
-import com.youhajun.core.model.room.Participant
+import com.youhajun.core.model.room.CurrentParticipant
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.image.MultipleCircleProfileImage
-import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import com.youhajun.transcall.core.ui.util.DateFormatPatterns
 import com.youhajun.transcall.core.ui.util.TimeFormatPatterns
 import com.youhajun.transcall.core.ui.util.toUiDateString
@@ -126,7 +121,7 @@ fun CallHistoryItem(
         ) {
             MultipleCircleProfileImage(
                 modifier = Modifier.weight(1f),
-                imageUrls = callHistory.participants.map { it.imageUrl }.toImmutableList(),
+                imageUrls = callHistory.currentParticipants.map { it.imageUrl }.toImmutableList(),
                 circleSize = 24.dp,
                 circleBorderColor = Colors.PrimaryLight,
                 maxVisibleCount = 6
@@ -165,8 +160,8 @@ private fun CallHistoryFullDateItemPreview() {
             historyId = "12345",
             title = "Sample Call History Title",
             summary = "This is a sample call history summary that is quite long and should be truncated if it exceeds the maximum line limit.",
-            participants = persistentListOf(
-                Participant(
+            currentParticipants = persistentListOf(
+                CurrentParticipant(
                     userId = "67890",
                     displayName = "John Doe dwaafwojfdkawdkadwkd dawkawd akwdkaw dawkd wa dwakd",
                     imageUrl = "https://example.com/image.jpg",
