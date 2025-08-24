@@ -155,8 +155,8 @@ private fun CreateRoomHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp, horizontal = 8.dp)
-            .bottomBorder(1.dp, Colors.FFEBEBEA),
+            .bottomBorder(1.dp, Colors.FFEBEBEA)
+            .padding(vertical = 12.dp, horizontal = 8.dp),
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_back),
