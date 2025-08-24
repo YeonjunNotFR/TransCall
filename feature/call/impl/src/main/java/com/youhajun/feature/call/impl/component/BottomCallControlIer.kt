@@ -70,10 +70,10 @@ private fun CallControlItem(
 }
 
 private fun CallControlAction.toCallControlActionHolder(): CallControlActionHolder = when (this) {
-    is CallControlAction.ToggleMicMute -> CallControlActionHolder(
-        backgroundColor = if (isMute) Colors.White else Colors.FF292929,
-        iconTint = if (isMute) Colors.Black else Colors.LightGray,
-        icon = if (isMute) R.drawable.ic_call_mic_off else R.drawable.ic_call_mic_on,
+    is CallControlAction.ToggleMicEnable -> CallControlActionHolder(
+        backgroundColor = if (isEnable) Colors.FF292929 else Colors.White,
+        iconTint = if (isEnable) Colors.LightGray else Colors.Black,
+        icon = if (isEnable) R.drawable.ic_call_mic_on else R.drawable.ic_call_mic_off,
         callAction = this,
     )
 
@@ -98,10 +98,10 @@ private fun CallControlAction.toCallControlActionHolder(): CallControlActionHold
         callAction = this
     )
 
-    CallControlAction.CallingLeft -> CallControlActionHolder(
+    CallControlAction.LeaveCall -> CallControlActionHolder(
         backgroundColor = Colors.FFFF0000,
         iconTint = Colors.White,
-        icon = R.drawable.ic_call_left,
+        icon = R.drawable.ic_leave_call,
         callAction = this
     )
 }
@@ -118,9 +118,9 @@ private data class CallControlActionHolder(
 private fun BottomCallControllerPreview() {
     BottomCallController(
         callControlActionList = persistentListOf(
-            CallControlAction.ToggleMicMute(isMute = true),
+            CallControlAction.ToggleMicEnable(isEnable = false),
             CallControlAction.SelectAudioDevice(currentDevice = AudioDeviceType.SPEAKER),
-            CallControlAction.CallingLeft,
+            CallControlAction.LeaveCall,
             CallControlAction.FlipCamera(isFront = true),
             CallControlAction.ToggleCameraEnable(isCameraEnabled = true),
         ),

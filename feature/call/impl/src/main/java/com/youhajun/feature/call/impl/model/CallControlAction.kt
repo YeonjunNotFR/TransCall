@@ -23,13 +23,13 @@ sealed class CallControlAction {
         val isCameraEnabled: Boolean
     ) : CallControlAction()
 
-    data class ToggleMicMute(
-        val isMute: Boolean
+    data class ToggleMicEnable(
+        val isEnable: Boolean
     ) : CallControlAction()
 
     data class FlipCamera(
         val isFront: Boolean
     ) : CallControlAction()
 
-    data object CallingLeft : CallControlAction()
+    data object LeaveCall : CallControlAction()
 }

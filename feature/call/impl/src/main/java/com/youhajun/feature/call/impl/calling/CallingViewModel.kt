@@ -16,14 +16,11 @@ import com.youhajun.feature.call.impl.model.CallControlAction
 import com.youhajun.feature.call.impl.model.CallUserUiModel
 import com.youhajun.feature.call.impl.model.CallingScreenType
 import com.youhajun.feature.call.impl.service.CallServiceContract
-import com.youhajun.webrtc.model.CallMediaUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import org.orbitmvi.orbit.Container
@@ -81,10 +78,10 @@ class CallingViewModel @Inject constructor(
 
     fun onClickCallAction(action: CallControlAction) {
         when(action) {
-            CallControlAction.CallingLeft -> callServiceContract?.callingLeft()
+            CallControlAction.LeaveCall -> callServiceContract?.leaveCall()
             is CallControlAction.FlipCamera -> callServiceContract?.flipCamera()
             is CallControlAction.ToggleCameraEnable -> callServiceContract?.setCameraEnabled(action.isCameraEnabled)
-            is CallControlAction.ToggleMicMute -> callServiceContract?.setMuteEnable(action.isMute)
+            is CallControlAction.ToggleMicEnable -> callServiceContract?.setMuteEnable(action.isEnable)
             is CallControlAction.SelectAudioDevice -> showAudioDeviceChangeDialog()
         }
     }

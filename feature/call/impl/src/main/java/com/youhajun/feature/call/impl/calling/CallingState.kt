@@ -41,9 +41,9 @@ data class CallingState(
     val myVideoStream: LocalVideoStream? = myDefaultCallUser?.mediaUser?.videoStream as? LocalVideoStream
 
     val callControlActionList: ImmutableList<CallControlAction> = persistentListOf(
-        CallControlAction.ToggleMicMute(myAudioStream?.isMicEnabled ?: true),
+        CallControlAction.ToggleMicEnable(myAudioStream?.isMicEnabled ?: true),
         CallControlAction.SelectAudioDevice(myAudioStream?.selectedDevice ?: AudioDeviceType.NONE),
-        CallControlAction.CallingLeft,
+        CallControlAction.LeaveCall,
         CallControlAction.FlipCamera(myVideoStream?.isFrontCamera ?: true),
         CallControlAction.ToggleCameraEnable(myVideoStream?.isVideoEnable ?: true),
     )
