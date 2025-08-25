@@ -53,7 +53,6 @@ import org.webrtc.VideoTrack
 import javax.inject.Inject
 
 internal class WebRtcSessionManagerImpl @Inject constructor(
-    private val signalingClient: SignalingClient,
     private val peerConnectionFactory: StreamPeerConnectionFactory,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val audioManager: AudioSessionManager,
@@ -61,6 +60,7 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
 ) : WebRtcSessionManager {
 
     private lateinit var localUserId: String
+    private lateinit var signalingClient: SignalingClient
     private val sessionScope = CoroutineScope(SupervisorJob() + ioDispatcher)
     private var privateId: Long? = null
     private val midMapper: MutableMap<String, SubscriberMidMapper> = mutableMapOf()
@@ -143,8 +143,19 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
         listOf(publisherPeerConnection, subscriberPeerConnection)
     }
 
-    override fun start(localUserId: String, videoRoomHandleInfo: VideoRoomHandleInfo) {
+    override fun initConfig(
+        localUserId: String,
+        turnCredential: TurnCredential,
+        signalingClient: SignalingClient
+    ) {
         this.localUserId = localUserId
+        this.signalingClient = signalingClient
+        peerConnectionFactory.initRtcConfig(turnCredential)
+        collectSignalingResponse()
+        collectLocalEvent()
+    }
+
+    override fun start(videoRoomHandleInfo: VideoRoomHandleInfo) {
         setVideoRoomHandleInfo(videoRoomHandleInfo)
         val cameraTrack = videoManager.startCamera(localUserId)
         val audioTrack = audioManager.startAudio(localUserId)
@@ -308,30 +319,29 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
             .addIceCandidate(iceCandidate.toWebRtcCandidate())
     }
 
-    init {
-        sessionScope.launch {
-            signalingClient.observeSignalingResponse().collect {
-                when(it) {
-                    is JoinedRoomPublisher -> {
-                        sendPublisherOffer(it.publisherHandleId, it.mediaContentType)
-                        if(it.publisherHandleId == publisherPeerConnection.handleId) {
-                            privateId = it.privateId
-                            sendJoinSubscriber(it.feeds)
-                        }
+    private fun collectSignalingResponse() = sessionScope.launch {
+        signalingClient.observeSignalingResponse().collect {
+            when(it) {
+                is JoinedRoomPublisher -> {
+                    sendPublisherOffer(it.publisherHandleId, it.mediaContentType)
+                    if(it.publisherHandleId == publisherPeerConnection.handleId) {
+                        privateId = it.privateId
+                        sendJoinSubscriber(it.feeds)
                     }
-                    is PublisherAnswer -> onPublisherAnswer(it.publisherHandleId, it.answerSdp)
-                    is SubscriberOffer -> {
-                        midMapper.putAll(it.feeds.toMidMap())
-                        onSubscriberOffer(it.offerSdp, it.subscriberHandleId)
-                    }
-                    is OnIceCandidate -> onRemoteIceCandidate(
-                        handleId = it.handleId,
-                        iceCandidate = IceCandidate(
-                            sdpMid = it.sdpMid,
-                            sdpMLineIndex = it.sdpMLineIndex,
-                            sdp = it.candidate
-                        )
+                }
+                is PublisherAnswer -> onPublisherAnswer(it.publisherHandleId, it.answerSdp)
+                is SubscriberOffer -> {
+                    midMapper.putAll(it.feeds.toMidMap())
+                    onSubscriberOffer(it.offerSdp, it.subscriberHandleId)
+                }
+                is OnIceCandidate -> onRemoteIceCandidate(
+                    handleId = it.handleId,
+                    iceCandidate = IceCandidate(
+                        sdpMid = it.sdpMid,
+                        sdpMLineIndex = it.sdpMLineIndex,
+                        sdp = it.candidate
                     )
+                )
 
                     is OnNewPublisher -> {
                         if(midMapper.isEmpty()) {
@@ -344,6 +354,7 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
             }
         }
 
+    private fun collectLocalEvent() {
         sessionScope.launch {
             videoManager.localVideoEvent.collect {
                 when (it) {

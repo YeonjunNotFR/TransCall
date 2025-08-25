@@ -71,16 +71,7 @@ class StreamPeerConnectionFactory @Inject constructor(
         }
     }
 
-    private val iceServers: List<PeerConnection.IceServer> by lazy {
-        listOf(PeerConnection.IceServer.builder(iceServerUrls).createIceServer())
-    }
-
-    private val rtcConfig: PeerConnection.RTCConfiguration by lazy {
-        PeerConnection.RTCConfiguration(iceServers).apply {
-            sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
-            iceTransportsType = PeerConnection.IceTransportsType.ALL
-        }
-    }
+    private lateinit var rtcConfig: PeerConnection.RTCConfiguration
 
     fun makePeerConnection(
         coroutineScope: CoroutineScope,
@@ -144,8 +135,20 @@ class StreamPeerConnectionFactory @Inject constructor(
         return localAudioCapabilitiesCodecs.firstOrNull()?.mimeType
     }
 
+    fun initRtcConfig(turnCredential: TurnCredential) {
+        val iceServers = listOf(
+            PeerConnection.IceServer.builder(iceStunServerUrls).createIceServer(),
+            PeerConnection.IceServer.builder(turnCredential.url).setUsername(turnCredential.username).setPassword(turnCredential.credential).createIceServer()
+        )
+
+        rtcConfig = PeerConnection.RTCConfiguration(iceServers).apply {
+            sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
+            iceTransportsType = PeerConnection.IceTransportsType.ALL
+        }
+    }
+
     companion object {
-        private val iceServerUrls = listOf(
+        private val iceStunServerUrls = listOf(
             "stun:stun.l.google.com:3478",
         )
     }
