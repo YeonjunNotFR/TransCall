@@ -1,6 +1,7 @@
 package com.youhajun.webrtc.audio
 
 import com.youhajun.webrtc.model.CallAudioStream
+import com.youhajun.webrtc.model.CallMediaKey
 import com.youhajun.webrtc.model.MediaContentType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +35,7 @@ internal class AudioStreamStoreImpl @Inject constructor() : AudioStreamStore {
         transform: (CallAudioStream) -> CallAudioStream
     ) {
         _audioStreamsFlow.update { list ->
-            list.map { if (it.key == userId + mediaContentType.type) transform(it) else it }
+            list.map { if (it.key == CallMediaKey.createKey(userId, mediaContentType.type)) transform(it) else it }
         }
     }
 }

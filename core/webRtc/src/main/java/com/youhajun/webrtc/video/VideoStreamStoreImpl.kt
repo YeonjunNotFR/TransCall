@@ -1,5 +1,6 @@
 package com.youhajun.webrtc.video
 
+import com.youhajun.webrtc.model.CallMediaKey
 import com.youhajun.webrtc.model.CallVideoStream
 import com.youhajun.webrtc.model.MediaContentType
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +29,7 @@ internal class VideoStreamStoreImpl @Inject constructor() : VideoStreamStore {
         transform: (CallVideoStream) -> CallVideoStream
     ) {
         _videoStreamsFlow.update { list ->
-            list.map { if (it.key == userId + mediaContentType.type) transform(it) else it }
+            list.map { if (it.key == CallMediaKey.createKey(userId, mediaContentType.type)) transform(it) else it }
         }
     }
 }
