@@ -83,8 +83,8 @@ internal class VideoSessionManagerImpl @Inject constructor(
     }
 
     override fun dispose() {
-        cameraController.dispose()
-        cameraSource.dispose()
-        cameraTrack.dispose()
+        runCatching { cameraController.dispose() }
+        runCatching { cameraSource.dispose() }
+        runCatching { cameraTrack.dispose() }
     }
 }
