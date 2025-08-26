@@ -14,10 +14,10 @@ fun LanguageType.toDisplayName(): Int {
 
 fun LanguageType.toDisplayIcon(): Int {
     return when (this) {
-        LanguageType.ENGLISH -> R.drawable.ic_call_left
-        LanguageType.KOREAN -> R.drawable.ic_call_left
-        LanguageType.JAPANESE -> R.drawable.ic_call_left
-        LanguageType.CHINESE -> R.drawable.ic_call_left
-        LanguageType.SPANISH -> R.drawable.ic_call_left
+        LanguageType.ENGLISH -> R.drawable.ic_leave_call
+        LanguageType.KOREAN -> R.drawable.ic_leave_call
+        LanguageType.JAPANESE -> R.drawable.ic_leave_call
+        LanguageType.CHINESE -> R.drawable.ic_leave_call
+        LanguageType.SPANISH -> R.drawable.ic_leave_call
     }
 }
