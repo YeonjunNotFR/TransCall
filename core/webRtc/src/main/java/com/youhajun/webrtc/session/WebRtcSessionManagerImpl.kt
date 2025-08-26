@@ -17,6 +17,7 @@ import com.youhajun.webrtc.model.LocalMediaUser
 import com.youhajun.webrtc.model.LocalVideoEvent
 import com.youhajun.webrtc.model.LocalVideoStream
 import com.youhajun.webrtc.model.MediaContentType
+import com.youhajun.webrtc.model.MicChunk
 import com.youhajun.webrtc.model.OnIceCandidate
 import com.youhajun.webrtc.model.OnNewPublisher
 import com.youhajun.webrtc.model.PublisherAnswer
@@ -31,6 +32,7 @@ import com.youhajun.webrtc.model.SubscriberMidMapper
 import com.youhajun.webrtc.model.SubscriberOffer
 import com.youhajun.webrtc.model.SubscriberUpdate
 import com.youhajun.webrtc.model.TrackType
+import com.youhajun.webrtc.model.TurnCredential
 import com.youhajun.webrtc.model.VideoRoomHandleInfo
 import com.youhajun.webrtc.model.toMidMap
 import com.youhajun.webrtc.peer.StreamPeerConnection
@@ -41,6 +43,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -76,6 +79,8 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
         initialValue = emptyList()
     )
 
+    override val micFlow: SharedFlow<MicChunk> = peerConnectionFactory.micFlow
+
     private val mediaConstraints = MediaConstraints().apply {
         mandatory.addAll(
             listOf(
@@ -94,9 +99,6 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
                 if(iceCandidate == null) sendCompleteIceCandidate(handleId)
                 else sendIceCandidate(handleId, iceCandidate.toWebRtcCandidate())
             },
-            onNegotiationNeeded = { peer, _ ->
-
-            }
         )
     }
 
@@ -343,16 +345,16 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
                     )
                 )
 
-                    is OnNewPublisher -> {
-                        if(midMapper.isEmpty()) {
-                            sendJoinSubscriber(it.feeds)
-                        } else {
-                            sendSubscribeAdd(it.feeds)
-                        }
+                is OnNewPublisher -> {
+                    if(midMapper.isEmpty()) {
+                        sendJoinSubscriber(it.feeds)
+                    } else {
+                        sendSubscribeAdd(it.feeds)
                     }
                 }
             }
         }
+    }
 
     private fun collectLocalEvent() {
         sessionScope.launch {

@@ -5,7 +5,7 @@ import org.webrtc.AudioTrack
 sealed interface CallAudioStream {
     val key get() = CallMediaKey.createKey(userId, mediaContentType)
     val userId: String
-    val isSpeaking: Boolean
+    val audioLevel: Float
     val audioTrack: AudioTrack?
     val isMicEnabled: Boolean
     val mediaContentType: String
@@ -14,7 +14,7 @@ sealed interface CallAudioStream {
 data class LocalAudioStream(
     override val userId: String,
     override val audioTrack: AudioTrack?,
-    override val isSpeaking: Boolean = false,
+    override val audioLevel: Float = 0f,
     override val isMicEnabled: Boolean = true,
     override val mediaContentType: String,
     val isMute: Boolean = false,
@@ -25,7 +25,7 @@ data class LocalAudioStream(
 data class RemoteAudioStream(
     override val userId: String,
     override val audioTrack: AudioTrack?,
-    override val isSpeaking: Boolean = false,
+    override val audioLevel: Float = 0f,
     override val isMicEnabled: Boolean = true,
     override val mediaContentType: String,
     val isOutputEnabled: Boolean = true,

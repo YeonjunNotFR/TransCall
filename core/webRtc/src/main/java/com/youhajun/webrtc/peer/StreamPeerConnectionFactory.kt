@@ -2,8 +2,16 @@ package com.youhajun.webrtc.peer
 
 import android.content.Context
 import android.os.Build
+import com.youhajun.webrtc.model.MicChunk
+import com.youhajun.webrtc.model.TurnCredential
 import com.youhajun.webrtc.model.toRtpCodec
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ServiceScoped
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
 import org.webrtc.DefaultVideoDecoderFactory
@@ -23,14 +31,18 @@ import org.webrtc.VideoTrack
 import org.webrtc.audio.JavaAudioDeviceModule
 import javax.inject.Inject
 
+@ServiceScoped
 class StreamPeerConnectionFactory @Inject constructor(
-    private val context: Context,
-    private val eglBaseContext: EglBase.Context
+    @ApplicationContext private val context: Context,
+    private val eglBaseContext: EglBase.Context,
 ) {
 
     private val videoDecoderFactory by lazy {
         DefaultVideoDecoderFactory(eglBaseContext)
     }
+
+    private val _micFlow = MutableSharedFlow<MicChunk>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val micFlow: SharedFlow<MicChunk> = _micFlow.asSharedFlow()
 
     private val videoEncoderFactory by lazy {
         val hardwareEncoder = HardwareVideoEncoderFactory(eglBaseContext, true, true)
@@ -51,6 +63,15 @@ class StreamPeerConnectionFactory @Inject constructor(
                     .builder(context)
                     .setUseHardwareAcousticEchoCanceler(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                     .setUseHardwareNoiseSuppressor(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    .setAudioRecordDataCallback { audioFormat, channelCount, sampleRate, audioBuffer ->
+                        val n = audioBuffer.remaining()
+                        if (n <= 0) return@setAudioRecordDataCallback
+
+                        val bytes = ByteArray(n)
+                        audioBuffer.get(bytes, 0, n)
+                        val chunk = MicChunk(audioFormat, channelCount, sampleRate, bytes)
+                        _micFlow.tryEmit(chunk)
+                    }
                     .createAudioDeviceModule().also {
                         it.setMicrophoneMute(false)
                         it.setSpeakerMute(false)
