@@ -2,6 +2,7 @@ package com.youhajun.data.calling
 
 import com.youhajun.core.model.calling.ClientMessage
 import com.youhajun.core.model.calling.ServerMessage
+import com.youhajun.core.model.calling.TurnCredential
 import com.youhajun.data.calling.dto.toDto
 import com.youhajun.domain.calling.CallingRepository
 import kotlinx.coroutines.flow.Flow
@@ -22,5 +23,9 @@ internal class CallingRepositoryImpl @Inject constructor(
 
     override suspend fun close() {
         remote.close()
+    }
+
+    override suspend fun getTurnCredential(): Result<TurnCredential> = runCatching {
+        remote.getTurnCredential().toModel()
     }
 }

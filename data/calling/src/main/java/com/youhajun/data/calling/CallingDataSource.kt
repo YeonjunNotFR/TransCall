@@ -2,9 +2,11 @@ package com.youhajun.data.calling
 
 import android.util.Log
 import com.youhajun.core.network.BuildConfig
+import com.youhajun.core.network.di.RestHttpClient
 import com.youhajun.core.network.di.WebSocketHttpClient
 import com.youhajun.data.calling.dto.ClientMessageDto
 import com.youhajun.data.calling.dto.ServerMessageDto
+import com.youhajun.data.calling.dto.TurnCredentialDto
 import com.youhajun.data.calling.dto.payload.ChangedRoomDto
 import com.youhajun.data.calling.dto.payload.CompleteIceCandidateDto
 import com.youhajun.data.calling.dto.payload.ConnectedRoomDto
@@ -24,8 +26,11 @@ import com.youhajun.data.calling.dto.payload.SubscriberAnswerDto
 import com.youhajun.data.calling.dto.payload.SubscriberOfferDto
 import com.youhajun.data.calling.dto.payload.SubscriberUpdateDto
 import com.youhajun.data.calling.dto.payload.TranslationMessageDto
+import com.youhajun.data.common.parametersFrom
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
@@ -45,10 +50,12 @@ internal interface CallingDataSource {
     fun connect(roomId: String): Flow<ServerMessageDto>
     suspend fun send(message: ClientMessageDto)
     suspend fun close()
+    suspend fun getTurnCredential(): TurnCredentialDto
 }
 
 internal class CallingDataSourceImpl @Inject constructor(
     @WebSocketHttpClient private val client: HttpClient,
+    @RestHttpClient private val restClient: HttpClient,
 ) : CallingDataSource {
 
     private var session: WebSocketSession? = null
@@ -74,6 +81,10 @@ internal class CallingDataSourceImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun getTurnCredential(): TurnCredentialDto {
+        return restClient.get(CallingEndpoint.TurnCredential.path).body()
     }
 
     override suspend fun send(message: ClientMessageDto) {
