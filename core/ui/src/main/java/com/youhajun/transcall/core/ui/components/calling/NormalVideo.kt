@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.webrtc.EglBase
 import org.webrtc.RendererCommon
 import org.webrtc.VideoTrack
 

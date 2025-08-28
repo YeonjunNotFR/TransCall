@@ -38,7 +38,7 @@ import com.youhajun.transcall.core.ui.components.modifier.speakingGlow
 @Composable
 fun DefaultVideoPlaceHolder(
     modifier: Modifier = Modifier,
-    isSpeaking: Boolean,
+    audioLevel: Float,
     currentParticipant: CurrentParticipant?,
     displayNameTextStyle: TextStyle = Typography.displayLarge.copy(
         fontWeight = FontWeight.W800,
@@ -62,7 +62,7 @@ fun DefaultVideoPlaceHolder(
             modifier = Modifier
                 .fillMaxWidth(0.6f)
                 .aspectRatio(1f)
-                .speakingGlow(isSpeaking, CircleShape, maxBlurDp = maxBlurValue)
+                .speakingGlow(audioLevel, CircleShape, maxBlurDp = maxBlurValue)
                 .padding(1.dp)
                 .clip(CircleShape)
         )
@@ -104,7 +104,7 @@ fun DefaultVideoPlaceHolder(
 private fun VideoPlaceHolderPreview() {
     DefaultVideoPlaceHolder(
         modifier = Modifier.fillMaxSize().background(Colors.SurfaceDark),
-        isSpeaking = true,
+        audioLevel = 1f,
         currentParticipant = CurrentParticipant(
             userId = "1",
             displayName = "John Doe",

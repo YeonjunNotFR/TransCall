@@ -5,6 +5,7 @@ import android.graphics.Paint
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -26,11 +27,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import com.youhajun.core.design.Colors
 
 @Composable
 fun Modifier.speakingGlow(
-    isSpeaking: Boolean,
+    audioLevel: Float,
     shape: Shape,
     glowColor: Color = Colors.FF00FFFF,
     minBlurDp: Dp = 1.dp,
@@ -38,27 +40,22 @@ fun Modifier.speakingGlow(
     outlineWidth: Dp = 3.dp,
     blurAlpha: Float = 0.9f,
     outlineAlpha: Float = 1f,
+    responseMs: Int = 120,
 ): Modifier {
 
     val density = LocalDensity.current
-    val minBlurPx = remember(minBlurDp, density) {
-        with(density) { minBlurDp.toPx() }
-    }
-    val maxBlurPx = remember(maxBlurDp, density) {
-        with(density) { maxBlurDp.toPx() }
-    }
-    val defaultGlowWidth = remember(outlineWidth, density) {
-        with(density) { outlineWidth.toPx() }
-    }
 
-    val animatedBlur by rememberInfiniteTransition().animateFloat(
-        initialValue = minBlurPx,
-        targetValue = if (isSpeaking) maxBlurPx else minBlurPx,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
+    val minBlurPx = remember(minBlurDp, density) { with(density) { minBlurDp.toPx() } }
+    val maxBlurPx = remember(maxBlurDp, density) { with(density) { maxBlurDp.toPx() } }
+    val defaultGlowWidth = remember(outlineWidth, density) { with(density) { outlineWidth.toPx() } }
+    val clampedLevel = audioLevel.coerceIn(0f, 1f)
+
+    val smoothLevel by animateFloatAsState(
+        targetValue = clampedLevel,
+        animationSpec = tween(durationMillis = responseMs, easing = LinearEasing),
     )
+
+    val animatedBlur = lerp(minBlurPx, maxBlurPx, smoothLevel)
 
     return this.then(
         Modifier.drawWithContent {
