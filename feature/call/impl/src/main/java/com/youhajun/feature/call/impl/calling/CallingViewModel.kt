@@ -81,7 +81,7 @@ class CallingViewModel @Inject constructor(
             CallControlAction.LeaveCall -> callServiceContract?.leaveCall()
             is CallControlAction.FlipCamera -> callServiceContract?.flipCamera()
             is CallControlAction.ToggleCameraEnable -> callServiceContract?.setCameraEnabled(action.isCameraEnabled)
-            is CallControlAction.ToggleMicEnable -> callServiceContract?.setMuteEnable(action.isEnable)
+            is CallControlAction.ToggleMicEnable -> callServiceContract?.setMicEnabled(!action.isEnable)
             is CallControlAction.SelectAudioDevice -> showAudioDeviceChangeDialog()
         }
     }
