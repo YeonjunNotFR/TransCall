@@ -19,7 +19,7 @@ interface CallServiceContract {
     fun setMuteEnable(enabled: Boolean)
     fun setAudioDeviceChange(deviceType: AudioDeviceType)
     fun setOutputEnable(userId: String, mediaContentType: MediaContentType, enabled: Boolean)
-    fun callingLeft()
+    fun leaveCall()
 }
 
 val LocalCallServiceContract = staticCompositionLocalOf<CallServiceContract?> {
