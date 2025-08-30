@@ -61,6 +61,7 @@ import com.youhajun.transcall.core.ui.components.calling.DefaultVideoPlaceHolder
 import com.youhajun.transcall.core.ui.components.calling.FloatingVideo
 import com.youhajun.transcall.core.ui.components.calling.NormalVideo
 import com.youhajun.transcall.core.ui.components.calling.SubtitleStack
+import com.youhajun.transcall.core.ui.components.modifier.speakingGlow
 import com.youhajun.webrtc.model.LocalVideoStream
 import kotlinx.collections.immutable.ImmutableList
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -162,6 +163,7 @@ private fun WaitingScreenType(
     onClickRoomCodeCopy: () -> Unit,
     onClickRoomCodeShare: () -> Unit,
 ) {
+    val audioLevel = myDefaultCallUser?.mediaUser?.audioStream?.audioLevel ?: 0f
     val myCameraVideo = myDefaultCallUser?.mediaUser?.videoStream
     val isFrontCamera = myCameraVideo is LocalVideoStream && myCameraVideo.isFrontCamera
 
@@ -183,6 +185,7 @@ private fun WaitingScreenType(
                 modifier = Modifier
                     .widthIn(max = 500.dp)
                     .heightIn(max = 400.dp)
+                    .speakingGlow(audioLevel = audioLevel, shape = RoundedCornerShape(16.dp))
                     .fillMaxWidth()
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(16.dp)),
@@ -195,7 +198,7 @@ private fun WaitingScreenType(
                             .fillMaxSize()
                             .background(Colors.SurfaceDark)
                             .padding(24.dp),
-                        isSpeaking = myDefaultCallUser?.mediaUser?.audioStream?.isSpeaking ?: false,
+                        audioLevel = myDefaultCallUser?.mediaUser?.audioStream?.audioLevel ?: 0f,
                         currentParticipant = myDefaultCallUser?.currentParticipant,
                         displayNameTextStyle = Typography.displayMedium.copy(
                             fontSize = 40.sp,
@@ -353,6 +356,7 @@ private fun CallingGridTypeTile(
     callUserUiModel: CallUserUiModel,
     onDoubleTapGrid: (CallUserUiModel) -> Unit
 ) {
+    val audioLevel = callUserUiModel.mediaUser.audioStream.audioLevel
     val videoStream = callUserUiModel.mediaUser.videoStream
     val isFrontCamera = videoStream is LocalVideoStream && videoStream.isFrontCamera
 
@@ -362,6 +366,7 @@ private fun CallingGridTypeTile(
                 detectTapGestures(onDoubleTap = { onDoubleTapGrid(callUserUiModel) })
             }
             .fillMaxSize()
+            .speakingGlow(audioLevel = audioLevel, shape = RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .background(Colors.Gray300),
         videoTrack = videoStream.videoTrack,
@@ -373,7 +378,7 @@ private fun CallingGridTypeTile(
                     .fillMaxSize()
                     .background(Colors.SurfaceDark)
                     .padding(24.dp),
-                isSpeaking = callUserUiModel.mediaUser.audioStream.isSpeaking,
+                audioLevel = callUserUiModel.mediaUser.audioStream.audioLevel,
                 currentParticipant = callUserUiModel.currentParticipant,
                 displayNameTextStyle = Typography.displayMedium.copy(
                     fontSize = 20.sp,
@@ -396,6 +401,8 @@ private fun CallingFloatingScreenType(
     var parentSize: IntSize by remember { mutableStateOf(IntSize(0, 0)) }
     val floatingVideo = floatingScreenType.floatingCallUser.mediaUser.videoStream
     val fullVideo = floatingScreenType.fullCallUser.mediaUser.videoStream
+    val floatingAudioLevel = floatingScreenType.floatingCallUser.mediaUser.audioStream.audioLevel
+    val fullAudioLevel = floatingScreenType.fullCallUser.mediaUser.audioStream.audioLevel
     val isFloatingFrontCamera = floatingVideo is LocalVideoStream && floatingVideo.isFrontCamera
     val isFullFrontCamera = fullVideo is LocalVideoStream && fullVideo.isFrontCamera
 
@@ -410,6 +417,7 @@ private fun CallingFloatingScreenType(
                     detectTapGestures(onDoubleTap = { onDoubleTapFull() })
                 }
                 .fillMaxSize()
+                .speakingGlow(audioLevel = fullAudioLevel, shape = RoundedCornerShape(16.dp))
                 .clip(RoundedCornerShape(16.dp)),
             videoTrack = fullVideo.videoTrack,
             isFrontCamera = isFullFrontCamera,
@@ -419,7 +427,7 @@ private fun CallingFloatingScreenType(
                         .fillMaxSize()
                         .background(Colors.SurfaceDark)
                         .padding(32.dp),
-                    isSpeaking = floatingScreenType.fullCallUser.mediaUser.audioStream.isSpeaking,
+                    audioLevel = floatingScreenType.fullCallUser.mediaUser.audioStream.audioLevel,
                     currentParticipant = floatingScreenType.fullCallUser.currentParticipant,
                     displayNameTextStyle = Typography.displayMedium.copy(
                         fontSize = 40.sp,
@@ -438,6 +446,7 @@ private fun CallingFloatingScreenType(
                     detectTapGestures(onDoubleTap = { onDoubleTapFloating() })
                 }
                 .size(width = 100.dp, height = 150.dp)
+                .speakingGlow(audioLevel = floatingAudioLevel, shape = RoundedCornerShape(16.dp))
                 .clip(RoundedCornerShape(16.dp))
                 .border(
                     width = 1.dp,
@@ -454,7 +463,7 @@ private fun CallingFloatingScreenType(
                         .fillMaxSize()
                         .background(Colors.SurfaceDark)
                         .padding(8.dp),
-                    isSpeaking = floatingScreenType.floatingCallUser.mediaUser.audioStream.isSpeaking,
+                    audioLevel = floatingScreenType.floatingCallUser.mediaUser.audioStream.audioLevel,
                     currentParticipant = floatingScreenType.floatingCallUser.currentParticipant,
                     displayNameTextStyle = Typography.displaySmall.copy(
                         fontSize = 20.sp
