@@ -1,6 +1,7 @@
 package com.youhajun.webrtc.peer
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.os.Build
 import com.youhajun.webrtc.model.MicChunk
 import com.youhajun.webrtc.model.TurnCredential
@@ -36,6 +37,7 @@ class StreamPeerConnectionFactory @Inject constructor(
     @ApplicationContext private val context: Context,
     private val eglBaseContext: EglBase.Context,
 ) {
+    private lateinit var rtcConfig: PeerConnection.RTCConfiguration
 
     private val videoDecoderFactory by lazy {
         DefaultVideoDecoderFactory(eglBaseContext)
@@ -49,34 +51,37 @@ class StreamPeerConnectionFactory @Inject constructor(
         SimulcastVideoEncoderFactory(hardwareEncoder, SoftwareVideoEncoderFactory())
     }
 
+    private val audioDeviceModule by lazy {
+        val attrs = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+            .build()
+
+        JavaAudioDeviceModule.builder(context)
+            .setUseHardwareAcousticEchoCanceler(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            .setUseHardwareNoiseSuppressor(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            .setAudioAttributes(attrs)
+            .setSamplesReadyCallback {
+                if (it.data.isEmpty()) return@setSamplesReadyCallback
+
+                val chunk = MicChunk(it.audioFormat, it.channelCount, it.sampleRate, it.data)
+                _micFlow.tryEmit(chunk)
+            }
+            .createAudioDeviceModule().also {
+                it.setMicrophoneMute(false)
+                it.setSpeakerMute(false)
+            }
+    }
+
     private val factory by lazy {
         PeerConnectionFactory.initialize(
-            PeerConnectionFactory.InitializationOptions.builder(context)
-                .createInitializationOptions(),
+            PeerConnectionFactory.InitializationOptions.builder(context).createInitializationOptions(),
         )
 
         PeerConnectionFactory.builder()
             .setVideoDecoderFactory(videoDecoderFactory)
             .setVideoEncoderFactory(videoEncoderFactory)
-            .setAudioDeviceModule(
-                JavaAudioDeviceModule
-                    .builder(context)
-                    .setUseHardwareAcousticEchoCanceler(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                    .setUseHardwareNoiseSuppressor(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                    .setAudioRecordDataCallback { audioFormat, channelCount, sampleRate, audioBuffer ->
-                        val n = audioBuffer.remaining()
-                        if (n <= 0) return@setAudioRecordDataCallback
-
-                        val bytes = ByteArray(n)
-                        audioBuffer.get(bytes, 0, n)
-                        val chunk = MicChunk(audioFormat, channelCount, sampleRate, bytes)
-                        _micFlow.tryEmit(chunk)
-                    }
-                    .createAudioDeviceModule().also {
-                        it.setMicrophoneMute(false)
-                        it.setSpeakerMute(false)
-                    },
-            )
+            .setAudioDeviceModule(audioDeviceModule)
             .createPeerConnectionFactory()
     }
 
@@ -91,8 +96,6 @@ class StreamPeerConnectionFactory @Inject constructor(
             it.toRtpCodec()
         }
     }
-
-    private lateinit var rtcConfig: PeerConnection.RTCConfiguration
 
     fun makePeerConnection(
         coroutineScope: CoroutineScope,
@@ -157,16 +160,17 @@ class StreamPeerConnectionFactory @Inject constructor(
     }
 
     fun initRtcConfig(turnCredential: TurnCredential) {
-        val iceServers = listOf(
-            PeerConnection.IceServer.builder(iceStunServerUrls).createIceServer(),
-            PeerConnection.IceServer.builder(turnCredential.url).setUsername(turnCredential.username).setPassword(turnCredential.credential).createIceServer()
-        )
-
+        val iceServers = createIceServerList(turnCredential)
         rtcConfig = PeerConnection.RTCConfiguration(iceServers).apply {
             sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
             iceTransportsType = PeerConnection.IceTransportsType.ALL
         }
     }
+
+    private fun createIceServerList(turnCredential: TurnCredential) = listOf(
+        PeerConnection.IceServer.builder(iceStunServerUrls).createIceServer(),
+        PeerConnection.IceServer.builder(turnCredential.url).setUsername(turnCredential.username).setPassword(turnCredential.credential).createIceServer()
+    )
 
     companion object {
         private val iceStunServerUrls = listOf(
