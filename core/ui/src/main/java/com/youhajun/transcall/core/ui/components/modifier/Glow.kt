@@ -40,7 +40,7 @@ fun Modifier.speakingGlow(
     outlineWidth: Dp = 3.dp,
     blurAlpha: Float = 0.9f,
     outlineAlpha: Float = 1f,
-    responseMs: Int = 120,
+    glowDuration: Int = 120,
 ): Modifier {
 
     val density = LocalDensity.current
@@ -52,7 +52,7 @@ fun Modifier.speakingGlow(
 
     val smoothLevel by animateFloatAsState(
         targetValue = clampedLevel,
-        animationSpec = tween(durationMillis = responseMs, easing = LinearEasing),
+        animationSpec = tween(durationMillis = glowDuration, easing = LinearEasing),
     )
 
     val animatedBlur = lerp(minBlurPx, maxBlurPx, smoothLevel)
