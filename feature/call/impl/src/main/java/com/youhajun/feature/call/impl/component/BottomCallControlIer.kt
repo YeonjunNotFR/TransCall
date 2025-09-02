@@ -93,7 +93,7 @@ private fun CallControlAction.toCallControlActionHolder(): CallControlActionHold
 
     is CallControlAction.FlipCamera -> CallControlActionHolder(
         backgroundColor = if (isFront) Colors.FF292929 else Colors.White,
-        iconTint = Colors.LightGray,
+        iconTint = if (isFront) Colors.LightGray else Colors.Black,
         icon = R.drawable.ic_call_camera_flip,
         callAction = this
     )
