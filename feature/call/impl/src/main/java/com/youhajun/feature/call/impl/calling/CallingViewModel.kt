@@ -16,6 +16,7 @@ import com.youhajun.feature.call.impl.model.CallControlAction
 import com.youhajun.feature.call.impl.model.CallUserUiModel
 import com.youhajun.feature.call.impl.model.CallingScreenType
 import com.youhajun.feature.call.impl.service.CallServiceContract
+import com.youhajun.webrtc.model.AudioDeviceType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -68,6 +69,16 @@ class CallingViewModel @Inject constructor(
         }
     }
 
+    fun onSelectAudioDevice(deviceType: AudioDeviceType) {
+        callServiceContract?.setAudioDeviceChange(deviceType)
+    }
+
+    fun onDismissAudioDeviceSelector() {
+        intent {
+            reduce { state.copy(isShowAudioDeviceChangeDialog = false) }
+        }
+    }
+
     fun onClickRoomCodeCopy() {
 
     }
@@ -80,7 +91,7 @@ class CallingViewModel @Inject constructor(
         when(action) {
             CallControlAction.LeaveCall -> callServiceContract?.leaveCall()
             is CallControlAction.FlipCamera -> callServiceContract?.flipCamera()
-            is CallControlAction.ToggleCameraEnable -> callServiceContract?.setCameraEnabled(action.isCameraEnabled)
+            is CallControlAction.ToggleCameraEnable -> callServiceContract?.setCameraEnabled(!action.isCameraEnabled)
             is CallControlAction.ToggleMicEnable -> callServiceContract?.setMicEnabled(!action.isEnable)
             is CallControlAction.SelectAudioDevice -> showAudioDeviceChangeDialog()
         }

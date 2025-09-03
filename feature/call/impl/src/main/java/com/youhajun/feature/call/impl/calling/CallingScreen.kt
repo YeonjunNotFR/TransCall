@@ -50,12 +50,14 @@ import com.youhajun.core.design.Typography
 import com.youhajun.core.model.conversation.Conversation
 import com.youhajun.core.model.room.RoomJoinType
 import com.youhajun.core.route.NavigationEvent
+import com.youhajun.feature.call.impl.component.AudioDeviceSelectorDialog
 import com.youhajun.feature.call.impl.component.BottomCallController
 import com.youhajun.feature.call.impl.component.RoomCodeComp
 import com.youhajun.feature.call.impl.model.CallControlAction
 import com.youhajun.feature.call.impl.model.CallUserUiModel
 import com.youhajun.feature.call.impl.model.CallingScreenType
 import com.youhajun.feature.call.impl.service.LocalCallServiceContract
+import com.youhajun.hyanghae.graphics.modifier.conditional
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.calling.DefaultVideoPlaceHolder
 import com.youhajun.transcall.core.ui.components.calling.FloatingVideo
@@ -82,6 +84,16 @@ internal fun CallingRoute(
         when (it) {
             is CallingSideEffect.Navigation -> onNavigate(it.navigationEvent)
         }
+    }
+
+    val myAudioStream = state.myAudioStream
+    if(myAudioStream != null && state.isShowAudioDeviceChangeDialog) {
+        AudioDeviceSelectorDialog(
+            selectedDevice = myAudioStream.selectedDevice,
+            availableDevices = myAudioStream.availableDevices,
+            onSelect = viewModel::onSelectAudioDevice,
+            onDismiss = viewModel::onDismissAudioDeviceSelector
+        )
     }
 
     CallingScreen(
@@ -185,7 +197,14 @@ private fun WaitingScreenType(
                 modifier = Modifier
                     .widthIn(max = 500.dp)
                     .heightIn(max = 400.dp)
-                    .speakingGlow(audioLevel = audioLevel, shape = RoundedCornerShape(16.dp))
+                    .conditional(myCameraVideo != null && myCameraVideo.isVideoEnable) {
+                        Modifier.speakingGlow(
+                            audioLevel = audioLevel,
+                            shape = RoundedCornerShape(16.dp),
+                            outlineWidth = 1.dp,
+                            outlineAlpha = 0.5f,
+                        )
+                    }
                     .fillMaxWidth()
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(16.dp)),
@@ -366,7 +385,16 @@ private fun CallingGridTypeTile(
                 detectTapGestures(onDoubleTap = { onDoubleTapGrid(callUserUiModel) })
             }
             .fillMaxSize()
-            .speakingGlow(audioLevel = audioLevel, shape = RoundedCornerShape(16.dp))
+            .conditional(videoStream.videoTrack != null && videoStream.isVideoEnable) {
+                Modifier.speakingGlow(
+                    audioLevel = audioLevel,
+                    shape = RoundedCornerShape(16.dp),
+                    minBlurDp = 1.dp,
+                    maxBlurDp = 30.dp,
+                    outlineWidth = 1.dp,
+                    outlineAlpha = 0.7f,
+                )
+            }
             .clip(RoundedCornerShape(16.dp))
             .background(Colors.Gray300),
         videoTrack = videoStream.videoTrack,
@@ -417,7 +445,16 @@ private fun CallingFloatingScreenType(
                     detectTapGestures(onDoubleTap = { onDoubleTapFull() })
                 }
                 .fillMaxSize()
-                .speakingGlow(audioLevel = fullAudioLevel, shape = RoundedCornerShape(16.dp))
+                .conditional(fullVideo.videoTrack != null && fullVideo.isVideoEnable) {
+                    Modifier.speakingGlow(
+                        audioLevel = fullAudioLevel,
+                        shape = RoundedCornerShape(16.dp),
+                        minBlurDp = 1.dp,
+                        maxBlurDp = 30.dp,
+                        outlineWidth = 1.dp,
+                        outlineAlpha = 0.7f,
+                    )
+                }
                 .clip(RoundedCornerShape(16.dp)),
             videoTrack = fullVideo.videoTrack,
             isFrontCamera = isFullFrontCamera,
@@ -446,13 +483,15 @@ private fun CallingFloatingScreenType(
                     detectTapGestures(onDoubleTap = { onDoubleTapFloating() })
                 }
                 .size(width = 100.dp, height = 150.dp)
-                .speakingGlow(audioLevel = floatingAudioLevel, shape = RoundedCornerShape(16.dp))
-                .clip(RoundedCornerShape(16.dp))
-                .border(
-                    width = 1.dp,
-                    color = Colors.Gray500,
-                    shape = RoundedCornerShape(16.dp)
-                ),
+                .speakingGlow(
+                    audioLevel = floatingAudioLevel,
+                    shape = RoundedCornerShape(16.dp),
+                    minBlurDp = 1.dp,
+                    maxBlurDp = 30.dp,
+                    outlineWidth = 1.dp,
+                    outlineAlpha = 0.7f,
+                )
+                .clip(RoundedCornerShape(16.dp)),
             videoTrack = floatingVideo.videoTrack,
             parentBounds = parentSize,
             paddingValues = PaddingValues(10.dp),

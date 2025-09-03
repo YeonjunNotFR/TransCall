@@ -41,7 +41,7 @@ internal fun WaitingScreenPreview() {
                 ),
             ),
             isShowBottomCallController = true,
-            callingScreenType = CallingScreenType.Grid,
+            callingScreenType = CallingScreenType.Waiting,
             callMediaUsers = persistentListOf(
                 LocalMediaUser(
                     userId = "1",
@@ -55,6 +55,7 @@ internal fun WaitingScreenPreview() {
                     ),
                     audioStream = LocalAudioStream(
                         isMicEnabled = true,
+                        audioLevel = 0.5f,
                         selectedDevice = AudioDeviceType.NONE,
                         mediaContentType = MediaContentType.DEFAULT.type,
                         userId = "1",
@@ -128,6 +129,7 @@ internal fun CallingScreenFloatingType() {
                         ),
                         audioStream = LocalAudioStream(
                             isMicEnabled = true,
+                            audioLevel = 0.5f,
                             selectedDevice = AudioDeviceType.NONE,
                             mediaContentType = MediaContentType.DEFAULT.type,
                             userId = "1",
@@ -173,6 +175,7 @@ internal fun CallingScreenFloatingType() {
                     ),
                     audioStream = LocalAudioStream(
                         isMicEnabled = true,
+                        audioLevel = 0.5f,
                         selectedDevice = AudioDeviceType.NONE,
                         mediaContentType = MediaContentType.DEFAULT.type,
                         userId = "1",
@@ -226,6 +229,7 @@ internal fun CallingScreenGridType() {
                 ),
                 audioStream = LocalAudioStream(
                     isMicEnabled = true,
+                    audioLevel = 0.5f,
                     selectedDevice = AudioDeviceType.NONE,
                     mediaContentType = MediaContentType.DEFAULT.type,
                     userId = userId,
