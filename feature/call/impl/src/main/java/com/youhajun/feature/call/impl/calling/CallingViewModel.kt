@@ -97,7 +97,7 @@ class CallingViewModel @Inject constructor(
         }
     }
 
-    fun onTabCallingScreen() {
+    fun onTapCallingScreen() {
         intent {
             reduce {
                 state.copy(isShowBottomCallController = !state.isShowBottomCallController)
@@ -127,14 +127,6 @@ class CallingViewModel @Inject constructor(
 
     fun onDoubleTapFloating() {
         intent {
-            reduce {
-                state.copy(callingScreenType = CallingScreenType.Grid)
-            }
-        }
-    }
-
-    fun onDoubleTapFull() {
-        intent {
             val current = state.callingScreenType as? CallingScreenType.FloatingAndFull ?: return@intent
             reduce {
                 state.copy(
@@ -143,6 +135,14 @@ class CallingViewModel @Inject constructor(
                         floatingCallUser = current.fullCallUser
                     )
                 )
+            }
+        }
+    }
+
+    fun onDoubleTapFull() {
+        intent {
+            reduce {
+                state.copy(callingScreenType = CallingScreenType.Grid)
             }
         }
     }

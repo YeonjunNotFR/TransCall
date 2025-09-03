@@ -2,8 +2,11 @@ package com.youhajun.feature.call.impl.calling
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -101,7 +105,7 @@ internal fun CallingRoute(
         onClickCallAction = viewModel::onClickCallAction,
         onClickRoomCodeCopy = viewModel::onClickRoomCodeCopy,
         onClickRoomCodeShare = viewModel::onClickRoomCodeShare,
-        onTabCallingScreen = viewModel::onTabCallingScreen,
+        onTapCallingScreen = viewModel::onTapCallingScreen,
         onDoubleTapGrid = viewModel::onDoubleTapGrid,
         onDoubleTapFloating = viewModel::onDoubleTapFloating,
         onDoubleTapFull = viewModel::onDoubleTapFull
@@ -114,14 +118,27 @@ internal fun CallingScreen(
     onClickCallAction: (CallControlAction) -> Unit,
     onClickRoomCodeCopy: () -> Unit,
     onClickRoomCodeShare: () -> Unit,
-    onTabCallingScreen: () -> Unit,
+    onTapCallingScreen: () -> Unit,
     onDoubleTapGrid: (CallUserUiModel) -> Unit,
     onDoubleTapFloating: () -> Unit,
     onDoubleTapFull: () -> Unit
 ) {
+
+    val holder = rememberSaveableStateHolder()
+
     AnimatedContent(
         modifier = Modifier.fillMaxSize(),
         targetState = state.callingScreenType,
+        contentKey = { type ->
+            when (type) {
+                is CallingScreenType.Waiting -> "waiting"
+                is CallingScreenType.Grid, is CallingScreenType.FloatingAndFull -> "calling"
+                CallingScreenType.Summary -> "summary"
+            }
+        },
+        transitionSpec = {
+            fadeIn(tween(150)) togetherWith fadeOut(tween(150))
+        },
     ) {
         when (it) {
             is CallingScreenType.Waiting -> WaitingScreenType(
@@ -133,32 +150,35 @@ internal fun CallingScreen(
                 onClickRoomCodeCopy = onClickRoomCodeCopy,
                 onClickRoomCodeShare = onClickRoomCodeShare
             )
-            is CallingScreenType.FloatingAndFull -> CallingScreenContainer(
-                recentConversation = state.recentConversation,
-                isShowBottomCallController = state.isShowBottomCallController,
-                callControlActionList = state.callControlActionList,
-                onClickCallAction = onClickCallAction,
-                onTabCallingScreen = onTabCallingScreen,
-            ) {
-                CallingFloatingScreenType(
-                    floatingScreenType = it,
-                    onDoubleTapFloating = onDoubleTapFloating,
-                    onDoubleTapFull = onDoubleTapFull
-                )
-            }
 
+            is CallingScreenType.FloatingAndFull,
             is CallingScreenType.Grid -> CallingScreenContainer(
                 recentConversation = state.recentConversation,
                 isShowBottomCallController = state.isShowBottomCallController,
                 callControlActionList = state.callControlActionList,
                 onClickCallAction = onClickCallAction,
-                onTabCallingScreen = onTabCallingScreen,
-            ) {
-                CallingGridScreenType(
-                    callUserUiList = state.callUserUiModelList,
-                    onDoubleTapGrid = onDoubleTapGrid
-                )
-            }
+                container = {
+                    if (it is CallingScreenType.Grid) {
+                        holder.SaveableStateProvider("grid") {
+                            CallingGridScreenType(
+                                callUserUiList = state.callUserUiModelList,
+                                onTapGrid = onTapCallingScreen,
+                                onDoubleTapGrid = onDoubleTapGrid
+                            )
+                        }
+                    }
+                    if (it is CallingScreenType.FloatingAndFull) {
+                        holder.SaveableStateProvider("floating") {
+                            CallingFloatingScreenType(
+                                floatingScreenType = it,
+                                onTapScreen = onTapCallingScreen,
+                                onDoubleTapFloating = onDoubleTapFloating,
+                                onDoubleTapFull = onDoubleTapFull
+                            )
+                        }
+                    }
+                }
+            )
 
             CallingScreenType.Summary -> SummaryScreenType()
         }
@@ -272,14 +292,10 @@ private fun CallingScreenContainer(
     isShowBottomCallController: Boolean,
     callControlActionList: ImmutableList<CallControlAction>,
     onClickCallAction: (CallControlAction) -> Unit,
-    onTabCallingScreen: () -> Unit,
     container: @Composable () -> Unit
 ) {
     Column(
         modifier = Modifier
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = { onTabCallingScreen() })
-            }
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(listOf(Colors.FF0A0A1A, Colors.FF15152B, Colors.FF1F1B2C))
@@ -318,6 +334,7 @@ private const val GRID_COLUMN_COUNT = 2
 @Composable
 private fun CallingGridScreenType(
     callUserUiList: ImmutableList<CallUserUiModel>,
+    onTapGrid: () -> Unit,
     onDoubleTapGrid: (CallUserUiModel) -> Unit
 ) {
     if (callUserUiList.size <= MAX_LAZY_GRID_SIZE) {
@@ -341,6 +358,7 @@ private fun CallingGridScreenType(
                                     .fillMaxHeight()) {
                                     CallingGridTypeTile(
                                         callUserUiModel = user,
+                                        onTapGrid = onTapGrid,
                                         onDoubleTapGrid = onDoubleTapGrid
                                     )
                                 }
@@ -363,6 +381,7 @@ private fun CallingGridScreenType(
             ) { callMediaUser ->
                 CallingGridTypeTile(
                     callUserUiModel = callMediaUser,
+                    onTapGrid = onTapGrid,
                     onDoubleTapGrid = onDoubleTapGrid
                 )
             }
@@ -373,6 +392,7 @@ private fun CallingGridScreenType(
 @Composable
 private fun CallingGridTypeTile(
     callUserUiModel: CallUserUiModel,
+    onTapGrid: () -> Unit,
     onDoubleTapGrid: (CallUserUiModel) -> Unit
 ) {
     val audioLevel = callUserUiModel.mediaUser.audioStream.audioLevel
@@ -382,7 +402,10 @@ private fun CallingGridTypeTile(
     NormalVideo(
         modifier = Modifier
             .pointerInput(Unit) {
-                detectTapGestures(onDoubleTap = { onDoubleTapGrid(callUserUiModel) })
+                detectTapGestures(
+                    onTap = { onTapGrid() },
+                    onDoubleTap = { onDoubleTapGrid(callUserUiModel) }
+                )
             }
             .fillMaxSize()
             .conditional(videoStream.videoTrack != null && videoStream.isVideoEnable) {
@@ -423,6 +446,7 @@ private fun CallingGridTypeTile(
 @Composable
 private fun CallingFloatingScreenType(
     floatingScreenType: CallingScreenType.FloatingAndFull,
+    onTapScreen: () -> Unit,
     onDoubleTapFloating: () -> Unit,
     onDoubleTapFull: () -> Unit
 ) {
@@ -442,7 +466,10 @@ private fun CallingFloatingScreenType(
         NormalVideo(
             modifier = Modifier
                 .pointerInput(Unit) {
-                    detectTapGestures(onDoubleTap = { onDoubleTapFull() })
+                    detectTapGestures(
+                        onTap = { onTapScreen() },
+                        onDoubleTap = { onDoubleTapFull() }
+                    )
                 }
                 .fillMaxSize()
                 .conditional(fullVideo.videoTrack != null && fullVideo.isVideoEnable) {
@@ -480,7 +507,10 @@ private fun CallingFloatingScreenType(
         FloatingVideo(
             modifier = Modifier
                 .pointerInput(Unit) {
-                    detectTapGestures(onDoubleTap = { onDoubleTapFloating() })
+                    detectTapGestures(
+                        onTap = { onTapScreen() },
+                        onDoubleTap = { onDoubleTapFloating() }
+                    )
                 }
                 .size(width = 100.dp, height = 150.dp)
                 .speakingGlow(

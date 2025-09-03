@@ -64,7 +64,7 @@ internal fun WaitingScreenPreview() {
                 )
             )
         ),
-        onTabCallingScreen = {},
+        onTapCallingScreen = {},
         onDoubleTapFloating = {},
         onDoubleTapFull = {},
         onDoubleTapGrid = {},
@@ -200,7 +200,7 @@ internal fun CallingScreenFloatingType() {
                 )
             ),
         ),
-        onTabCallingScreen = {},
+        onTapCallingScreen = {},
         onDoubleTapFloating = {},
         onDoubleTapFull = {},
         onDoubleTapGrid = {},
@@ -292,7 +292,7 @@ internal fun CallingScreenGridType() {
                 timestamp = System.currentTimeMillis()
             )
         ),
-        onTabCallingScreen = {},
+        onTapCallingScreen = {},
         onDoubleTapFloating = {},
         onDoubleTapFull = {},
         onDoubleTapGrid = {},
