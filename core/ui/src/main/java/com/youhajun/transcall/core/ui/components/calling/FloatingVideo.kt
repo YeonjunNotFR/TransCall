@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -13,6 +14,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +50,7 @@ fun FloatingVideo(
         .then(modifier)
 
     Box(modifier = dragModifier) {
-        if(enabled && videoTrack != null) {
+        if (enabled && videoTrack != null) {
             VideoRenderer(
                 modifier = Modifier.fillMaxSize(),
                 videoTrack = videoTrack,
@@ -67,13 +70,16 @@ private fun Modifier.dragInParentArea(
     paddingValues: PaddingValues
 ): Modifier {
 
-    var dragPosition by remember { mutableStateOf(Offset(0f, 0f)) }
-    var dragAlign by remember { mutableStateOf(firstAlign) }
+    var dragPosition by rememberSaveable(stateSaver = OffsetSaver) {
+        mutableStateOf(Offset(0f, 0f))
+    }
+    var dragAlignString by rememberSaveable { mutableStateOf(firstAlign.toString()) }
+    val dragAlign: Alignment = remember(dragAlignString) { dragAlignString.toAlignment() }
     val offset by animateOffsetAsState(targetValue = dragPosition, label = "")
     var currentCompSize by remember { mutableStateOf(IntSize(0, 0)) }
 
     val startPadding = paddingValues.calculateStartPadding(LayoutDirection.Ltr).value
-    val endPadding = paddingValues.calculateStartPadding(LayoutDirection.Ltr).value
+    val endPadding = paddingValues.calculateEndPadding(LayoutDirection.Ltr).value
     val topPadding = paddingValues.calculateTopPadding().value
     val bottomPadding = paddingValues.calculateBottomPadding().value
     val boundaryWidth = parentBounds.width - currentCompSize.width - endPadding
@@ -84,7 +90,7 @@ private fun Modifier.dragInParentArea(
     val bottomStartPosition = Offset(startPadding, boundaryHeight)
     val bottomEndPosition = Offset(boundaryWidth, boundaryHeight)
 
-    LaunchedEffect(parentBounds) {
+    LaunchedEffect(parentBounds, dragAlign) {
         dragPosition = calculateDragPosition(
             dragAlign,
             topStartPosition,
@@ -112,7 +118,7 @@ private fun Modifier.dragInParentArea(
                         bottomStartPosition,
                         bottomEndPosition
                     )
-                    dragAlign = align
+                    dragAlignString = align.toString()
                     dragPosition = position
                 },
                 onDragCancel = {
@@ -160,4 +166,17 @@ private fun calculateDragDropAlign(dragPosition: Offset, parentBounds: IntSize):
         bottomEnd -> Alignment.BottomEnd
         else -> Alignment.BottomEnd
     }
+}
+
+private val OffsetSaver = Saver<Offset, List<Float>>(
+    save = { listOf(it.x, it.y) },
+    restore = { Offset(it[0], it[1]) }
+)
+
+private fun String.toAlignment(): Alignment = when (this) {
+    Alignment.TopStart.toString() -> Alignment.TopStart
+    Alignment.TopEnd.toString() -> Alignment.TopEnd
+    Alignment.BottomStart.toString() -> Alignment.BottomStart
+    Alignment.BottomEnd.toString() -> Alignment.BottomEnd
+    else -> Alignment.TopEnd
 }
