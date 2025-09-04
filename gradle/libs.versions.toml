@@ -1,43 +1,43 @@
 [versions]
-agp = "8.8.2"
-kotlin = "2.1.10"
-coreKtx = "1.16.0"
+agp = "8.13.0"
+kotlin = "2.2.20"
+timber = "5.0.1"
+coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.9.1"
-activityCompose = "1.10.1"
-composeBom = "2025.06.01"
+lifecycleRuntimeKtx = "2.9.4"
+activityCompose = "1.11.0"
+composeBom = "2025.10.01"
 composeConstraintLayout = "1.1.1"
 appcompat = "1.7.1"
-material = "1.12.0"
-jetbrainsKotlinJvm = "2.1.10"
-gms = "4.4.3"
-ksp = "2.1.10-1.0.31"
-hilt = "2.56.1"
-ktor = "3.2.1"
-kotlinx-serialization-json = "1.6.3"
+material = "1.13.0"
+gms = "4.4.4"
+ksp = "2.2.20-2.0.4"
+hilt = "2.57.2"
+ktor = "3.2.3"
+kotlinx-serialization-json = "1.9.0"
 javaxInject = "1"
-navigation = "2.9.1"
-hiltNavigation = "1.2.0"
-kotlinx-collections-immutable = "0.3.7"
-orbit = "6.1.0"
-coil = "2.6.0"
+navigation = "2.9.5"
+kotlinx-collections-immutable = "0.4.0"
+orbit = "10.0.0"
+coil = "3.3.0"
 dataStore = "1.1.7"
-kotlinx-coroutines-core = "1.10.1"
-webRtc = "1.1.2"
-audio-switch = "1.2.0"
-room = "2.7.2"
+kotlinx-coroutines-core = "1.10.2"
+webRtc = "1.3.10"
+audio-switch = "1.2.4"
+room = "2.8.3"
 googleId = "1.1.1"
 credentials = "1.5.0"
+paging = "3.3.6"
+paging-compose = "3.4.0-alpha04"
+work-manager = "2.10.5"
+androidx-hilt = "1.3.0"
+firebase-bom = "34.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 # androidx-compose
@@ -52,24 +52,43 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material-icon = { group = "androidx.compose.material", name = "material-icons-core" }
 androidx-compose-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "composeConstraintLayout" }
+
+#androidx
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "paging" }
+androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging-compose" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+androidx-work-manager = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work-manager" }
+androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidx-hilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidx-hilt" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidx-hilt" }
+
+#firebase
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 
 #room
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 
 #coil
-coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+
+#log
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 #orbit
 orbit_core = { group = "org.orbit-mvi", name = "orbit-core", version.ref = "orbit" }
 orbit_compose = { group = "org.orbit-mvi", name = "orbit-compose", version.ref = "orbit" }
 orbit_viewmodel = { group = "org.orbit-mvi", name = "orbit-viewmodel", version.ref = "orbit" }
-
-#navigation
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
-androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }
 
 #dataStore
 datastore = { group = "androidx.datastore", name = "datastore", version.ref = "dataStore" }
@@ -81,7 +100,7 @@ stream-webrtc = { group = "io.getstream", name = "stream-webrtc-android", versio
 
 # hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-hilt-android-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javaxInject" }
 
 # ktor
@@ -113,12 +132,14 @@ kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-p
 compose-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
+jvm-library = { id = "java-library" }
 android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-android-library = { id = "com.android.library", version.ref = "agp" }
-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin"}
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 gms = { id = "com.google.gms.google-services", version.ref = "gms" }
@@ -129,13 +150,16 @@ youhajun-android-library = { id = "com.youhajun.android.library" }
 youhajun-android-application-compose = { id = "com.youhajun.android.application.compose" }
 youhajun-android-library-compose = { id = "com.youhajun.android.library.compose" }
 youhajun-android-hilt = { id = "com.youhajun.android.hilt" }
+youhajun-android-firebase = { id = "com.youhajun.android.fiebase" }
 youhajun-jvm-library = { id = "com.youhajun.jvm.library" }
 
 [bundles]
 webRtc = ["stream-webrtc", "stream-webrtc-android-compose", "stream-webrtc-android-ui"]
 ktor = ["ktor-client-auth", "ktor-client-core", "ktor-client-okhttp", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json", "ktor-client-logging", "ktor-client_cio", "ktor-client-websockets"]
 navigation = ["androidx-navigation-compose", "androidx-hilt-navigation-compose"]
+workmanager = ["androidx-work-manager", "androidx-hilt-work"]
 orbit = ["orbit_core", "orbit_compose", "orbit_viewmodel"]
 dataStore = ["datastore", "datastore-preferences"]
-room = ["room-runtime", "room-ktx"]
+room = ["room-runtime", "room-ktx", "room-paging"]
 credentials = ["google-credentials", "google-credentials-play-services-auth", "google-id"]
+compose-default = ["androidx-compose-foundation", "androidx-compose-ui", "androidx-compose-ui-graphics", "androidx-compose-material3", "androidx-compose-material", "androidx-compose-material-icon"]
