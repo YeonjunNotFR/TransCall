@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.youhajun.feature.splash.impl"
+    namespace = "com.youhajun.feature.splash"
 }
 
 dependencies {
@@ -14,10 +14,9 @@ dependencies {
     implementation(projects.core.design)
     implementation(projects.core.model)
     implementation(projects.core.route)
+    implementation(libs.bundles.compose.default)
     implementation(libs.bundles.navigation)
     implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.foundation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

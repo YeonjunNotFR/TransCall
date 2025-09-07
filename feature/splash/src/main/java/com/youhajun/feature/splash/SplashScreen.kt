@@ -1,4 +1,4 @@
-package com.youhajun.feature.splash.impl
+package com.youhajun.feature.splash
 
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.RepeatMode
@@ -32,7 +32,6 @@ import com.youhajun.transcall.core.ui.components.VerticalSpacer
 internal fun SplashRoute() {
     val infiniteTransition = rememberInfiniteTransition()
 
-    // 동일한 애니메이션 리듬 기반
     val sharedAnimProgress by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
@@ -57,7 +56,7 @@ internal fun SplashRoute() {
     ) {
         Icon(
             imageVector = Icons.Default.Call,
-            contentDescription = "App Logo",
+            contentDescription = null,
             tint = Colors.White,
             modifier = Modifier
                 .size(100.dp)

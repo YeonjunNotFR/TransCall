@@ -1,4 +1,4 @@
-package com.youhajun.feature.splash.impl
+package com.youhajun.feature.splash
 
 import org.junit.Test
 
