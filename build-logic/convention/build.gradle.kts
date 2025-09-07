@@ -34,5 +34,9 @@ gradlePlugin {
             id = libs.plugins.youhajun.jvm.library.get().pluginId
             implementationClass = "JvmLibraryConventionPlugin"
         }
+        register("androidFirebase") {
+            id = libs.plugins.youhajun.android.firebase.get().pluginId
+            implementationClass = "FirebaseConventionPlugin"
+        }
     }
 }
