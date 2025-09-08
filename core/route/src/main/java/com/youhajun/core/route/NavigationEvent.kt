@@ -1,5 +1,7 @@
 package com.youhajun.core.route
 
+import android.net.Uri
+
 sealed interface NavigationEvent {
 
     data class Navigate(
@@ -22,6 +24,11 @@ sealed interface NavigationEvent {
         val route: TransCallRoute,
         val launchSingleTop: Boolean,
         val popUpRoute: TransCallRoute? = null
+    ) : NavigationEvent
+
+    data class NavigateDeepLink(
+        val uri: Uri,
+        val defaultRoute: TransCallRoute
     ) : NavigationEvent
 
     data class NavigateWeb(val url: String) : NavigationEvent
