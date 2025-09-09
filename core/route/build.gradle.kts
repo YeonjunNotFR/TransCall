@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.youhajun.android.library)
     alias(libs.plugins.youhajun.android.library.compose)
     alias(libs.plugins.youhajun.android.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -10,6 +11,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.appcompat)
     implementation(libs.bundles.navigation)
 }
