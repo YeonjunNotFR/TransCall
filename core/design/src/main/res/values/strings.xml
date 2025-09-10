@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">TransCall</string>
 
-    <string name="screen_title_history">통화 기록</string>
-
     <string name="language_english">English</string>
     <string name="language_korean">한국어</string>
     <string name="language_japanese">日本語</string>
@@ -12,26 +10,45 @@
     <string name="common_duration_minute_label">m</string>
     <string name="common_duration_second_label">s</string>
     <string name="common_duration_hour_label">h</string>
+    <string name="common_duration_day_label">d</string>
+    <string name="common_relative_ago">ago</string>
+    <string name="common_relative_now">now</string>
     <string name="common_more">더보기</string>
     <string name="common_cancel">취소</string>
     <string name="common_join">참여하기</string>
+    <string name="common_public">공개</string>
+    <string name="common_private">비공개</string>
+    <string name="common_waiting_network">데이터를 불러오는 중..</string>
 
     <string name="common_week_range">일주일</string>
     <string name="common_month_range">한 달</string>
     <string name="common_all_range">전체</string>
 
+    <string name="audio_device_speaker">스피커</string>
+    <string name="audio_device_earpiece">수화기</string>
+    <string name="audio_device_bluetooth">블루투스</string>
+    <string name="audio_device_headset">헤드셋/이어폰</string>
+    <string name="audio_device_none">없음</string>
+
     <string name="dialog_join_code_title">참여 코드 입력</string>
     <string name="dialog_hint_input_code">코드를 입력하세요</string>
+    <string name="dialog_audio_device_selector_title">오디오 장치 선택</string>
 
     <string name="bottom_bar_home">홈</string>
     <string name="bottom_bar_history">기록</string>
-    <string name="bottom_bar_profile">프로필</string>
+    <string name="bottom_bar_room">대화방</string>
 
     <string name="home_profile_remain_time_minute">남은 통화 시간 : %d 분</string>
     <string name="home_call_start">통화 시작</string>
     <string name="home_call_join">코드로 참여</string>
     <string name="home_call_history">최근 통화 기록</string>
     <string name="home_call_history_empty">최근 통화 기록이 없습니다.</string>
+
+    <string name="history_title">통화 기록</string>
+    <string name="history_duration_calling">통화중</string>
+    <string name="history_detail_participants">참여자들</string>
+    <string name="history_detail_view_summary">요약 보기</string>
+    <string name="history_detail_view_memo">메모 보기</string>
 
     <string name="login_description_app">언제 어디서나 언어 장벽을 허물어주는 실시간 번역 영상통화를 경험하세요.</string>
     <string name="login_google_login">구글 계정으로 로그인</string>
@@ -42,22 +59,32 @@
 
     <string name="create_room_header_title">통화방 생성</string>
     <string name="create_room_title_text">방 제목 (option)</string>
-    <string name="create_room_title_hint">e.g., Chill Vibes Chat</string>
+    <string name="create_room_title_hint">즐겁게 놀아봐요!</string>
+    <string name="create_room_title_hint_with_name">%s 님의 생성방</string>
     <string name="create_room_max_participant_count_text">최대 참여 인원</string>
     <string name="create_room_visibility_text">공개 여부</string>
-    <string name="create_room_visibility_public">공개</string>
-    <string name="create_room_visibility_private">비공개</string>
     <string name="create_room_tag_text">Tags (최대 %d 개)</string>
     <string name="create_room_tag_hint">태그를 입력한 후 Enter 키를 누르세요</string>
     <string name="create_room_create_button_text">방 생성</string>
 
-    <string name="notification_channel_name_fcm">알림</string>
-    <string name="notification_channel_desc_fcm">TransCall 알림</string>
+    <string name="room_list_title">공개방 목록</string>
+    <string name="room_list_participant_count_sort">참여자순</string>
+    <string name="room_list_created_at_sort">시간순</string>
+    
+    <string name="conversation_language_origin">원문 • %s</string>
+    <string name="conversation_language_translated">번역 • %s</string>
+
+    <string name="notification_channel_name_default">알림</string>
+    <string name="notification_channel_desc_default">TransCall 알림</string>
     <string name="notification_channel_name_call">통화</string>
     <string name="notification_channel_desc_call">영상/음성 통화 관련 알림</string>
     <string name="notification_call_title">통화 중</string>
     <string name="notification_call_content">상대방과 통화가 진행 중입니다</string>
     <string name="notification_call_end">통화 종료</string>
+    <string name="notification_mic_off">음소거 해제</string>
+    <string name="notification_mic_on">음소거</string>
+    <string name="notification_camera_off">카메라 켜기</string>
+    <string name="notification_camera_on">카메라 끄기</string>
 
     <string name="permission_denied_title">권한 거부</string>
     <string name="permission_denied_message">권한이 완전히 거부되었습니다.\n설정 화면에서 직접 허용해주세요.</string>
@@ -66,6 +93,7 @@
     <string name="permission_rationale_title">권한 요청</string>
     <string name="permission_rationale_message_default">이 기능을 사용하기 위해 권한이 필요합니다.\n권한을 허용해주세요.</string>
     <string name="permission_rationale_message_camera_and_mic">영상 통화를 위해 카메라와 마이크 권한이 필요합니다.</string>
+    <string name="permission_rationale_message_notification">원활한 사용을 위해 알림 권한을 허용해주세요.</string>
     <string name="permission_rationale_confirm">권한 요청</string>
     <string name="permission_rationale_dismiss">취소</string>
 
