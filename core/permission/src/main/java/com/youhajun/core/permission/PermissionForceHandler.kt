@@ -13,13 +13,13 @@ import androidx.compose.ui.res.stringResource
 import com.youhajun.core.design.R
 import com.youhajun.transcall.core.common.getActivity
 import kotlinx.collections.immutable.ImmutableList
-
 @Composable
-fun PermissionHandler(
+fun PermissionForceHandler(
     controller: PermissionRequestController,
     permissions: ImmutableList<String>,
     rationaleMessage: String? = null,
     onPermissionGranted: () -> Unit,
+    onPermissionDenied: (() -> Unit) = {}
 ) {
     val context = LocalContext.current
     val activity = context.getActivity()
@@ -30,8 +30,7 @@ fun PermissionHandler(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { results ->
         val allGranted = results.values.all { it }
-        val needsRationale =
-            activity != null && PermissionManager.shouldShowRationale(activity, permissions)
+        val needsRationale = activity != null && PermissionManager.shouldShowRationale(activity, permissions)
 
         when {
             allGranted -> onPermissionGranted()
@@ -67,7 +66,10 @@ fun PermissionHandler(
                 showRationale = false
                 permissionLauncher.launch(permissions.toTypedArray())
             },
-            onDismiss = { showRationale = false }
+            onDismiss = {
+                showRationale = false
+                onPermissionDenied()
+            }
         )
     }
 
@@ -80,8 +82,12 @@ fun PermissionHandler(
             onConfirm = {
                 showDeniedDialog = false
                 PermissionManager.openAppSettings(context)
+                onPermissionDenied()
             },
-            onDismiss = { showDeniedDialog = false }
+            onDismiss = {
+                showDeniedDialog = false
+                onPermissionDenied()
+            }
         )
     }
 }
