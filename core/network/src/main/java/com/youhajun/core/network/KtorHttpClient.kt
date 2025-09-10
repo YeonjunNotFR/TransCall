@@ -1,6 +1,5 @@
 package com.youhajun.core.network
 
-import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.auth.Auth
@@ -19,10 +18,11 @@ import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import okhttp3.ConnectionPool
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Singleton
 internal class KtorHttpClient @Inject constructor(
@@ -36,7 +36,7 @@ internal class KtorHttpClient @Inject constructor(
             level = LogLevel.ALL
             logger = object : Logger {
                 override fun log(message: String) {
-                    if (BuildConfig.DEBUG) Log.d("Ktor", message)
+                    Timber.d(message)
                 }
             }
         }
@@ -93,7 +93,7 @@ internal class KtorHttpClient @Inject constructor(
 
     fun createWss(baseUrl: String): HttpClient = HttpClient(OkHttp) {
         install(WebSockets) {
-            pingInterval = 20000.milliseconds
+            pingInterval = 15.seconds
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
         }
 
@@ -101,7 +101,7 @@ internal class KtorHttpClient @Inject constructor(
             level = LogLevel.ALL
             logger = object : Logger {
                 override fun log(message: String) {
-                    if (BuildConfig.DEBUG) Log.d("Ktor", message)
+                    Timber.d(message)
                 }
             }
         }
@@ -120,6 +120,12 @@ internal class KtorHttpClient @Inject constructor(
                     context.url.parameters.append("token", accessToken)
                 }
                 proceed()
+            }
+        }
+
+        engine {
+            config {
+                pingInterval(15, TimeUnit.SECONDS)
             }
         }
     }
