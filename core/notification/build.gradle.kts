@@ -5,16 +5,14 @@ plugins {
 
 android {
     namespace = "com.youhajun.core.notification"
-
-    buildFeatures {
-        buildConfig = true
-    }
 }
 
 dependencies {
     implementation(projects.core.design)
+    implementation(projects.core.model)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
