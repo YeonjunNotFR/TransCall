@@ -1,6 +1,5 @@
 package com.youhajun.core.database.entity
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -9,17 +8,11 @@ data class ConversationEntity(
     @PrimaryKey
     val id: String,
     val roomId: String,
-    @Embedded(prefix = "sender_")
-    val senderInfo: SenderInfoEntity,
+    val senderId: String,
     val originText: String,
+    val originLanguageCode: String,
     val transText: String?,
-    val transLanguageCode: String,
-    val timestamp: Long
-)
-
-data class SenderInfoEntity(
-    val id: String,
-    val displayName: String,
-    val languageCode: String,
-    val profileUrl: String? = null,
+    val transLanguageCode: String?,
+    val updatedAtToEpochTime: Long,
+    val createdAtToEpochTime: Long
 )
