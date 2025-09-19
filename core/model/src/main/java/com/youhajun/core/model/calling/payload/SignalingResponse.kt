@@ -4,7 +4,7 @@ import com.youhajun.core.model.calling.PublisherFeedResponse
 import com.youhajun.core.model.calling.SubscriberFeedResponse
 import com.youhajun.core.model.calling.type.MediaContentType
 
-sealed interface SignalingResponse : MessagePayload, ResponsePayload
+sealed interface SignalingResponse : ResponsePayload
 
 data class JoinedRoomPublisher(
     val publisherHandleId: Long,

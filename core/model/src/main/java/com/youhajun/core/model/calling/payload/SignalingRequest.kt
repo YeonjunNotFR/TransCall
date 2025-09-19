@@ -3,7 +3,7 @@ package com.youhajun.core.model.calling.payload
 import com.youhajun.core.model.calling.SubscriberFeedRequest
 import com.youhajun.core.model.calling.type.MediaContentType
 
-sealed interface SignalingRequest : MessagePayload, RequestPayload
+sealed interface SignalingRequest : RequestPayload
 
 data class JoinRoomPublisher(
     val handleId: Long,
