@@ -2,6 +2,7 @@ package com.youhajun.webrtc.peer
 
 import android.content.Context
 import android.media.AudioAttributes
+import android.media.AudioFormat
 import android.os.Build
 import com.youhajun.webrtc.model.MicChunk
 import com.youhajun.webrtc.model.TurnCredential
@@ -43,8 +44,8 @@ class StreamPeerConnectionFactory @Inject constructor(
         DefaultVideoDecoderFactory(eglBaseContext)
     }
 
-    private val _micFlow = MutableSharedFlow<MicChunk>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    val micFlow: SharedFlow<MicChunk> = _micFlow.asSharedFlow()
+    private val _localMicChunk = MutableSharedFlow<MicChunk>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    internal val localMicChunk: SharedFlow<MicChunk> = _localMicChunk.asSharedFlow()
 
     private val videoEncoderFactory by lazy {
         val hardwareEncoder = HardwareVideoEncoderFactory(eglBaseContext, true, true)
@@ -61,11 +62,12 @@ class StreamPeerConnectionFactory @Inject constructor(
             .setUseHardwareAcousticEchoCanceler(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
             .setUseHardwareNoiseSuppressor(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
             .setAudioAttributes(attrs)
+            .setAudioFormat(AudioFormat.ENCODING_PCM_16BIT)
+            .setSampleRate(16000)
             .setSamplesReadyCallback {
-                if (it.data.isEmpty()) return@setSamplesReadyCallback
-
-                val chunk = MicChunk(it.audioFormat, it.channelCount, it.sampleRate, it.data)
-                _micFlow.tryEmit(chunk)
+                val numberOfFrames = it.data.size / (2 * it.channelCount)
+                val chunk = MicChunk(audioData = it.data, sampleRate = it.sampleRate, numberOfFrames = numberOfFrames, numberOfChannels = it.channelCount)
+                _localMicChunk.tryEmit(chunk)
             }
             .createAudioDeviceModule().also {
                 it.setMicrophoneMute(false)
