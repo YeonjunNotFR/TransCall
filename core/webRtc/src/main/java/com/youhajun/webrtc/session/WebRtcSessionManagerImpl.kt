@@ -7,17 +7,21 @@ import com.youhajun.webrtc.model.AudioDeviceType
 import com.youhajun.webrtc.model.CallAudioStream
 import com.youhajun.webrtc.model.CallMediaUser
 import com.youhajun.webrtc.model.CallVideoStream
+import com.youhajun.webrtc.model.CameraEnabledChanged
 import com.youhajun.webrtc.model.CompleteIceCandidate
 import com.youhajun.webrtc.model.IceCandidate
 import com.youhajun.webrtc.model.JoinRoomPublisher
 import com.youhajun.webrtc.model.JoinRoomSubscriber
 import com.youhajun.webrtc.model.JoinedRoomPublisher
+import com.youhajun.webrtc.model.LocalAudioEvent
 import com.youhajun.webrtc.model.LocalAudioStream
 import com.youhajun.webrtc.model.LocalMediaUser
 import com.youhajun.webrtc.model.LocalVideoEvent
 import com.youhajun.webrtc.model.LocalVideoStream
 import com.youhajun.webrtc.model.MediaContentType
-import com.youhajun.webrtc.model.MicChunk
+import com.youhajun.webrtc.model.MediaStateChanged
+import com.youhajun.webrtc.model.MediaStateInit
+import com.youhajun.webrtc.model.MicEnableChanged
 import com.youhajun.webrtc.model.OnIceCandidate
 import com.youhajun.webrtc.model.OnNewPublisher
 import com.youhajun.webrtc.model.PublisherAnswer
@@ -79,7 +83,7 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
         initialValue = emptyList()
     )
 
-    override val micFlow: SharedFlow<MicChunk> = peerConnectionFactory.micFlow
+    override val micByteFlow: SharedFlow<ByteArray> = audioManager.myAudioPcmFlow
 
     private val mediaConstraints = MediaConstraints().apply {
         mandatory.addAll(
@@ -154,7 +158,9 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
         this.signalingClient = signalingClient
         peerConnectionFactory.initRtcConfig(turnCredential)
         collectSignalingResponse()
-        collectLocalEvent()
+        collectMediaStateResponse()
+        collectLocalAudioEvent()
+        collectLocalVideoEvent()
     }
 
     override fun start(videoRoomHandleInfo: VideoRoomHandleInfo) {
@@ -172,15 +178,14 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
     override fun dispose() {
         videoManager.dispose()
         audioManager.dispose()
+        runCatching { publisherPeerConnection.connection.dispose() }
         sessionScope.cancel()
     }
 
     override fun flipCamera() = videoManager.flipCamera(localUserId)
 
     override fun setCameraEnabled(enabled: Boolean) {
-        sessionScope.launch {
-            videoManager.setCameraEnabled(localUserId, enabled)
-        }
+        videoManager.setCameraEnabled(localUserId, enabled)
     }
 
     override fun selectAudioDevice(deviceType: AudioDeviceType) = audioManager.selectAudioDevice(deviceType)
@@ -321,6 +326,21 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
             .addIceCandidate(iceCandidate.toWebRtcCandidate())
     }
 
+    private fun collectMediaStateResponse() = sessionScope.launch {
+        signalingClient.observeMediaStateResponse().collect {
+            when(it) {
+                is MediaStateChanged -> {
+                    audioManager.onMediaStateChanged(it.mediaState)
+                    videoManager.onMediaStateChanged(it.mediaState)
+                }
+                is MediaStateInit -> {
+                    audioManager.onMediaStateInit(it.mediaStateList)
+                    videoManager.onMediaStateInit(it.mediaStateList)
+                }
+            }
+        }
+    }
+
     private fun collectSignalingResponse() = sessionScope.launch {
         signalingClient.observeSignalingResponse().collect {
             when(it) {
@@ -356,12 +376,24 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
         }
     }
 
-    private fun collectLocalEvent() {
+    private fun collectLocalVideoEvent() {
         sessionScope.launch {
             videoManager.localVideoEvent.collect {
-                when (it) {
-                    is LocalVideoEvent.EnabledChanged -> TODO()
+                val message = when (it) {
+                    is LocalVideoEvent.CameraEnabledChanged -> CameraEnabledChanged(it.enabled)
                 }
+                signalingClient.sendMediaStateRequest(message)
+            }
+        }
+    }
+
+    private fun collectLocalAudioEvent() {
+        sessionScope.launch {
+            audioManager.localAudioEvent.collect {
+                val message = when (it) {
+                    is LocalAudioEvent.MicEnableChanged -> MicEnableChanged(it.enabled)
+                }
+                signalingClient.sendMediaStateRequest(message)
             }
         }
     }
