@@ -2,7 +2,9 @@ package com.youhajun.webrtc.audio
 
 import com.youhajun.webrtc.model.CallAudioStream
 import com.youhajun.webrtc.model.CallMediaKey
+import com.youhajun.webrtc.model.LocalAudioStream
 import com.youhajun.webrtc.model.MediaContentType
+import com.youhajun.webrtc.model.RemoteAudioStream
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,8 +36,23 @@ internal class AudioStreamStoreImpl @Inject constructor() : AudioStreamStore {
         mediaContentType: MediaContentType,
         transform: (CallAudioStream) -> CallAudioStream
     ) {
+        val key = CallMediaKey.createKey(userId, mediaContentType.type)
         _audioStreamsFlow.update { list ->
-            list.map { if (it.key == CallMediaKey.createKey(userId, mediaContentType.type)) transform(it) else it }
+            list.map { if (it.key == key) transform(it) else it }
+        }
+    }
+
+    override fun updateDefaultLocal(userId: String, transform: (LocalAudioStream) -> LocalAudioStream) {
+        val defaultKey = CallMediaKey.createKey(userId, MediaContentType.DEFAULT.type)
+        _audioStreamsFlow.update { list ->
+            list.map { if (it.key == defaultKey) transform(it as LocalAudioStream) else it }
+        }
+    }
+
+    override fun updateDefaultRemote(userId: String, transform: (RemoteAudioStream) -> RemoteAudioStream) {
+        val defaultKey = CallMediaKey.createKey(userId, MediaContentType.DEFAULT.type)
+        _audioStreamsFlow.update { list ->
+            list.map { if (it.key == defaultKey) transform(it as RemoteAudioStream) else it }
         }
     }
 }

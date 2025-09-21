@@ -7,25 +7,23 @@ import com.youhajun.webrtc.model.CallAudioStream
 import com.youhajun.webrtc.model.LocalAudioEvent
 import com.youhajun.webrtc.model.LocalAudioStream
 import com.youhajun.webrtc.model.MediaContentType
-import com.youhajun.webrtc.model.MediaMessage
+import com.youhajun.webrtc.model.MediaState
+import com.youhajun.webrtc.model.MicChunk
 import com.youhajun.webrtc.model.RemoteAudioStream
 import com.youhajun.webrtc.peer.StreamPeerConnectionFactory
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import org.webrtc.AudioTrack
 import org.webrtc.MediaConstraints
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 
 internal class AudioSessionManagerImpl @Inject constructor(
     private val peerConnectionFactory: StreamPeerConnectionFactory,
@@ -34,6 +32,7 @@ internal class AudioSessionManagerImpl @Inject constructor(
     private val audioStreamStore: AudioStreamStore
 ) : AudioSessionManager {
 
+    private val smootherMap = mutableMapOf<String, SoundLevelSmoother>()
     private val audioConstraints: MediaConstraints by lazy(::buildAudioConstraints)
 
     private val audioSource by lazy {
@@ -52,9 +51,12 @@ internal class AudioSessionManagerImpl @Inject constructor(
     private val _localAudioEvent: MutableSharedFlow<LocalAudioEvent> = MutableSharedFlow(extraBufferCapacity = 1)
     override val localAudioEvent: SharedFlow<LocalAudioEvent> = _localAudioEvent.asSharedFlow()
 
+    private val _myAudioPcmFlow: MutableSharedFlow<ByteArray> = MutableSharedFlow(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    override val myAudioPcmFlow: SharedFlow<ByteArray> = _myAudioPcmFlow.asSharedFlow()
+
     override fun startAudio(localUserId: String): AudioTrack {
         audioDeviceChangeCollect(localUserId)
-        audioLevelCollect(localUserId)
+        localMicChunkCollect(localUserId)
         return localAudioTrack.also {
             val localStream = LocalAudioStream(
                 userId = localUserId,
@@ -70,18 +72,13 @@ internal class AudioSessionManagerImpl @Inject constructor(
     override fun dispose() {
         scope.cancel()
         audioDeviceController.stop()
-
+        runCatching { audioStreamsFlow.value.forEach { it.audioTrack?.dispose() } }
         runCatching { audioSource.dispose() }
-        runCatching { localAudioTrack.dispose() }
     }
 
     override fun setMicEnabled(localUserId: String, enabled: Boolean) {
         localAudioTrack.setEnabled(enabled)
-        audioStreamStore.update(localUserId, MediaContentType.DEFAULT) {
-            (it as LocalAudioStream).copy(
-                isMicEnabled = enabled
-            )
-        }
+        audioStreamStore.updateDefaultLocal(localUserId) { it.copy(isMicEnabled = enabled) }
         _localAudioEvent.tryEmit(LocalAudioEvent.MicEnableChanged(enabled))
     }
 
@@ -93,40 +90,32 @@ internal class AudioSessionManagerImpl @Inject constructor(
         audioStreamStore.updateAll {
             it.audioTrack?.setEnabled(enabled)
             when(it) {
-                is LocalAudioStream -> it.copy(
-                    isMute = enabled,
-                )
-                is RemoteAudioStream -> it.copy(
-                    isOutputEnabled = enabled,
-                )
+                is LocalAudioStream -> it.copy(isMute = enabled)
+                is RemoteAudioStream -> it.copy(isOutputEnabled = enabled)
             }
         }
     }
 
-    override fun setOutputEnable(
-        userId: String,
-        mediaContentType: MediaContentType,
-        enabled: Boolean
-    ) {
-        audioStreamStore.update(userId, mediaContentType) {
-            (it as RemoteAudioStream).copy(
-                isOutputEnabled = enabled
-            )
-        }
-    }
-
-    override fun setAudioStateChange(state: MediaMessage.AudioStateChange) {
-        val mediaType = MediaContentType.fromType(state.mediaContentType)
-        audioStreamStore.update(state.userId, mediaType) {
-            (it as RemoteAudioStream).copy(
-                isMicEnabled = state.isMicEnabled,
-//                isSpeaking = state.isSpeaking
-            )
+    override fun setOutputEnable(userId: String, mediaContentType: MediaContentType, enabled: Boolean) {
+        audioStreamStore.updateDefaultRemote(userId) {
+            it.copy(isOutputEnabled = enabled)
         }
     }
 
     override fun addRemoteAudioTrack(remoteAudio: RemoteAudioStream) {
+        if(remoteAudio.audioTrack == null) return
         audioStreamStore.upsert(remoteAudio)
+        remoteAudioAddSink(remoteAudio.audioTrack, remoteAudio.userId)
+    }
+
+    override fun onMediaStateChanged(state: MediaState) {
+        audioStreamStore.updateDefaultRemote(state.userId) {
+            it.copy(isMicEnabled = state.micEnabled)
+        }
+    }
+
+    override fun onMediaStateInit(list: List<MediaState>) {
+        list.forEach { onMediaStateChanged(it) }
     }
 
     private fun buildAudioConstraints(): MediaConstraints {
@@ -152,8 +141,8 @@ internal class AudioSessionManagerImpl @Inject constructor(
     private fun audioDeviceChangeCollect(localUserId: String) {
         scope.launch {
             audioDeviceController.audioDeviceState.collect { state ->
-                audioStreamStore.update(localUserId, MediaContentType.DEFAULT) {
-                    (it as LocalAudioStream).copy(
+                audioStreamStore.updateDefaultLocal(localUserId) {
+                    it.copy(
                         selectedDevice = state.selectedDevice,
                         availableDevices = state.availableDevices
                     )
@@ -162,23 +151,45 @@ internal class AudioSessionManagerImpl @Inject constructor(
         }
     }
 
-    @OptIn(FlowPreview::class)
-    private fun audioLevelCollect(localUserId: String) {
-        scope.launch {
-            peerConnectionFactory.micFlow.conflate().sample(300.milliseconds).collect {
-                val audioLevel = if(localAudioTrack.enabled()) {
-                    val rawLevel = SoundUtil.calculateAudioLevel(it)
-                    SoundUtil.getSmoothedLevel(rawLevel)
-                } else {
-                    0.0f
-                }
+    private fun remoteAudioAddSink(audioTrack: AudioTrack, userId: String) {
+        audioTrack.addSink { audioData, bitsPerSample, sampleRate, numberOfChannels, numberOfFrames, _ ->
+            val byteArray = ByteArray(audioData.remaining())
+            audioData.get(byteArray)
 
-                audioStreamStore.update(localUserId, MediaContentType.DEFAULT) { stream ->
-                    (stream as LocalAudioStream).copy(
-                        audioLevel = audioLevel
-                    )
-                }
+            val chunk = MicChunk(
+                audioData = byteArray,
+                sampleRate = sampleRate,
+                numberOfChannels = numberOfChannels,
+                numberOfFrames = numberOfFrames
+            )
+
+            updateAudioLevel(chunk, userId, audioTrack.enabled())
+        }
+    }
+
+    private fun localMicChunkCollect(localUserId: String) {
+        scope.launch {
+            peerConnectionFactory.localMicChunk.collect { chunk ->
+                updateAudioLevel(chunk, localUserId, localAudioTrack.enabled())
+                _myAudioPcmFlow.tryEmit(chunk.audioData)
             }
         }
+    }
+
+    private fun updateAudioLevel(chunk: MicChunk, userId: String, trackEnable: Boolean) {
+        val smoother = getOrCreateSmoother(userId)
+        val rawLevel = if(trackEnable) SoundUtil.calculateAudioLevel(chunk) else 0.0f
+        val audioLevel = smoother.getSmoothedLevel(rawLevel)
+
+        audioStreamStore.update(userId, MediaContentType.DEFAULT) { stream ->
+            when(stream) {
+                is LocalAudioStream -> stream.copy(audioLevel = audioLevel)
+                is RemoteAudioStream -> stream.copy(audioLevel = audioLevel)
+            }
+        }
+    }
+
+    private fun getOrCreateSmoother(userId: String): SoundLevelSmoother {
+        return smootherMap.getOrPut(userId) { SoundLevelSmoother() }
     }
 }
