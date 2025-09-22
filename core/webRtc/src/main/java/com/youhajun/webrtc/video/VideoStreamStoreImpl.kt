@@ -2,7 +2,9 @@ package com.youhajun.webrtc.video
 
 import com.youhajun.webrtc.model.CallMediaKey
 import com.youhajun.webrtc.model.CallVideoStream
+import com.youhajun.webrtc.model.LocalVideoStream
 import com.youhajun.webrtc.model.MediaContentType
+import com.youhajun.webrtc.model.RemoteVideoStream
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,13 +25,17 @@ internal class VideoStreamStoreImpl @Inject constructor() : VideoStreamStore {
         }
     }
 
-    override fun update(
-        userId: String,
-        mediaContentType: MediaContentType,
-        transform: (CallVideoStream) -> CallVideoStream
-    ) {
+    override fun updateDefaultLocal(userId: String, transform: (LocalVideoStream) -> LocalVideoStream) {
+        val defaultKey = CallMediaKey.createKey(userId, MediaContentType.DEFAULT.type)
         _videoStreamsFlow.update { list ->
-            list.map { if (it.key == CallMediaKey.createKey(userId, mediaContentType.type)) transform(it) else it }
+            list.map { if (it.key == defaultKey) transform(it as LocalVideoStream) else it }
+        }
+    }
+
+    override fun updateDefaultRemote(userId: String, transform: (RemoteVideoStream) -> RemoteVideoStream) {
+        val defaultKey = CallMediaKey.createKey(userId, MediaContentType.DEFAULT.type)
+        _videoStreamsFlow.update { list ->
+            list.map { if (it.key == defaultKey) transform(it as RemoteVideoStream) else it }
         }
     }
 }

@@ -60,8 +60,7 @@ internal class CameraControllerImpl @Inject constructor(
     }
 
     override fun dispose() {
-        stopCapture()
-        capturer.dispose()
+        runCatching { surfaceTextureHelper.dispose() }
     }
 
     private fun findFrontFacingCameraId(cameraManager: CameraManager): String? {

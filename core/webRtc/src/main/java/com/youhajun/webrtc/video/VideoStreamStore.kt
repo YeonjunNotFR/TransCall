@@ -1,12 +1,14 @@
 package com.youhajun.webrtc.video
 
 import com.youhajun.webrtc.model.CallVideoStream
-import com.youhajun.webrtc.model.MediaContentType
+import com.youhajun.webrtc.model.LocalVideoStream
+import com.youhajun.webrtc.model.RemoteVideoStream
 import kotlinx.coroutines.flow.StateFlow
 
 internal interface VideoStreamStore {
     val videoStreamsFlow: StateFlow<List<CallVideoStream>>
 
     fun upsert(stream: CallVideoStream)
-    fun update(userId: String, mediaContentType: MediaContentType, transform: (CallVideoStream) -> CallVideoStream)
+    fun updateDefaultLocal(userId: String, transform: (LocalVideoStream) -> LocalVideoStream)
+    fun updateDefaultRemote(userId: String, transform: (RemoteVideoStream) -> RemoteVideoStream)
 }

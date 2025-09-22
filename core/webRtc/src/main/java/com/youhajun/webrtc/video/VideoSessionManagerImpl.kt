@@ -5,7 +5,7 @@ import com.youhajun.webrtc.model.CallVideoStream
 import com.youhajun.webrtc.model.LocalVideoEvent
 import com.youhajun.webrtc.model.LocalVideoStream
 import com.youhajun.webrtc.model.MediaContentType
-import com.youhajun.webrtc.model.MediaMessage
+import com.youhajun.webrtc.model.MediaState
 import com.youhajun.webrtc.model.RemoteVideoStream
 import com.youhajun.webrtc.peer.StreamPeerConnectionFactory
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -45,26 +45,19 @@ internal class VideoSessionManagerImpl @Inject constructor(
     }
 
     override fun setCameraEnabled(localUserId: String, enabled: Boolean) {
-        cameraTrack.setEnabled(enabled)
+        videoStreamStore.updateDefaultLocal(localUserId) { it.copy(isVideoEnable = enabled) }
         val result = if(enabled) cameraController.startCapture() else cameraController.stopCapture()
         result.onSuccess {
-            videoStreamStore.update(localUserId, MediaContentType.DEFAULT) {
-                (it as LocalVideoStream).copy(
-                    isVideoEnable = enabled
-                )
-            }
-            _localVideoEvent.tryEmit(LocalVideoEvent.EnabledChanged(enabled))
+            _localVideoEvent.tryEmit(LocalVideoEvent.CameraEnabledChanged(enabled))
         }.onFailure {
-            cameraTrack.setEnabled(!enabled)
+            videoStreamStore.updateDefaultLocal(localUserId) { it.copy(isVideoEnable = !enabled) }
         }
     }
 
     override fun flipCamera(localUserId: String) {
         cameraController.switchCamera { isFrontCamera ->
-            videoStreamStore.update(localUserId, MediaContentType.DEFAULT) {
-                (it as LocalVideoStream).copy(
-                    isFrontCamera = isFrontCamera
-                )
+            videoStreamStore.updateDefaultLocal(localUserId) {
+                it.copy(isFrontCamera = isFrontCamera)
             }
         }
     }
@@ -73,18 +66,20 @@ internal class VideoSessionManagerImpl @Inject constructor(
         videoStreamStore.upsert(remoteVideo)
     }
 
-    override fun setVideoStateChange(state: MediaMessage.VideoStateChange) {
-        val mediaType = MediaContentType.fromType(state.mediaContentType)
-        videoStreamStore.update(state.userId, mediaType) {
-            (it as RemoteVideoStream).copy(
-                isVideoEnable = state.isVideoEnabled
-            )
+    override fun dispose() {
+        cameraController.stopCapture()
+        runCatching { videoStreamsFlow.value.forEach { it.videoTrack?.dispose() } }
+        runCatching { cameraSource.dispose() }
+        cameraController.dispose()
+    }
+
+    override fun onMediaStateChanged(state: MediaState) {
+        videoStreamStore.updateDefaultRemote(state.userId) {
+            it.copy(isVideoEnable = state.cameraEnabled)
         }
     }
 
-    override fun dispose() {
-        runCatching { cameraController.dispose() }
-        runCatching { cameraSource.dispose() }
-        runCatching { cameraTrack.dispose() }
+    override fun onMediaStateInit(list: List<MediaState>) {
+        list.forEach { onMediaStateChanged(it) }
     }
 }
