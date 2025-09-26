@@ -1,5 +1,6 @@
 package com.youhajun.data.common
 
+import com.youhajun.core.model.TimeRange
 import com.youhajun.core.model.filter.DateRangeFilter
 import com.youhajun.core.model.pagination.CursorPageRequest
 import com.youhajun.core.model.pagination.OffsetPageRequest
@@ -19,4 +20,9 @@ fun HttpRequestBuilder.parametersFrom(range: DateRangeFilter) {
 fun HttpRequestBuilder.parametersFrom(request: CursorPageRequest) {
     parameter("after", request.after)
     parameter("first", request.first)
+}
+
+fun HttpRequestBuilder.parametersFrom(request: TimeRange) {
+    parameter("joinedAtToEpochTime", request.joinedAtToEpochTime)
+    parameter("leftAtToEpochTime", request.leftAtToEpochTime)
 }
