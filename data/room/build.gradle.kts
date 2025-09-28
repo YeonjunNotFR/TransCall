@@ -10,8 +10,10 @@ android {
 
 dependencies {
     implementation(projects.domain.room)
+    implementation(projects.data.common)
     implementation(projects.core.network)
     implementation(projects.core.model)
+    implementation(projects.core.database)
     implementation(libs.bundles.ktor)
     implementation(libs.kotlinx.collections.immutable)
     testImplementation(libs.junit)
