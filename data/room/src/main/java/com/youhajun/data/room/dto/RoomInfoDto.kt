@@ -18,6 +18,8 @@ data class RoomInfoDto(
     val title: String = "",
     @SerialName("maxParticipantCount")
     val maxParticipantCount: Int = 0,
+    @SerialName("currentParticipantCount")
+    val currentParticipantCount: Int = 0,
     @SerialName("visibility")
     val visibility: String = "",
     @SerialName("joinType")
@@ -26,15 +28,22 @@ data class RoomInfoDto(
     val tags: Set<String> = emptySet(),
     @SerialName("status")
     val status: String = "",
+    @SerialName("hostId")
+    val hostId: String = "",
+    @SerialName("createdAtToEpochTime")
+    val createdAtToEpochTime: Long = 0,
 ) {
     fun toModel(): RoomInfo = RoomInfo(
         roomId = roomId,
         roomCode = roomCode,
         title = title,
         maxParticipantCount = maxParticipantCount,
+        currentParticipantCount = currentParticipantCount,
         visibility = RoomVisibility.fromType(visibility),
         joinType = RoomJoinType.fromType(joinType),
         tags = tags.toImmutableSet(),
         status = RoomStatus.fromType(status),
+        hostId = hostId,
+        createdAtToEpochTime = createdAtToEpochTime,
     )
 }
