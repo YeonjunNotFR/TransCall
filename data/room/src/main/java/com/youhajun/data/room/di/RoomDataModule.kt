@@ -1,5 +1,7 @@
 package com.youhajun.data.room.di
 
+import com.youhajun.data.room.ParticipantLocalDataSource
+import com.youhajun.data.room.ParticipantLocalDataSourceImpl
 import com.youhajun.data.room.RoomRemoteDataSource
 import com.youhajun.data.room.RoomRemoteDataSourceImpl
 import com.youhajun.data.room.RoomRepositoryImpl
@@ -26,4 +28,10 @@ internal interface RoomDataModule {
     fun bindRoomRepository(
         repo: RoomRepositoryImpl
     ): RoomRepository
+
+    @Singleton
+    @Binds
+    fun bindParticipantLocalDataSource(
+        local: ParticipantLocalDataSourceImpl
+    ): ParticipantLocalDataSource
 }
