@@ -1,5 +1,6 @@
 package com.youhajun.data.user.dto
 
+import com.youhajun.core.model.CountryType
 import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.MembershipPlan
 import com.youhajun.core.model.user.MyInfo
@@ -12,8 +13,10 @@ internal data class MyInfoDto(
     val userId: String = "",
     @SerialName("displayName")
     val displayName: String = "",
-    @SerialName("language")
-    val language: String = "",
+    @SerialName("languageCode")
+    val languageCode: String = "",
+    @SerialName("countryCode")
+    val countryCode: String = "",
     @SerialName("membershipPlan")
     val membershipPlan: String = "",
     @SerialName("remainTime")
@@ -25,7 +28,8 @@ internal data class MyInfoDto(
         userId = userId,
         displayName = displayName,
         imageUrl = imageUrl ?: "",
-        language = LanguageType.fromCode(language),
+        language = LanguageType.fromCode(languageCode),
+        country = CountryType.fromCode(countryCode),
         membershipPlan = MembershipPlan.fromId(membershipPlan),
         remainTime = remainTime.toModel(),
     )
