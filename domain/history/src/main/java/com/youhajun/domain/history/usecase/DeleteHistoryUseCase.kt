@@ -8,7 +8,7 @@ import javax.inject.Singleton
 class DeleteHistoryUseCase @Inject constructor(
     private val repository: HistoryRepository
 ) {
-    suspend operator fun invoke(callId: String): Result<Unit> {
-        return repository.deleteHistory(callId)
+    suspend operator fun invoke(historyId: String): Result<Unit> {
+        return repository.deleteHistory(historyId)
     }
 }
