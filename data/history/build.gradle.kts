@@ -15,6 +15,7 @@ dependencies {
     implementation(projects.core.model)
     implementation(libs.bundles.ktor)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

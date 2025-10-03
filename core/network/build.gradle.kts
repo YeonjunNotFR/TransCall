@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.youhajun.android.library)
     alias(libs.plugins.youhajun.android.hilt)
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
