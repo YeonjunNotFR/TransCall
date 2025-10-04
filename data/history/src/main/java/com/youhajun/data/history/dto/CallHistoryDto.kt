@@ -1,6 +1,6 @@
 package com.youhajun.data.history.dto
 
-import com.youhajun.core.model.calling.CallHistory
+import com.youhajun.core.model.history.CallHistory
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -9,6 +9,8 @@ import kotlinx.serialization.Serializable
 internal data class CallHistoryDto(
     @SerialName("historyId")
     val historyId: String = "",
+    @SerialName("roomId")
+    val roomId: String = "",
     @SerialName("title")
     val title: String = "",
     @SerialName("summary")
@@ -17,23 +19,24 @@ internal data class CallHistoryDto(
     val memo: String = "",
     @SerialName("isLiked")
     val isLiked: Boolean = false,
-    @SerialName("startedAtToEpochTime")
-    val startedAtToEpochTime: Long = 0,
-    @SerialName("endedAtToEpochTime")
-    val endedAtToEpochTime: Long = 0,
+    @SerialName("joinedAtToEpochTime")
+    val joinedAtToEpochTime: Long = 0,
+    @SerialName("leftAtToEpochTime")
+    val leftAtToEpochTime: Long? = null,
     @SerialName("durationSeconds")
-    val durationSeconds: Int = 0,
+    val durationSeconds: Int? = null,
     @SerialName("participants")
     val participants: List<ParticipantDto> = emptyList(),
 ) {
     fun toModel(): CallHistory = CallHistory(
         historyId = historyId,
+        roomId = roomId,
         title = title,
         summary = summary,
-        startedAtToEpochTime = startedAtToEpochTime,
-        endedAtToEpochTime = endedAtToEpochTime,
+        joinedAtToEpochTime = joinedAtToEpochTime,
+        leftAtToEpochTime = leftAtToEpochTime,
         durationSeconds = durationSeconds,
-        currentParticipants = participants.map { it.toModel() }.toImmutableList(),
+        participants = participants.map { it.toModel() }.toImmutableList(),
         memo = memo,
         isLiked = isLiked,
     )

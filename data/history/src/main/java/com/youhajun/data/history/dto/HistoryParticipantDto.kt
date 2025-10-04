@@ -1,12 +1,14 @@
 package com.youhajun.data.history.dto
 
 import com.youhajun.core.model.LanguageType
-import com.youhajun.core.model.room.CurrentParticipant
+import com.youhajun.core.model.room.Participant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class ParticipantDto(
+    @SerialName("participantId")
+    val participantId: String = "",
     @SerialName("userId")
     val userId: String = "",
     @SerialName("displayName")
@@ -16,7 +18,8 @@ internal data class ParticipantDto(
     @SerialName("language")
     val language: String = "",
 ) {
-    fun toModel(): CurrentParticipant = CurrentParticipant(
+    fun toModel(): Participant = Participant(
+        participantId = participantId,
         userId = userId,
         displayName = displayName,
         imageUrl = imageUrl ?: "",

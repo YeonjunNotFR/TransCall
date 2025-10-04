@@ -18,8 +18,8 @@ internal interface HistoryRemoteDataSource {
         range: DateRangeFilter?
     ): CursorPageDto<CallHistoryDto>
 
-    suspend fun getHistoryDetail(callId: String): CallHistoryDto
-    suspend fun deleteHistory(callId: String)
+    suspend fun getHistoryDetail(historyId: String): CallHistoryDto
+    suspend fun deleteHistory(historyId: String)
 }
 
 internal class HistoryRemoteDataSourceImpl @Inject constructor(
@@ -36,11 +36,11 @@ internal class HistoryRemoteDataSourceImpl @Inject constructor(
         }.body()
     }
 
-    override suspend fun getHistoryDetail(callId: String): CallHistoryDto {
-        return client.get(HistoryEndpoint.Detail(callId).path).body()
+    override suspend fun getHistoryDetail(historyId: String): CallHistoryDto {
+        return client.get(HistoryEndpoint.Detail(historyId).path).body()
     }
 
-    override suspend fun deleteHistory(callId: String) {
-        return client.delete(HistoryEndpoint.Delete(callId).path).body()
+    override suspend fun deleteHistory(historyId: String) {
+        return client.delete(HistoryEndpoint.Delete(historyId).path).body()
     }
 }

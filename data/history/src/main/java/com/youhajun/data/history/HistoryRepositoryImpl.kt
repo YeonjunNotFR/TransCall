@@ -1,6 +1,6 @@
 package com.youhajun.data.history
 
-import com.youhajun.core.model.calling.CallHistory
+import com.youhajun.core.model.history.CallHistory
 import com.youhajun.core.model.filter.DateRangeFilter
 import com.youhajun.core.model.pagination.CursorPage
 import com.youhajun.core.model.pagination.CursorPageRequest
@@ -18,11 +18,11 @@ internal class HistoryRepositoryImpl @Inject constructor(
         remote.getHistoryList(request, range).toModel { it.toModel() }
     }
 
-    override suspend fun getHistoryDetail(callId: String) = runCatching {
-        remote.getHistoryDetail(callId).toModel()
+    override suspend fun getHistoryDetail(historyId: String) = runCatching {
+        remote.getHistoryDetail(historyId).toModel()
     }
 
-    override suspend fun deleteHistory(callId: String) = runCatching {
-        remote.deleteHistory(callId)
+    override suspend fun deleteHistory(historyId: String) = runCatching {
+        remote.deleteHistory(historyId)
     }
 }
