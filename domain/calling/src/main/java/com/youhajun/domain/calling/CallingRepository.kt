@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface CallingRepository {
     fun connect(roomId: String): Flow<ServerMessage>
-    suspend fun send(message: ClientMessage)
+    suspend fun sendClientMessage(message: ClientMessage)
+
+    suspend fun sendBinaryMessage(data: ByteArray)
     suspend fun close()
     suspend fun getTurnCredential(): Result<TurnCredential>
 }
