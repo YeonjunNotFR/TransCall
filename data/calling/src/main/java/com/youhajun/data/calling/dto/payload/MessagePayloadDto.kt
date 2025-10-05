@@ -1,9 +1,9 @@
 package com.youhajun.data.calling.dto.payload
 
+import com.youhajun.core.model.calling.payload.MediaStateRequest
 import com.youhajun.core.model.calling.payload.RequestPayload
 import com.youhajun.core.model.calling.payload.ResponsePayload
 import com.youhajun.core.model.calling.payload.SignalingRequest
-import com.youhajun.core.model.calling.payload.TranslationRequest
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,7 +13,7 @@ internal sealed interface RequestPayloadDto : MessagePayloadDto
 
 internal fun RequestPayload.toDto(): RequestPayloadDto = when (this) {
     is SignalingRequest -> this.toDto()
-    is TranslationRequest -> this.toDto()
+    is MediaStateRequest -> this.toDto()
 }
 
 @Serializable

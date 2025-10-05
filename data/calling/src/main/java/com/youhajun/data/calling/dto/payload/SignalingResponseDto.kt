@@ -14,10 +14,10 @@ import com.youhajun.data.calling.dto.payload.OnIceCandidateDto.Companion.ON_ICE_
 import com.youhajun.data.calling.dto.payload.OnNewPublisherDto.Companion.ON_NEW_PUBLISHER_ACTION_TYPE
 import com.youhajun.data.calling.dto.payload.PublisherAnswerDto.Companion.PUBLISHER_ANSWER_ACTION_TYPE
 import com.youhajun.data.calling.dto.payload.SubscriberOfferDto.Companion.SUBSCRIBER_OFFER_ACTION_TYPE
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
-internal sealed interface SignalingResponseDto : MessagePayloadDto, ResponsePayloadDto
+internal sealed interface SignalingResponseDto : ResponsePayloadDto
 
 @Serializable
 @SerialName(JOINED_PUBLISHER_ACTION_TYPE)

@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SubscriberFeedRequestDto(
+internal data class SubscriberFeedRequestDto(
     @SerialName("feedId")
     val feedId: Long,
     @SerialName("mid")
@@ -14,7 +14,7 @@ data class SubscriberFeedRequestDto(
     val crossrefid: String?
 )
 
-fun SubscriberFeedRequest.toDto() = SubscriberFeedRequestDto(
+internal fun SubscriberFeedRequest.toDto() = SubscriberFeedRequestDto(
     feedId = feedId,
     mid = mid,
     crossrefid = crossrefid

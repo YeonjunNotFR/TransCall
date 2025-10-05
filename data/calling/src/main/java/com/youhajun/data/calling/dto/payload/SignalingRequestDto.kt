@@ -20,7 +20,7 @@ import com.youhajun.data.calling.dto.toDto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-internal sealed interface SignalingRequestDto : MessagePayloadDto, RequestPayloadDto
+internal sealed interface SignalingRequestDto : RequestPayloadDto
 
 @Serializable
 @SerialName(JOIN_PUBLISHER_ACTION_TYPE)

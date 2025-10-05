@@ -6,14 +6,13 @@ import com.youhajun.core.model.calling.payload.ResponsePayload
 import com.youhajun.data.calling.dto.VideoRoomHandleInfoDto
 import com.youhajun.data.calling.dto.payload.ChangedRoomDto.Companion.CHANGED_ROOM_ACTION_TYPE
 import com.youhajun.data.calling.dto.payload.ConnectedRoomDto.Companion.CONNECTED_ACTION_TYPE
-import com.youhajun.data.room.dto.CurrentParticipantDto
+import com.youhajun.data.room.dto.ParticipantDto
 import com.youhajun.data.room.dto.RoomInfoDto
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal sealed interface RoomResponseDto : MessagePayloadDto, ResponsePayloadDto
+internal sealed interface RoomResponseDto : ResponsePayloadDto
 
 @Serializable
 @SerialName(CONNECTED_ACTION_TYPE)
@@ -21,7 +20,7 @@ internal data class ConnectedRoomDto(
     @SerialName("roomInfo")
     val roomInfoDto: RoomInfoDto,
     @SerialName("participants")
-    val participants: List<CurrentParticipantDto>,
+    val participants: List<ParticipantDto>,
     @SerialName("videoRoomHandleInfo")
     val videoRoomHandleInfo: VideoRoomHandleInfoDto,
 ) : RoomResponseDto {
@@ -32,7 +31,7 @@ internal data class ConnectedRoomDto(
 
     override fun toModel(): ResponsePayload = ConnectedRoom(
         roomInfo = roomInfoDto.toModel(),
-        participants = participants.map { it.toModel() }.toImmutableList(),
+        participants = participants.map { it.toModel() },
         videoRoomHandleInfo = videoRoomHandleInfo.toModel(),
     )
 }
@@ -43,7 +42,7 @@ internal data class ChangedRoomDto(
     @SerialName("roomInfo")
     val roomInfoDto: RoomInfoDto,
     @SerialName("participants")
-    val participants: List<CurrentParticipantDto>,
+    val participants: List<ParticipantDto>,
 ) : RoomResponseDto {
 
     companion object {
@@ -52,6 +51,6 @@ internal data class ChangedRoomDto(
 
     override fun toModel(): ResponsePayload = ChangedRoom(
         roomInfo = roomInfoDto.toModel(),
-        participants = participants.map { it.toModel() }.toImmutableList(),
+        participants = participants.map { it.toModel() },
     )
 }

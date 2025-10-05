@@ -6,7 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PublisherFeedResponseDto(
+internal data class PublisherFeedResponseDto(
     @SerialName("feedId")
     val feedId: Long,
     @SerialName("display")
@@ -22,7 +22,7 @@ data class PublisherFeedResponseDto(
 }
 
 @Serializable
-data class PublisherFeedResponseStreamDto(
+internal data class PublisherFeedResponseStreamDto(
     @SerialName("type")
     val type: String,
     @SerialName("mid")

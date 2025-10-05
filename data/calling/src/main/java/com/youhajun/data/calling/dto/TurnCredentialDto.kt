@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TurnCredentialDto(
+internal data class TurnCredentialDto(
     @SerialName("url")
     val url: String,
     @SerialName("username")

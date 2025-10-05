@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class VideoRoomHandleInfoDto(
+internal data class VideoRoomHandleInfoDto(
     @SerialName("defaultPublisherHandleId")
     val defaultPublisherHandleId: Long,
     @SerialName("screenSharePublisherHandleId")
