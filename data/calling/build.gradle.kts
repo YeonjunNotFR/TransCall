@@ -15,6 +15,7 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.model)
     implementation(libs.bundles.ktor)
+    implementation(libs.timber)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.collections.immutable)
     testImplementation(libs.junit)
