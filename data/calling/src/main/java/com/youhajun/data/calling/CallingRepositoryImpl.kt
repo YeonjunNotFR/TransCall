@@ -17,8 +17,12 @@ internal class CallingRepositoryImpl @Inject constructor(
         return remote.connect(roomId).map { it.toModel() }
     }
 
-    override suspend fun send(message: ClientMessage) {
-        remote.send(message.toDto())
+    override suspend fun sendClientMessage(message: ClientMessage) {
+        remote.sendClientMessage(message.toDto())
+    }
+
+    override suspend fun sendBinaryMessage(data: ByteArray) {
+        remote.sendBinaryMessage(data)
     }
 
     override suspend fun close() {
