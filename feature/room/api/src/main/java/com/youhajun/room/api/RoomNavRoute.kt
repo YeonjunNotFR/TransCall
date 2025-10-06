@@ -7,4 +7,7 @@ sealed interface RoomNavRoute : TransCallRoute {
 
     @Serializable
     data object CreateRoom : RoomNavRoute
+
+    @Serializable
+    data object RoomList : RoomNavRoute
 }
