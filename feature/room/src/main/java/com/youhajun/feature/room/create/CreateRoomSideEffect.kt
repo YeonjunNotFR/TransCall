@@ -1,4 +1,4 @@
-package com.youhajun.feature.impl
+package com.youhajun.feature.room.create
 
 import com.youhajun.core.route.NavigationEvent
 

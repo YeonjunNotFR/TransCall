@@ -1,4 +1,4 @@
-package com.youhajun.feature.impl
+package com.youhajun.feature.room.create
 
 import android.Manifest
 import androidx.compose.foundation.background
@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,24 +40,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
 import com.youhajun.core.model.room.RoomVisibility
-import com.youhajun.core.permission.PermissionHandler
+import com.youhajun.core.permission.PermissionForceHandler
 import com.youhajun.core.permission.rememberPermissionRequestController
 import com.youhajun.core.route.NavigationEvent
 import com.youhajun.feature.call.api.LocalCallIntentFactory
 import com.youhajun.hyanghae.graphics.modifier.conditional
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
-import com.youhajun.transcall.core.ui.components.modifier.bottomBorder
 import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import com.youhajun.transcall.core.ui.components.room.RoomVisibilityRow
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentSetOf
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
@@ -71,24 +70,19 @@ internal fun CreateRoomRoute(
 
     viewModel.collectSideEffect {
         when (it) {
+            CreateRoomSideEffect.PermissionCheck -> permissionController.request()
             is CreateRoomSideEffect.Navigation -> onNavigate(it.navigationEvent)
             is CreateRoomSideEffect.GoToCall -> {
                 val callIntent = callIntentFactory.getCallActivityIntent(context, it.roomId)
                 context.startActivity(callIntent)
             }
 
-            CreateRoomSideEffect.PermissionCheck -> {
-                permissionController.request()
-            }
         }
     }
 
-    PermissionHandler(
+    PermissionForceHandler(
         controller = permissionController,
-        permissions = persistentListOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
-        ),
+        permissions = persistentListOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
         rationaleMessage = stringResource(R.string.permission_rationale_message_camera_and_mic),
         onPermissionGranted = viewModel::onPermissionGranted
     )
@@ -129,8 +123,11 @@ internal fun CreateRoomScreen(
     ) {
         CreateRoomHeader(onClickBack)
 
+        HorizontalDivider(modifier = Modifier, 1.dp, Colors.FFE6E9EE)
+
         CreateRoomBody(
             titleTextField = titleTextField,
+            titleHintText = state.titleHint,
             tagTextField = tagTextField,
             maxParticipantCount = state.maxParticipantCount,
             selectedMaxParticipantCount = state.selectedMaxParticipantCount,
@@ -155,7 +152,6 @@ private fun CreateRoomHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .bottomBorder(1.dp, Colors.FFEBEBEA)
             .padding(vertical = 12.dp, horizontal = 8.dp),
     ) {
         Icon(
@@ -184,6 +180,7 @@ private fun CreateRoomHeader(
 @Composable
 private fun ColumnScope.CreateRoomBody(
     titleTextField: TextFieldValue,
+    titleHintText: String,
     tagTextField: TextFieldValue,
     maxParticipantCount: Int,
     selectedMaxParticipantCount: Int,
@@ -209,6 +206,7 @@ private fun ColumnScope.CreateRoomBody(
 
         TitleSection(
             titleTextField = titleTextField,
+            titleHintText = titleHintText,
             onTitleInputTextChanged = onTitleInputTextChanged,
         )
 
@@ -249,6 +247,7 @@ private fun ColumnScope.CreateRoomBody(
 @Composable
 private fun TitleSection(
     titleTextField: TextFieldValue,
+    titleHintText: String,
     onTitleInputTextChanged: (TextFieldValue) -> Unit = {},
 ) {
     Text(
@@ -293,7 +292,7 @@ private fun TitleSection(
 
             if (titleTextField.text.isEmpty()) {
                 Text(
-                    text = stringResource(R.string.create_room_title_hint),
+                    text = titleHintText,
                     color = Colors.FF8C8D8B,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.W400
@@ -334,14 +333,14 @@ private fun ParticipantCountSection(
             key(count) {
                 Box(
                     modifier = Modifier
+                        .background(backgroundColor, RoundedCornerShape(8.dp))
                         .conditional(!isSelected) {
-                            Modifier.border(
+                            border(
                                 width = 1.dp,
                                 color = Colors.FFEBEBEA,
                                 RoundedCornerShape(8.dp)
                             )
                         }
-                        .background(backgroundColor, RoundedCornerShape(8.dp))
                         .padding(16.dp)
                         .noRippleClickable { onClickParticipantCount(count) },
                     contentAlignment = Alignment.Center
@@ -349,7 +348,8 @@ private fun ParticipantCountSection(
                     Text(
                         text = count.toString(),
                         color = textColor,
-                        style = Typography.bodyMedium.copy(fontWeight = FontWeight.W600),
+                        fontWeight = FontWeight.W600,
+                        style = Typography.bodyMedium,
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -460,7 +460,8 @@ private fun TagSection(
                     Text(
                         text = it,
                         color = Colors.White,
-                        style = Typography.bodyMedium.copy(fontWeight = FontWeight.W600),
+                        fontWeight = FontWeight.W600,
+                        style = Typography.bodyMedium,
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -483,33 +484,17 @@ private fun CreateButton(
     ) {
         Text(
             text = stringResource(R.string.create_room_create_button_text),
-            style = Typography.bodyLarge.copy(fontWeight = FontWeight.W600, fontSize = 16.sp),
+            fontWeight = FontWeight.W600,
+            fontSize = 16.sp,
+            style = Typography.bodyLarge,
             color = Colors.White,
             textAlign = TextAlign.Center,
         )
     }
 }
 
-@Preview
 @Composable
-private fun CreateRoomPreview() {
-    CreateRoomScreen(
-        state = CreateRoomState(
-            maxParticipantCount = 8,
-            selectedMaxParticipantCount = 2,
-            selectedRoomVisibility = RoomVisibility.PUBLIC,
-            tags = persistentSetOf("Tag1", "Tag2"),
-            maxTagCount = 8,
-        ),
-        titleTextField = TextFieldValue("Room Title"),
-        tagTextField = TextFieldValue("Tag1, Tag2"),
-        onClickBack = {},
-        onTitleInputTextChanged = {},
-        onClickParticipantCount = {},
-        onClickVisibility = {},
-        onTagInputTextChanged = {},
-        onTagInsert = {},
-        onTagDelete = {},
-        onClickCreateRoom = {}
-    )
+@Preview
+private fun CreateRoomPreviewMirror() {
+    CreateRoomPreview()
 }
