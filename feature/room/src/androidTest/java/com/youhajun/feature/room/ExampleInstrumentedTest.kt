@@ -1,4 +1,4 @@
-package com.youhajun.feature.impl
+package com.youhajun.feature.splash
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
