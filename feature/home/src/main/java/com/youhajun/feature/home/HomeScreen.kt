@@ -1,11 +1,14 @@
-package com.youhajun.feature.home.impl
+package com.youhajun.feature.home
 
 import android.Manifest
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,15 +20,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -36,18 +43,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
-import com.youhajun.core.model.calling.CallHistory
+import com.youhajun.core.model.history.CallHistory
+import com.youhajun.core.model.room.CurrentRoomInfo
+import com.youhajun.core.model.room.RoomInfo
+import com.youhajun.core.model.room.RoomVisibility
 import com.youhajun.core.model.user.MyInfo
-import com.youhajun.core.permission.PermissionHandler
+import com.youhajun.core.permission.PermissionForceHandler
+import com.youhajun.core.permission.PermissionSoftHandler
 import com.youhajun.core.permission.rememberPermissionRequestController
 import com.youhajun.core.route.NavigationEvent
 import com.youhajun.feature.call.api.LocalCallIntentFactory
+import com.youhajun.feature.call.api.LocalCallServiceMainContract
 import com.youhajun.transcall.core.ui.components.FilledActionButton
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.MembershipBadge
@@ -55,6 +69,7 @@ import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.bottomSheet.JoinWithCodeBottomSheet
 import com.youhajun.transcall.core.ui.components.history.CallHistoryItem
 import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
+import com.youhajun.transcall.core.ui.components.room.CurrentRoomCard
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -68,35 +83,50 @@ internal fun HomeRoute(
     val context = LocalContext.current
     val permissionController = rememberPermissionRequestController()
     val callIntentFactory = LocalCallIntentFactory.current
+    val callServiceMainContract = LocalCallServiceMainContract.current
 
     viewModel.collectSideEffect {
         when (it) {
+            HomeSideEffect.CallPermissionCheck -> permissionController.request()
             is HomeSideEffect.Navigation -> onNavigate(it.navigationEvent)
             is HomeSideEffect.GoToCall -> {
                 val callIntent = callIntentFactory.getCallActivityIntent(context, it.roomId)
                 context.startActivity(callIntent)
             }
-            HomeSideEffect.PermissionCheck -> {
-                permissionController.request()
-            }
         }
     }
 
-    PermissionHandler(
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.onResume()
+    }
+
+    LaunchedEffect(callServiceMainContract) {
+        viewModel.setCallServiceMainContract(callServiceMainContract)
+    }
+
+    PermissionForceHandler(
         controller = permissionController,
-        permissions = persistentListOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
-        ),
+        permissions = persistentListOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
         rationaleMessage = stringResource(R.string.permission_rationale_message_camera_and_mic),
         onPermissionGranted = viewModel::onJoinRoomPermissionGranted
     )
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        PermissionSoftHandler(
+            controller = permissionController,
+            permissions = persistentListOf(Manifest.permission.POST_NOTIFICATIONS),
+            rationaleMessage = stringResource(R.string.permission_rationale_message_notification),
+            onPermissionGranted = {}
+        )
+    }
 
     HomeScreen(
         state = state,
         onClickHistoryMore = viewModel::onClickHistoryMore,
         onClickCreateRoom = viewModel::onClickCreateRoom,
         onClickJoinCall = viewModel::onClickJoinCall,
+        onClickCurrentRoom = viewModel::onClickCurrentRoom,
+        onClickHistory = viewModel::onClickHistory
     )
 
     JoinWithCodeBottomSheet(
@@ -113,6 +143,8 @@ internal fun HomeScreen(
     onClickHistoryMore: () -> Unit,
     onClickCreateRoom: () -> Unit,
     onClickJoinCall: () -> Unit,
+    onClickCurrentRoom: (RoomInfo) -> Unit,
+    onClickHistory: (CallHistory) -> Unit
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -168,11 +200,14 @@ internal fun HomeScreen(
                 }
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
+            currentRoomInfo = state.currentRoomInfo,
             previewMaxSize = state.callHistoryPreviewMaxSize,
             callHistoryList = state.callHistoryList,
             onClickHistoryMore = onClickHistoryMore,
             onClickCreateRoom = onClickCreateRoom,
-            onClickJoinCall = onClickJoinCall
+            onClickJoinCall = onClickJoinCall,
+            onClickCurrentRoom = onClickCurrentRoom,
+            onClickHistory = onClickHistory
         )
     }
 }
@@ -198,9 +233,8 @@ private fun HomeHeader(
             text = stringResource(R.string.app_name),
             modifier = Modifier.weight(1f),
             color = Colors.Black,
-            style = Typography.titleLarge.copy(
-                fontWeight = FontWeight.W600
-            )
+            fontWeight = FontWeight.W600,
+            style = Typography.titleLarge
         )
     }
 }
@@ -266,36 +300,43 @@ private fun ProfileCard(
 @Composable
 private fun HomeBody(
     modifier: Modifier,
+    currentRoomInfo: CurrentRoomInfo?,
     previewMaxSize: Int,
     callHistoryList: ImmutableList<CallHistory>,
     onClickHistoryMore: () -> Unit,
     onClickCreateRoom: () -> Unit,
     onClickJoinCall: () -> Unit,
+    onClickCurrentRoom: (RoomInfo) -> Unit,
+    onClickHistory: (CallHistory) -> Unit
 ) {
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
     ) {
-        FilledActionButton(
-            text = stringResource(R.string.home_call_start),
-            icon = painterResource(R.drawable.ic_home),
-            containerColor = Colors.PrimaryLight,
-            contentColor = Colors.White,
-            paddingValues = PaddingValues(12.dp),
-            iconSize = 34.dp,
-            onClick = onClickCreateRoom,
-        )
+        if(currentRoomInfo == null) {
+            FilledActionButton(
+                text = stringResource(R.string.home_call_start),
+                icon = painterResource(R.drawable.ic_home),
+                containerColor = Colors.PrimaryLight,
+                contentColor = Colors.White,
+                paddingValues = PaddingValues(12.dp),
+                iconSize = 34.dp,
+                onClick = onClickCreateRoom,
+            )
 
-        VerticalSpacer(12.dp)
+            VerticalSpacer(12.dp)
 
-        FilledActionButton(
-            text = stringResource(R.string.home_call_join),
-            icon = painterResource(R.drawable.ic_home),
-            containerColor = Colors.Secondary,
-            contentColor = Colors.White,
-            iconSize = 34.dp,
-            paddingValues = PaddingValues(12.dp),
-            onClick = onClickJoinCall,
-        )
+            FilledActionButton(
+                text = stringResource(R.string.home_call_join),
+                icon = painterResource(R.drawable.ic_home),
+                containerColor = Colors.Secondary,
+                contentColor = Colors.White,
+                iconSize = 34.dp,
+                paddingValues = PaddingValues(12.dp),
+                onClick = onClickJoinCall,
+            )
+        } else {
+            CurrentRoomCard(currentRoomInfo = currentRoomInfo, onClickCurrentRoom = onClickCurrentRoom)
+        }
 
         VerticalSpacer(24.dp)
 
@@ -324,23 +365,24 @@ private fun HomeBody(
         } else {
             CallHistorySection(
                 callHistoryList = callHistoryList,
+                previewMaxSize = previewMaxSize,
                 onClickHistoryMore = onClickHistoryMore,
-                previewMaxSize = previewMaxSize
+                onClickHistory = onClickHistory
             )
         }
     }
 }
 
-
 @Composable
 private fun ColumnScope.CallHistorySection(
     callHistoryList: ImmutableList<CallHistory>,
-    onClickHistoryMore: () -> Unit,
     previewMaxSize: Int,
+    onClickHistoryMore: () -> Unit,
+    onClickHistory: (CallHistory) -> Unit
 ) {
-    callHistoryList.take(previewMaxSize).forEach { call ->
-        key(call.historyId) {
-            CallHistoryItem(call)
+    callHistoryList.take(previewMaxSize).forEach { history ->
+        key(history.historyId) {
+            CallHistoryItem(callHistory = history, onClickHistory = onClickHistory)
 
             VerticalSpacer(8.dp)
         }

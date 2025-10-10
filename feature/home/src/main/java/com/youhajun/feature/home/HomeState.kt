@@ -1,6 +1,7 @@
-package com.youhajun.feature.home.impl
+package com.youhajun.feature.home
 
-import com.youhajun.core.model.calling.CallHistory
+import com.youhajun.core.model.history.CallHistory
+import com.youhajun.core.model.room.CurrentRoomInfo
 import com.youhajun.core.model.user.MyInfo
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -10,4 +11,5 @@ data class HomeState(
     val callHistoryList: ImmutableList<CallHistory> = persistentListOf(),
     val callHistoryPreviewMaxSize: Int,
     val isShowJoinBottomSheet: Boolean = false,
+    val currentRoomInfo: CurrentRoomInfo? = null
 )
