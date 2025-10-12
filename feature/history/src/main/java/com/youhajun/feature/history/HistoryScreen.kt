@@ -1,34 +1,38 @@
-package com.youhajun.feature.history.impl
+package com.youhajun.feature.history
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
 import com.youhajun.core.model.DateRange
-import com.youhajun.core.model.calling.CallHistory
+import com.youhajun.core.model.history.CallHistory
 import com.youhajun.core.route.NavigationEvent
 import com.youhajun.transcall.core.ui.components.LazyBackgroundColumn
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
@@ -60,6 +64,7 @@ internal fun HistoryRoute(
         state = state,
         historyListState = lazyListState,
         onClickDateRange = viewModel::onClickDateRange,
+        onClickHistory = viewModel::onClickHistory
     )
 }
 
@@ -68,11 +73,12 @@ internal fun HistoryScreen(
     state: HistoryState,
     historyListState: LazyListState,
     onClickDateRange: (DateRange) -> Unit,
+    onClickHistory: (CallHistory) -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Colors.FFE5EDF5)
+            .background(Colors.White)
             .padding(horizontal = 12.dp),
     ) {
         VerticalSpacer(8.dp)
@@ -85,7 +91,8 @@ internal fun HistoryScreen(
             historyListState = historyListState,
             callHistoryMap = state.callHistoryDateMap,
             selectedDateRange = state.selectedDateRange,
-            onClickDateRange = onClickDateRange
+            onClickDateRange = onClickDateRange,
+            onClickHistory = onClickHistory
         )
     }
 }
@@ -97,12 +104,11 @@ private fun HistoryHeader() {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = stringResource(R.string.screen_title_history),
+            text = stringResource(R.string.history_title),
             modifier = Modifier.weight(1f),
             color = Colors.Black,
-            style = Typography.titleLarge.copy(
-                fontWeight = FontWeight.W600,
-            ),
+            fontWeight = FontWeight.W600,
+            style = Typography.titleLarge,
             textAlign = TextAlign.Center
         )
     }
@@ -112,11 +118,19 @@ private fun HistoryHeader() {
 private fun ColumnScope.HistoryBody(
     historyListState: LazyListState,
     selectedDateRange: DateRange,
-    onClickDateRange: (DateRange) -> Unit,
     callHistoryMap: ImmutableMap<String, ImmutableList<CallHistory>>,
+    onClickDateRange: (DateRange) -> Unit,
+    onClickHistory: (CallHistory) -> Unit
 ) {
     DateRangeRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Colors.FFEEF6FF, RoundedCornerShape(12.dp))
+            .border(1.dp, Colors.FFB2F2FF, RoundedCornerShape(12.dp)),
         selectedDateRange = selectedDateRange,
+        indicatorColor = Colors.FF60A5FA,
         onClick = onClickDateRange,
     )
 
@@ -124,7 +138,8 @@ private fun ColumnScope.HistoryBody(
 
     CallHistoryLazyColumn(
         callHistoryMap = callHistoryMap,
-        state = historyListState
+        state = historyListState,
+        onClickHistory = onClickHistory
     )
 }
 
@@ -132,6 +147,7 @@ private fun ColumnScope.HistoryBody(
 private fun ColumnScope.CallHistoryLazyColumn(
     callHistoryMap: ImmutableMap<String, ImmutableList<CallHistory>>,
     state: LazyListState,
+    onClickHistory: (CallHistory) -> Unit
 ) {
     LazyColumn(
         state = state,
@@ -142,6 +158,7 @@ private fun ColumnScope.CallHistoryLazyColumn(
         callHistoryMap.forEach { (date, callHistories) ->
             stickyHeader(key = date) {
                 LazyBackgroundColumn(
+                    color = Colors.FFEEF6FF,
                     isFirst = true,
                     isLast = false,
                     paddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
@@ -151,9 +168,8 @@ private fun ColumnScope.CallHistoryLazyColumn(
                     Text(
                         text = date,
                         color = Colors.Black,
-                        style = Typography.titleLarge.copy(
-                            fontWeight = FontWeight.W800
-                        )
+                        fontWeight = FontWeight.W800,
+                        style = Typography.titleLarge
                     )
                 }
             }
@@ -165,13 +181,15 @@ private fun ColumnScope.CallHistoryLazyColumn(
                 val isLast = idx == callHistories.lastIndex
 
                 LazyBackgroundColumn(
+                    color = Colors.FFEEF6FF,
                     isFirst = false,
                     isLast = isLast,
                     paddingValues = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     CallHistoryItem(
                         callHistory = callHistory,
-                        createdAtDateFormat = DateFormatPatterns.TIME_ONLY,
+                        dateFormat = DateFormatPatterns.HOUR_MINUTE,
+                        onClickHistory = onClickHistory
                     )
 
                     if (isLast) {

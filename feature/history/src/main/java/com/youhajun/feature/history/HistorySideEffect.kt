@@ -1,4 +1,4 @@
-package com.youhajun.feature.history.impl
+package com.youhajun.feature.history
 
 import com.youhajun.core.route.NavigationEvent
 

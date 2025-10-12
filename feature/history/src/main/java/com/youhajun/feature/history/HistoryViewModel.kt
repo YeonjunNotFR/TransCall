@@ -1,26 +1,24 @@
-package com.youhajun.feature.history.impl
+package com.youhajun.feature.history
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.youhajun.core.model.DateRange
-import com.youhajun.core.model.calling.CallHistory
+import com.youhajun.core.model.history.CallHistory
 import com.youhajun.core.model.pagination.CursorPageRequest
 import com.youhajun.core.model.pagination.CursorPagingState
+import com.youhajun.core.route.NavigationEvent
 import com.youhajun.domain.history.usecase.GetHistoryListUseCase
+import com.youhajun.feature.history.api.HistoryNavRoute
 import com.youhajun.transcall.core.ui.util.DateFormatPatterns
 import com.youhajun.transcall.core.ui.util.toUiDateString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
-import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.reduce
+import org.orbitmvi.orbit.annotation.OrbitExperimental
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
-
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
@@ -35,37 +33,39 @@ class HistoryViewModel @Inject constructor(
         request = CursorPageRequest(first = CALL_HISTORY_SIZE_PER_PAGE)
     )
 
-    fun onHistoryNextPage() {
-        viewModelScope.launch {
-            getHistoryList()
-        }
+    fun onHistoryNextPage() = intent {
+        getHistoryList()
     }
 
-    fun onClickDateRange(dateRange: DateRange) {
+    fun onClickDateRange(dateRange: DateRange) = intent {
+        reduce { state.copy(selectedDateRange = dateRange) }
+    }
+
+    fun onClickHistory(callHistory: CallHistory) {
         intent {
-            reduce { state.copy(selectedDateRange = dateRange) }
+            val destination = HistoryNavRoute.HistoryDetail(callHistory.historyId)
+            val event = NavigationEvent.NavigateAndSave(destination, true, HistoryNavRoute.HistoryList)
+            postSideEffect(HistorySideEffect.Navigation(event))
         }
     }
 
-    private fun onInit() {
-        viewModelScope.launch {
-            getHistoryList()
-        }
+    private suspend fun onInit() {
+        historyPagingState = CursorPagingState(request = CursorPageRequest(first = CALL_HISTORY_SIZE_PER_PAGE))
+        getHistoryList()
     }
 
-    private suspend fun getHistoryList() {
-        if (historyPagingState.canLoadMore()) return
+    @OptIn(OrbitExperimental::class)
+    private suspend fun getHistoryList() = subIntent {
+        if (!historyPagingState.canLoadMore()) return@subIntent
+
         val isFirstCall = historyPagingState.isFirstCall()
         getHistoryListUseCase(historyPagingState.request).onSuccess {
             historyPagingState = historyPagingState.next(it)
         }.map { it.edges.map { it.node } }.onSuccess {
             val newHistoryMap = groupByDate(it)
-            val oldHistoryMap = container.stateFlow.value.callHistoryDateMap
+            val oldHistoryMap = state.callHistoryDateMap
             val mergedMap = if(isFirstCall) newHistoryMap else getMergedHistoryMap(oldHistoryMap, newHistoryMap)
-
-            intent {
-                reduce { state.copy(callHistoryDateMap = mergedMap.toImmutableMap()) }
-            }
+            reduce { state.copy(callHistoryDateMap = mergedMap.toImmutableMap()) }
         }
     }
 
@@ -86,7 +86,7 @@ class HistoryViewModel @Inject constructor(
 
     private fun groupByDate(historyList: List<CallHistory>): Map<String, ImmutableList<CallHistory>> {
         return historyList
-            .groupBy { it.startedAtToEpochTime.toUiDateString(DateFormatPatterns.DATE_ONLY) }
+            .groupBy { it.joinedAtToEpochTime.toUiDateString(DateFormatPatterns.YEAR_MONTH_DAY) }
             .mapValues { it.value.toImmutableList() }
     }
 
