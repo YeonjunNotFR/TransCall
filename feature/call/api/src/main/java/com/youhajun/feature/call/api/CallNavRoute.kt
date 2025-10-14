@@ -7,7 +7,4 @@ sealed interface CallNavRoute: TransCallRoute {
 
     @Serializable
     data class Calling(val roomId: String) : CallNavRoute
-
-    @Serializable
-    data class Summary(val roomId: String) : CallNavRoute
 }
