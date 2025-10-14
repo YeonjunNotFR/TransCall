@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application>
         <activity
-            android:name="com.youhajun.feature.call.impl.CallActivity"
+            android:name="com.youhajun.feature.call.CallActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|uiMode"
             android:exported="true"
-            android:configChanges="uiMode"
+            android:launchMode="singleTask"
+            android:supportsPictureInPicture="true"
             android:theme="@style/Theme.TransCall.TransparentSystemBar">
         </activity>
 
         <service
-            android:name="com.youhajun.feature.call.impl.service.CallForegroundService"
-            android:foregroundServiceType="microphone|camera"
+            android:name="com.youhajun.feature.call.service.CallForegroundService"
+            android:foregroundServiceType="microphone|camera|mediaPlayback"
             android:exported="false" />
 
     </application>

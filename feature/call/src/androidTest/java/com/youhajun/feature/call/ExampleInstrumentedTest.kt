@@ -1,4 +1,4 @@
-package com.youhajun.feature.home.impl
+package com.youhajun.feature.call
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.youhajun.feature.room.impl.test", appContext.packageName)
+        assertEquals("com.youhajun.feature.call.call.test", appContext.packageName)
     }
 }
