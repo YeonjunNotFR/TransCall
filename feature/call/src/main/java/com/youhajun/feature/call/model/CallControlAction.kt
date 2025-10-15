@@ -1,4 +1,4 @@
-package com.youhajun.feature.call.impl.model;
+package com.youhajun.feature.call.model;
 
 import androidx.annotation.DrawableRes
 import com.youhajun.core.design.R
@@ -24,7 +24,7 @@ sealed class CallControlAction {
     ) : CallControlAction()
 
     data class ToggleMicEnable(
-        val isEnable: Boolean
+        val isMicEnabled: Boolean
     ) : CallControlAction()
 
     data class FlipCamera(
