@@ -1,4 +1,4 @@
-package com.youhajun.feature.call.impl.component
+package com.youhajun.feature.call.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
-import com.youhajun.feature.call.impl.model.CallControlAction
+import com.youhajun.feature.call.model.CallControlAction
 import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
 import com.youhajun.webrtc.model.AudioDeviceType
 import kotlinx.collections.immutable.ImmutableList
@@ -71,9 +71,9 @@ private fun CallControlItem(
 
 private fun CallControlAction.toCallControlActionHolder(): CallControlActionHolder = when (this) {
     is CallControlAction.ToggleMicEnable -> CallControlActionHolder(
-        backgroundColor = if (isEnable) Colors.FF292929 else Colors.White,
-        iconTint = if (isEnable) Colors.LightGray else Colors.Black,
-        icon = if (isEnable) R.drawable.ic_call_mic_on else R.drawable.ic_call_mic_off,
+        backgroundColor = if (isMicEnabled) Colors.FF292929 else Colors.White,
+        iconTint = if (isMicEnabled) Colors.LightGray else Colors.Black,
+        icon = if (isMicEnabled) R.drawable.ic_call_mic_on else R.drawable.ic_call_mic_off,
         callAction = this,
     )
 
@@ -87,7 +87,7 @@ private fun CallControlAction.toCallControlActionHolder(): CallControlActionHold
     is CallControlAction.ToggleCameraEnable -> CallControlActionHolder(
         backgroundColor = if (isCameraEnabled) Colors.FF292929 else Colors.White,
         iconTint = if (isCameraEnabled) Colors.LightGray else Colors.Black,
-        icon = if (isCameraEnabled) R.drawable.ic_call_video_on else R.drawable.ic_call_video_off,
+        icon = if (isCameraEnabled) R.drawable.ic_call_camera_on else R.drawable.ic_call_camera_off,
         callAction = this
     )
 
@@ -109,7 +109,7 @@ private fun CallControlAction.toCallControlActionHolder(): CallControlActionHold
 private data class CallControlActionHolder(
     val backgroundColor: Color,
     val iconTint: Color,
-    @DrawableRes val icon: Int,
+    @param:DrawableRes val icon: Int,
     val callAction: CallControlAction,
 )
 
@@ -118,7 +118,7 @@ private data class CallControlActionHolder(
 private fun BottomCallControllerPreview() {
     BottomCallController(
         callControlActionList = persistentListOf(
-            CallControlAction.ToggleMicEnable(isEnable = false),
+            CallControlAction.ToggleMicEnable(isMicEnabled = false),
             CallControlAction.SelectAudioDevice(currentDevice = AudioDeviceType.SPEAKER),
             CallControlAction.LeaveCall,
             CallControlAction.FlipCamera(isFront = true),

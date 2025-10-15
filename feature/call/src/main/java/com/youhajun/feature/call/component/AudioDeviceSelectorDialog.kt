@@ -1,4 +1,4 @@
-package com.youhajun.feature.call.impl.component
+package com.youhajun.feature.call.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

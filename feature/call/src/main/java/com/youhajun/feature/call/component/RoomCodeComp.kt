@@ -1,4 +1,4 @@
-package com.youhajun.feature.call.impl.component
+package com.youhajun.feature.call.component
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Arrangement
@@ -37,9 +37,8 @@ internal fun RoomCodeComp(
         Text(
             text = stringResource(R.string.waiting_room_code_header),
             color = Colors.Gray500,
-            style = Typography.titleMedium.copy(
-                fontWeight = FontWeight.W500
-            )
+            fontWeight = FontWeight.W500,
+            style = Typography.titleMedium
         )
 
         VerticalSpacer(8.dp)
