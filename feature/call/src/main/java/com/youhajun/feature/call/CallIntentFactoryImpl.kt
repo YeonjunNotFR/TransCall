@@ -1,9 +1,9 @@
-package com.youhajun.feature.call.impl
+package com.youhajun.feature.call
 
 import android.content.Context
 import android.content.Intent
 import com.youhajun.feature.call.api.CallIntentFactory
-import com.youhajun.feature.call.impl.service.CallForegroundService
+import com.youhajun.feature.call.service.CallForegroundService
 import javax.inject.Inject
 
 class CallIntentFactoryImpl @Inject constructor() : CallIntentFactory {
@@ -18,5 +18,9 @@ class CallIntentFactoryImpl @Inject constructor() : CallIntentFactory {
         return Intent(context, CallForegroundService::class.java).apply {
             putExtra(CallForegroundService.INTENT_KEY_ROOM_ID, roomId)
         }
+    }
+
+    override fun getCallServiceIntent(context: Context): Intent {
+        return Intent(context, CallForegroundService::class.java)
     }
 }
