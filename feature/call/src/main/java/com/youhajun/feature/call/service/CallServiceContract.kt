@@ -1,4 +1,4 @@
-package com.youhajun.feature.call.impl.service
+package com.youhajun.feature.call.service
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.youhajun.core.model.calling.ServerMessage
