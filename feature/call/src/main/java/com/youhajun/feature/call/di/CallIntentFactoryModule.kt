@@ -1,7 +1,7 @@
-package com.youhajun.feature.call.impl.di
+package com.youhajun.feature.call.di
 
 import com.youhajun.feature.call.api.CallIntentFactory
-import com.youhajun.feature.call.impl.CallIntentFactoryImpl
+import com.youhajun.feature.call.CallIntentFactoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
