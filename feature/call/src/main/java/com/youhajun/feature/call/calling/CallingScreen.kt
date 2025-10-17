@@ -1,11 +1,6 @@
-package com.youhajun.feature.call.impl.calling
+package com.youhajun.feature.call.calling
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -46,21 +41,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
-import com.youhajun.core.model.conversation.Conversation
+import com.youhajun.core.model.calling.payload.TranslationMessage
+import com.youhajun.core.model.room.Participant
 import com.youhajun.core.model.room.RoomJoinType
 import com.youhajun.core.route.NavigationEvent
-import com.youhajun.feature.call.impl.component.AudioDeviceSelectorDialog
-import com.youhajun.feature.call.impl.component.BottomCallController
-import com.youhajun.feature.call.impl.component.RoomCodeComp
-import com.youhajun.feature.call.impl.model.CallControlAction
-import com.youhajun.feature.call.impl.model.CallUserUiModel
-import com.youhajun.feature.call.impl.model.CallingScreenType
-import com.youhajun.feature.call.impl.service.LocalCallServiceContract
+import com.youhajun.feature.call.component.AudioDeviceSelectorDialog
+import com.youhajun.feature.call.component.AutoEnterPipPreS
+import com.youhajun.feature.call.component.BottomCallController
+import com.youhajun.feature.call.component.PipBroadcastReceiver
+import com.youhajun.feature.call.component.RoomCodeComp
+import com.youhajun.feature.call.component.autoEnterPipModifier
+import com.youhajun.feature.call.component.rememberIsInPipMode
+import com.youhajun.feature.call.model.CallControlAction
+import com.youhajun.feature.call.model.CallUserUiModel
+import com.youhajun.feature.call.model.CallingScreenType
+import com.youhajun.feature.call.service.LocalCallServiceContract
 import com.youhajun.hyanghae.graphics.modifier.conditional
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.calling.DefaultVideoPlaceHolder
@@ -79,16 +79,26 @@ internal fun CallingRoute(
 ) {
     val callServiceContract = LocalCallServiceContract.current
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
-
-    LaunchedEffect(callServiceContract) {
-        viewModel.setCallServiceContract(callServiceContract)
-    }
+    val isInPip = rememberIsInPipMode()
 
     viewModel.collectSideEffect {
         when (it) {
             is CallingSideEffect.Navigation -> onNavigate(it.navigationEvent)
         }
     }
+
+    LaunchedEffect(isInPip) {
+        if(isInPip) viewModel.onEnterPipMode()
+        else viewModel.onExitPipMode()
+    }
+
+    LaunchedEffect(callServiceContract) {
+        viewModel.setCallServiceContract(callServiceContract)
+    }
+
+    AutoEnterPipPreS(shouldAutoEnter = state.shouldAutoEnterPip)
+
+    PipBroadcastReceiver(isInPip, viewModel::onClickCallAction)
 
     val myAudioStream = state.myAudioStream
     if(myAudioStream != null && state.isShowAudioDeviceChangeDialog) {
@@ -125,20 +135,14 @@ internal fun CallingScreen(
 ) {
 
     val holder = rememberSaveableStateHolder()
+    val myCameraVideo = state.myDefaultCallUser?.mediaUser?.videoStream
+    val myCameraAudio = state.myDefaultCallUser?.mediaUser?.audioStream
+    val isMicEnable = myCameraAudio?.isMicEnabled ?: false
+    val isCameraEnable = myCameraVideo?.isVideoEnable ?: false
 
-    AnimatedContent(
-        modifier = Modifier.fillMaxSize(),
+    Crossfade(
+        modifier = Modifier.fillMaxSize().autoEnterPipModifier(true, isCameraEnable, isMicEnable),
         targetState = state.callingScreenType,
-        contentKey = { type ->
-            when (type) {
-                is CallingScreenType.Waiting -> "waiting"
-                is CallingScreenType.Grid, is CallingScreenType.FloatingAndFull -> "calling"
-                CallingScreenType.Summary -> "summary"
-            }
-        },
-        transitionSpec = {
-            fadeIn(tween(150)) togetherWith fadeOut(tween(150))
-        },
     ) {
         when (it) {
             is CallingScreenType.Waiting -> WaitingScreenType(
@@ -153,11 +157,12 @@ internal fun CallingScreen(
 
             is CallingScreenType.FloatingAndFull,
             is CallingScreenType.Grid -> CallingScreenContainer(
+                recentParticipant = state.recentParticipant,
                 recentConversation = state.recentConversation,
                 isShowBottomCallController = state.isShowBottomCallController,
                 callControlActionList = state.callControlActionList,
                 onClickCallAction = onClickCallAction,
-                container = {
+                content = {
                     if (it is CallingScreenType.Grid) {
                         holder.SaveableStateProvider("grid") {
                             CallingGridScreenType(
@@ -170,6 +175,7 @@ internal fun CallingScreen(
                     if (it is CallingScreenType.FloatingAndFull) {
                         holder.SaveableStateProvider("floating") {
                             CallingFloatingScreenType(
+                                callUserUiModelList = state.callUserUiModelList,
                                 floatingScreenType = it,
                                 onTapScreen = onTapCallingScreen,
                                 onDoubleTapFloating = onDoubleTapFloating,
@@ -180,7 +186,12 @@ internal fun CallingScreen(
                 }
             )
 
-            CallingScreenType.Summary -> SummaryScreenType()
+            is CallingScreenType.PipMode -> PipModeScreenType(
+                callUserUiModelList = state.callUserUiModelList,
+                pipModeScreenType = it
+            )
+
+            CallingScreenType.ENDED -> Unit
         }
     }
 }
@@ -195,8 +206,9 @@ private fun WaitingScreenType(
     onClickRoomCodeCopy: () -> Unit,
     onClickRoomCodeShare: () -> Unit,
 ) {
-    val audioLevel = myDefaultCallUser?.mediaUser?.audioStream?.audioLevel ?: 0f
     val myCameraVideo = myDefaultCallUser?.mediaUser?.videoStream
+    val myCameraAudio = myDefaultCallUser?.mediaUser?.audioStream
+    val isMicEnable = myCameraAudio?.isMicEnabled ?: false
     val isFrontCamera = myCameraVideo is LocalVideoStream && myCameraVideo.isFrontCamera
 
     Column(
@@ -218,8 +230,8 @@ private fun WaitingScreenType(
                     .widthIn(max = 500.dp)
                     .heightIn(max = 400.dp)
                     .conditional(myCameraVideo != null && myCameraVideo.isVideoEnable) {
-                        Modifier.speakingGlow(
-                            audioLevel = audioLevel,
+                        speakingGlow(
+                            audioLevel = myCameraAudio?.audioLevel ?: 0f,
                             shape = RoundedCornerShape(16.dp),
                             outlineWidth = 1.dp,
                             outlineAlpha = 0.5f,
@@ -230,7 +242,8 @@ private fun WaitingScreenType(
                     .clip(RoundedCornerShape(16.dp)),
                 videoTrack = myCameraVideo?.videoTrack,
                 isFrontCamera = isFrontCamera,
-                enabled = myCameraVideo?.isVideoEnable ?: true,
+                isMicEnable = isMicEnable,
+                cameraEnabled = myCameraVideo?.isVideoEnable ?: true,
                 placeholder = {
                     DefaultVideoPlaceHolder(
                         modifier = Modifier
@@ -238,13 +251,9 @@ private fun WaitingScreenType(
                             .background(Colors.SurfaceDark)
                             .padding(24.dp),
                         audioLevel = myDefaultCallUser?.mediaUser?.audioStream?.audioLevel ?: 0f,
-                        currentParticipant = myDefaultCallUser?.currentParticipant,
-                        displayNameTextStyle = Typography.displayMedium.copy(
-                            fontSize = 40.sp,
-                        ),
-                        languageTextStyle = Typography.bodyLarge.copy(
-                            fontSize = 24.sp
-                        ),
+                        participant = myDefaultCallUser?.participant,
+                        displayNameTextStyle = Typography.displayMedium.copy(fontSize = 40.sp,),
+                        languageTextStyle = Typography.bodyLarge.copy(fontSize = 24.sp),
                         languageIconSize = 32.dp,
                     )
                 }
@@ -288,11 +297,12 @@ private fun WaitingScreenType(
 
 @Composable
 private fun CallingScreenContainer(
-    recentConversation: Conversation?,
+    recentParticipant: Participant?,
+    recentConversation: TranslationMessage?,
     isShowBottomCallController: Boolean,
     callControlActionList: ImmutableList<CallControlAction>,
     onClickCallAction: (CallControlAction) -> Unit,
-    container: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -308,18 +318,20 @@ private fun CallingScreenContainer(
                 .fillMaxWidth()
                 .weight(1f),
         ) {
-            container()
+            content()
 
-            SubtitleStack(
-                conversation = recentConversation,
-                modifier = Modifier.align(Alignment.BottomCenter),
-            )
+            if(recentParticipant != null && recentConversation != null) {
+                SubtitleStack(
+                    participant = recentParticipant,
+                    conversation = recentConversation,
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                )
+            }
         }
 
-        AnimatedVisibility(
-            visible = isShowBottomCallController,
-            modifier = Modifier.padding(top = 12.dp)
-        ) {
+        if(isShowBottomCallController) {
+            VerticalSpacer(12.dp)
+
             BottomCallController(
                 callControlActionList = callControlActionList,
                 onClickCallAction = onClickCallAction
@@ -337,53 +349,62 @@ private fun CallingGridScreenType(
     onTapGrid: () -> Unit,
     onDoubleTapGrid: (CallUserUiModel) -> Unit
 ) {
-    if (callUserUiList.size <= MAX_LAZY_GRID_SIZE) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            val columns = if (callUserUiList.size <= 2) 1 else GRID_COLUMN_COUNT
-            callUserUiList.chunked(columns).forEachIndexed { idx, rowUsers ->
-                key("row_$idx") {
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        rowUsers.forEach { user ->
-                            key(user.mediaKey) {
-                                Box(modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight()) {
-                                    CallingGridTypeTile(
-                                        callUserUiModel = user,
-                                        onTapGrid = onTapGrid,
-                                        onDoubleTapGrid = onDoubleTapGrid
-                                    )
+    val isLazyGrid = callUserUiList.size > MAX_LAZY_GRID_SIZE
+
+    Crossfade(
+        targetState = isLazyGrid,
+        label = "CallingGridCrossfade"
+    ) {
+        if (it) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(GRID_COLUMN_COUNT),
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(
+                    items = callUserUiList,
+                    key = { it.mediaKey },
+                ) { callMediaUser ->
+                    CallingGridTypeTile(
+                        callUserUiModel = callMediaUser,
+                        onTapGrid = onTapGrid,
+                        onDoubleTapGrid = onDoubleTapGrid
+                    )
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                val columns = if (callUserUiList.size <= 2) 1 else GRID_COLUMN_COUNT
+                callUserUiList.chunked(columns).forEach { rowUsers ->
+                    key(rowUsers.joinToString("-") { it.mediaKey }) {
+                        Row(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            rowUsers.forEach { user ->
+                                key(user.mediaKey) {
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight()
+                                    ) {
+                                        CallingGridTypeTile(
+                                            callUserUiModel = user,
+                                            onTapGrid = onTapGrid,
+                                            onDoubleTapGrid = onDoubleTapGrid
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-    } else {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(GRID_COLUMN_COUNT),
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(
-                items = callUserUiList,
-                key = { it.mediaKey },
-            ) { callMediaUser ->
-                CallingGridTypeTile(
-                    callUserUiModel = callMediaUser,
-                    onTapGrid = onTapGrid,
-                    onDoubleTapGrid = onDoubleTapGrid
-                )
             }
         }
     }
@@ -395,8 +416,8 @@ private fun CallingGridTypeTile(
     onTapGrid: () -> Unit,
     onDoubleTapGrid: (CallUserUiModel) -> Unit
 ) {
-    val audioLevel = callUserUiModel.mediaUser.audioStream.audioLevel
     val videoStream = callUserUiModel.mediaUser.videoStream
+    val audioStream = callUserUiModel.mediaUser.audioStream
     val isFrontCamera = videoStream is LocalVideoStream && videoStream.isFrontCamera
 
     NormalVideo(
@@ -409,8 +430,8 @@ private fun CallingGridTypeTile(
             }
             .fillMaxSize()
             .conditional(videoStream.videoTrack != null && videoStream.isVideoEnable) {
-                Modifier.speakingGlow(
-                    audioLevel = audioLevel,
+                speakingGlow(
+                    audioLevel = audioStream.audioLevel,
                     shape = RoundedCornerShape(16.dp),
                     minBlurDp = 1.dp,
                     maxBlurDp = 30.dp,
@@ -422,7 +443,8 @@ private fun CallingGridTypeTile(
             .background(Colors.Gray300),
         videoTrack = videoStream.videoTrack,
         isFrontCamera = isFrontCamera,
-        enabled = videoStream.isVideoEnable,
+        cameraEnabled = videoStream.isVideoEnable,
+        isMicEnable = audioStream.isMicEnabled,
         placeholder = {
             DefaultVideoPlaceHolder(
                 modifier = Modifier
@@ -430,13 +452,9 @@ private fun CallingGridTypeTile(
                     .background(Colors.SurfaceDark)
                     .padding(24.dp),
                 audioLevel = callUserUiModel.mediaUser.audioStream.audioLevel,
-                currentParticipant = callUserUiModel.currentParticipant,
-                displayNameTextStyle = Typography.displayMedium.copy(
-                    fontSize = 20.sp,
-                ),
-                languageTextStyle = Typography.bodyLarge.copy(
-                    fontSize = 14.sp
-                ),
+                participant = callUserUiModel.participant,
+                displayNameTextStyle = Typography.displayMedium.copy(fontSize = 20.sp),
+                languageTextStyle = Typography.bodyLarge.copy(fontSize = 14.sp),
                 languageIconSize = 24.dp,
             )
         }
@@ -445,16 +463,20 @@ private fun CallingGridTypeTile(
 
 @Composable
 private fun CallingFloatingScreenType(
+    callUserUiModelList: ImmutableList<CallUserUiModel>,
     floatingScreenType: CallingScreenType.FloatingAndFull,
     onTapScreen: () -> Unit,
     onDoubleTapFloating: () -> Unit,
     onDoubleTapFull: () -> Unit
 ) {
     var parentSize: IntSize by remember { mutableStateOf(IntSize(0, 0)) }
-    val floatingVideo = floatingScreenType.floatingCallUser.mediaUser.videoStream
-    val fullVideo = floatingScreenType.fullCallUser.mediaUser.videoStream
-    val floatingAudioLevel = floatingScreenType.floatingCallUser.mediaUser.audioStream.audioLevel
-    val fullAudioLevel = floatingScreenType.fullCallUser.mediaUser.audioStream.audioLevel
+    val floatingMedia = callUserUiModelList.first { it.mediaKey == floatingScreenType.floatingMediaKey }
+    val fullMedia = callUserUiModelList.first { it.mediaKey == floatingScreenType.fullMediaKey }
+
+    val floatingVideo = floatingMedia.mediaUser.videoStream
+    val floatingAudio = floatingMedia.mediaUser.audioStream
+    val fullVideo = fullMedia.mediaUser.videoStream
+    val fullAudio = fullMedia.mediaUser.audioStream
     val isFloatingFrontCamera = floatingVideo is LocalVideoStream && floatingVideo.isFrontCamera
     val isFullFrontCamera = fullVideo is LocalVideoStream && fullVideo.isFrontCamera
 
@@ -473,8 +495,8 @@ private fun CallingFloatingScreenType(
                 }
                 .fillMaxSize()
                 .conditional(fullVideo.videoTrack != null && fullVideo.isVideoEnable) {
-                    Modifier.speakingGlow(
-                        audioLevel = fullAudioLevel,
+                    speakingGlow(
+                        audioLevel = fullAudio.audioLevel,
                         shape = RoundedCornerShape(16.dp),
                         minBlurDp = 1.dp,
                         maxBlurDp = 30.dp,
@@ -485,20 +507,18 @@ private fun CallingFloatingScreenType(
                 .clip(RoundedCornerShape(16.dp)),
             videoTrack = fullVideo.videoTrack,
             isFrontCamera = isFullFrontCamera,
+            isMicEnable = fullAudio.isMicEnabled,
+            cameraEnabled = fullVideo.isVideoEnable,
             placeholder = {
                 DefaultVideoPlaceHolder(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Colors.SurfaceDark)
                         .padding(32.dp),
-                    audioLevel = floatingScreenType.fullCallUser.mediaUser.audioStream.audioLevel,
-                    currentParticipant = floatingScreenType.fullCallUser.currentParticipant,
-                    displayNameTextStyle = Typography.displayMedium.copy(
-                        fontSize = 40.sp,
-                    ),
-                    languageTextStyle = Typography.bodyLarge.copy(
-                        fontSize = 24.sp
-                    ),
+                    audioLevel = fullMedia.mediaUser.audioStream.audioLevel,
+                    participant = fullMedia.participant,
+                    displayNameTextStyle = Typography.displayMedium.copy(fontSize = 40.sp),
+                    languageTextStyle = Typography.bodyLarge.copy(fontSize = 24.sp),
                     languageIconSize = 32.dp,
                 )
             }
@@ -514,7 +534,7 @@ private fun CallingFloatingScreenType(
                 }
                 .size(width = 100.dp, height = 150.dp)
                 .speakingGlow(
-                    audioLevel = floatingAudioLevel,
+                    audioLevel = floatingAudio.audioLevel,
                     shape = RoundedCornerShape(16.dp),
                     minBlurDp = 1.dp,
                     maxBlurDp = 30.dp,
@@ -526,21 +546,19 @@ private fun CallingFloatingScreenType(
             parentBounds = parentSize,
             paddingValues = PaddingValues(10.dp),
             isFrontCamera = isFloatingFrontCamera,
+            isMicEnable = floatingAudio.isMicEnabled,
+            cameraEnabled = floatingVideo.isVideoEnable,
             placeholder = {
                 DefaultVideoPlaceHolder(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Colors.SurfaceDark)
                         .padding(8.dp),
-                    audioLevel = floatingScreenType.floatingCallUser.mediaUser.audioStream.audioLevel,
-                    currentParticipant = floatingScreenType.floatingCallUser.currentParticipant,
-                    displayNameTextStyle = Typography.displaySmall.copy(
-                        fontSize = 20.sp
-                    ),
-                    languageTextStyle = Typography.bodyLarge.copy(
-                        fontSize = 12.sp
-                    ),
-                    languageIconSize = 18.dp,
+                    audioLevel = floatingMedia.mediaUser.audioStream.audioLevel,
+                    participant = floatingMedia.participant,
+                    displayNameTextStyle = Typography.displaySmall.copy(fontSize = 20.sp),
+                    languageTextStyle = Typography.bodyLarge.copy(fontSize = 12.sp),
+                    languageIconSize = 12.dp,
                     maxBlurValue = 24.dp,
                 )
             }
@@ -549,10 +567,97 @@ private fun CallingFloatingScreenType(
 }
 
 @Composable
-private fun SummaryScreenType(
-
+private fun PipModeScreenType(
+    callUserUiModelList: ImmutableList<CallUserUiModel>,
+    pipModeScreenType: CallingScreenType.PipMode,
 ) {
+    val firstPipMedia = callUserUiModelList.first { it.mediaKey == pipModeScreenType.pipFirstMediaKey }
+    val secondPipMedia = callUserUiModelList.firstOrNull { it.mediaKey == pipModeScreenType.pipSecondMediaKey }
+    val firstVideo = firstPipMedia.mediaUser.videoStream
+    val firstAudio = firstPipMedia.mediaUser.audioStream
+    val secondVideo = secondPipMedia?.mediaUser?.videoStream
+    val secondAudio = secondPipMedia?.mediaUser?.audioStream
+    val isFirstFrontCamera = firstVideo is LocalVideoStream && firstVideo.isFrontCamera
+    val isSecondFrontCamera = secondVideo is LocalVideoStream && secondVideo.isFrontCamera
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Colors.Black)
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        NormalVideo(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .conditional(firstVideo.videoTrack != null && firstVideo.isVideoEnable) {
+                    speakingGlow(
+                        audioLevel = firstAudio.audioLevel,
+                        shape = RoundedCornerShape(16.dp),
+                        minBlurDp = 1.dp,
+                        maxBlurDp = 30.dp,
+                        outlineWidth = 1.dp,
+                        outlineAlpha = 0.7f
+                    )
+                }
+                .clip(RoundedCornerShape(16.dp)),
+            videoTrack = firstVideo.videoTrack,
+            isFrontCamera = isFirstFrontCamera,
+            isMicEnable = firstAudio.isMicEnabled,
+            cameraEnabled = firstVideo.isVideoEnable,
+            placeholder = {
+                DefaultVideoPlaceHolder(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Colors.SurfaceDark)
+                        .padding(24.dp),
+                    audioLevel = firstAudio.audioLevel,
+                    participant = firstPipMedia.participant,
+                    displayNameTextStyle = Typography.displayMedium.copy(fontSize = 28.sp),
+                    languageTextStyle = Typography.bodyLarge.copy(fontSize = 16.sp),
+                    languageIconSize = 24.dp,
+                )
+            }
+        )
+
+        if (secondPipMedia != null) {
+            NormalVideo(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .conditional(secondVideo?.videoTrack != null && secondVideo.isVideoEnable) {
+                        speakingGlow(
+                            audioLevel = secondAudio?.audioLevel ?: 0f,
+                            shape = RoundedCornerShape(16.dp),
+                            minBlurDp = 1.dp,
+                            maxBlurDp = 30.dp,
+                            outlineWidth = 1.dp,
+                            outlineAlpha = 0.7f
+                        )
+                    }
+                    .clip(RoundedCornerShape(16.dp)),
+                videoTrack = secondVideo?.videoTrack,
+                isFrontCamera = isSecondFrontCamera,
+                isMicEnable = secondAudio?.isMicEnabled ?: false,
+                cameraEnabled = secondVideo?.isVideoEnable ?: false,
+                placeholder = {
+                    DefaultVideoPlaceHolder(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Colors.SurfaceDark)
+                            .padding(24.dp),
+                        audioLevel = secondAudio?.audioLevel ?: 0f,
+                        participant = secondPipMedia.participant,
+                        displayNameTextStyle = Typography.displayMedium.copy(fontSize = 28.sp),
+                        languageTextStyle = Typography.bodyLarge.copy(fontSize = 16.sp),
+                        languageIconSize = 24.dp,
+                    )
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -564,11 +669,23 @@ private fun WaitingScreenPreviewMirror() {
 @Composable
 @Preview
 private fun CallingScreenFloatingTypePreviewMirror() {
-    CallingScreenFloatingType()
+    CallingScreenFloatingPreview()
+}
+
+@Composable
+@Preview
+private fun CallingScreenLazyGridTypePreviewMirror() {
+    CallingScreenLazyGridPreview()
 }
 
 @Composable
 @Preview
 private fun CallingScreenGridTypePreviewMirror() {
-    CallingScreenGridType()
+    CallingScreenGridPreview()
+}
+
+@Composable
+@Preview
+private fun CallingScreenPipModePreviewMirror() {
+    CallingScreenPipModePreview()
 }

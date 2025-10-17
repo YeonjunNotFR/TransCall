@@ -1,4 +1,4 @@
-package com.youhajun.feature.call.impl.calling
+package com.youhajun.feature.call.calling
 
 import com.youhajun.core.route.NavigationEvent
 
