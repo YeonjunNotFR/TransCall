@@ -89,7 +89,8 @@ private fun RoomVisibilityItem(
         Text(
             text = getStringResource(roomVisibility),
             color = selectedContentColor,
-            style = Typography.bodyMedium.copy(fontWeight = FontWeight.W700),
+            fontWeight = FontWeight.W700,
+            style = Typography.bodyMedium,
         )
     }
 }
@@ -106,8 +107,8 @@ private fun getIconResource(roomVisibility: RoomVisibility): Painter {
 @Composable
 private fun getStringResource(roomVisibility: RoomVisibility): String {
     val res = when (roomVisibility) {
-        RoomVisibility.PUBLIC -> R.string.create_room_visibility_public
-        RoomVisibility.PRIVATE -> R.string.create_room_visibility_private
+        RoomVisibility.PUBLIC -> R.string.common_public
+        RoomVisibility.PRIVATE -> R.string.common_private
     }
     return stringResource(res)
 }
