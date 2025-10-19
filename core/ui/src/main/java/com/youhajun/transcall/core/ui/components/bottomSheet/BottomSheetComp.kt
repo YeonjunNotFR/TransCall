@@ -1,11 +1,10 @@
 package com.youhajun.transcall.core.ui.components.bottomSheet
 
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,8 +25,10 @@ fun BottomSheetComp(
     isVisible: Boolean,
     shape: Shape = BottomSheetDefaults.ExpandedShape,
     containerColor: Color = BottomSheetDefaults.ContainerColor,
-    isClickableOutside: Boolean = false,
-    isSkipPartiallyExpanded: Boolean = false,
+    dismissClickOutside: Boolean = false,
+    dismissClickBackPress: Boolean = true,
+    isSkipPartiallyExpanded: Boolean = true,
+    isGestureEnabled: Boolean = false,
     dragHandler: @Composable (() -> Unit)? = { BottomSheetDefaults.DragHandle() },
     onVisibilityChange: (Boolean) -> Unit,
     content: @Composable ColumnScope.() -> Unit
@@ -35,7 +36,11 @@ fun BottomSheetComp(
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = isSkipPartiallyExpanded,
-        confirmValueChange = { isClickableOutside }
+        confirmValueChange = { true }
+    )
+    val property = ModalBottomSheetProperties(
+        shouldDismissOnBackPress = dismissClickBackPress,
+        shouldDismissOnClickOutside = dismissClickOutside
     )
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -46,23 +51,25 @@ fun BottomSheetComp(
             sheetState.show()
         } else {
             scope.launch { sheetState.hide() }.invokeOnCompletion {
-                showBottomSheet = false
+                if (!sheetState.isVisible) {
+                    showBottomSheet = false
+                }
             }
         }
     }
 
     if (showBottomSheet) {
         ModalBottomSheet(
+            sheetGesturesEnabled = isGestureEnabled,
             onDismissRequest = { onVisibilityChange(false) },
             sheetState = sheetState,
             dragHandle = dragHandler,
             modifier = modifier,
             shape = shape,
-            containerColor = containerColor
+            containerColor = containerColor,
+            properties = property
         ) {
             content()
-
-            Spacer(Modifier.navigationBarsPadding())
         }
     }
 }

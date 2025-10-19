@@ -45,7 +45,6 @@ fun JoinWithCodeBottomSheet(
         isVisible = isVisible,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         containerColor = Color.White,
-        isSkipPartiallyExpanded = true,
         dragHandler = null,
         onVisibilityChange = onVisibleChanged
     ) {
@@ -58,16 +57,15 @@ fun JoinWithCodeBottomSheet(
             Text(
                 text = stringResource(R.string.dialog_join_code_title),
                 color = Color.Black,
-                style = Typography.headlineMedium.copy(
-                    fontWeight = FontWeight.W800
-                )
+                fontWeight = FontWeight.W800,
+                style = Typography.headlineMedium
             )
 
             VerticalSpacer(16.dp)
 
             OutlinedTextField(
                 value = code,
-                onValueChange = { code = it },
+                onValueChange = { code = it.uppercase() },
                 placeholder = {
                     Text(
                         text = stringResource(R.string.dialog_join_code_title),
@@ -100,13 +98,15 @@ fun JoinWithCodeBottomSheet(
                 Text(
                     text = stringResource(R.string.common_cancel),
                     color = Colors.PrimaryLight,
-                    style = Typography.titleLarge.copy(
-                        fontWeight = FontWeight.W600
-                    ),
+                    fontWeight = FontWeight.W600,
+                    style = Typography.titleLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .noRippleClickable(onClick = onClickCancel)
+                        .noRippleClickable(onClick = {
+                            onClickCancel()
+                            code = ""
+                        })
                         .background(Colors.White, shape = RoundedCornerShape(16.dp))
                         .padding(vertical = 16.dp)
                         .weight(1f)
@@ -117,13 +117,15 @@ fun JoinWithCodeBottomSheet(
                 Text(
                     text = stringResource(R.string.common_join),
                     color = Colors.White,
-                    style = Typography.titleLarge.copy(
-                        fontWeight = FontWeight.W600
-                    ),
+                    fontWeight = FontWeight.W600,
+                    style = Typography.titleLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .noRippleClickable(onClick = { onClickConfirm(code) })
+                        .noRippleClickable(onClick = {
+                            onClickConfirm(code)
+                            code = ""
+                        })
                         .background(Colors.PrimaryLight, shape = RoundedCornerShape(16.dp))
                         .padding(vertical = 16.dp)
                         .weight(1f)
