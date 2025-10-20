@@ -37,6 +37,7 @@ fun MultipleCircleProfileImage(
     circleSize: Dp = 40.dp,
     circleBorderWidth: Dp = 2.dp,
     circleBorderColor: Color = Colors.White,
+    overflowCircleColor: Color = Colors.Gray700,
     overlap: Dp = 12.dp,
     maxVisibleCount: Int = 4,
     onClick: (Int) -> Unit = {},
@@ -57,9 +58,9 @@ fun MultipleCircleProfileImage(
                         .noRippleClickable { onClick(index) }
                         .zIndex(index.toFloat())
                         .offset(x = (-index * overlap))
-                        .size(circleSize)
                         .clip(CircleShape)
                         .border(circleBorderWidth, circleBorderColor, CircleShape)
+                        .size(circleSize)
                 )
             }
         }
@@ -69,25 +70,23 @@ fun MultipleCircleProfileImage(
                 modifier = Modifier
                     .zIndex(visibleCount.toFloat())
                     .offset(x = (-visibleCount * overlap))
-                    .size(circleSize)
                     .clip(CircleShape)
-                    .background(Colors.Gray700)
-                    .border(2.dp, Colors.White, CircleShape),
+                    .background(overflowCircleColor, CircleShape)
+                    .size(circleSize),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "+$overflowCount",
                     color = Colors.White,
-                    style = Typography.bodySmall.copy(
-                        fontWeight = FontWeight.W800
-                    ),
+                    fontWeight = FontWeight.W800,
+                    style = Typography.bodySmall,
                 )
             }
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun MultipleCircleProfileImagePreview() {
     MultipleCircleProfileImage(
@@ -98,8 +97,10 @@ private fun MultipleCircleProfileImagePreview() {
             "https://example.com/image4.jpg",
             "https://example.com/image5.jpg"
         ),
-        circleSize = 40.dp,
-        overlap = 12.dp,
-        maxVisibleCount = 4
+        circleSize = 32.dp,
+        maxVisibleCount = 4,
+        circleBorderWidth = 1.dp,
+        circleBorderColor = Colors.PrimaryLight,
+        overlap = 8.dp,
     )
 }
