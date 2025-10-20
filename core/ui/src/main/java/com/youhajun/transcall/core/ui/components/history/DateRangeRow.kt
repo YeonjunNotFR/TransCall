@@ -1,7 +1,7 @@
 package com.youhajun.transcall.core.ui.components.history
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,19 +29,17 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun DateRangeRow(
-    dateRangeList: ImmutableList<DateRange> = DateRange.entries.toImmutableList(),
+    modifier: Modifier,
     selectedDateRange: DateRange,
+    dateRangeList: ImmutableList<DateRange> = DateRange.entries.toImmutableList(),
+    indicatorColor: Color = Colors.FF60A5FA,
     onClick: (DateRange) -> Unit,
 ) {
     RowIndicatorBox(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Colors.White, RoundedCornerShape(12.dp)),
+        modifier = modifier,
         itemList = dateRangeList,
         selectedItem = selectedDateRange,
-        indicatorColor = Colors.FF60A5FA,
+        indicatorColor = indicatorColor,
         indicatorShape = RectangleShape,
         onClick = onClick,
         itemContent = { dateRange, isSelected ->
@@ -60,7 +59,8 @@ private fun DateRangeItem(
     Text(
         text = getStringResource(dateRange),
         color = if (isSelected) Colors.White else Colors.Black,
-        style = Typography.bodyLarge.copy(fontWeight = if (isSelected) FontWeight.W800 else FontWeight.W400),
+        fontWeight = if (isSelected) FontWeight.W800 else FontWeight.W400,
+        style = Typography.bodyLarge,
     )
 }
 
@@ -79,6 +79,12 @@ private fun getStringResource(dateRange: DateRange): String {
 private fun DateRangeRowPreview() {
     var selectedDateRange by remember { mutableStateOf(DateRange.Week) }
     DateRangeRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Colors.FFEEF6FF, RoundedCornerShape(12.dp))
+            .border(1.dp, Colors.FFB2F2FF, RoundedCornerShape(12.dp)),
         selectedDateRange = selectedDateRange,
         onClick = { selectedDateRange = it },
     )
