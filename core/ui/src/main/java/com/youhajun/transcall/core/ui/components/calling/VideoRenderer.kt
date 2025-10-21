@@ -30,7 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import com.youhajun.transcall.core.ui.components.locals.LocalEglBaseContext
+import com.youhajun.transcall.core.ui.locals.LocalEglBaseContext
 import io.getstream.webrtc.android.compose.VideoScalingType
 import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
 import org.webrtc.RendererCommon

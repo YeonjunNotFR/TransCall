@@ -1,6 +1,7 @@
 package com.youhajun.transcall.core.ui.components.calling
 
 import androidx.compose.animation.core.animateOffsetAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,6 +10,9 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,10 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.youhajun.core.design.Colors
+import com.youhajun.core.design.R
 import org.webrtc.RendererCommon
 import org.webrtc.VideoTrack
 
@@ -34,9 +41,10 @@ fun FloatingVideo(
     modifier: Modifier = Modifier,
     videoTrack: VideoTrack?,
     parentBounds: IntSize,
-    isFrontCamera: Boolean = true,
+    isFrontCamera: Boolean,
+    isMicEnable: Boolean,
+    cameraEnabled: Boolean,
     firstAlign: Alignment = Alignment.TopEnd,
-    enabled: Boolean = true,
     paddingValues: PaddingValues = PaddingValues(0.dp, 0.dp),
     rendererEvent: RendererCommon.RendererEvents = object : RendererCommon.RendererEvents {
         override fun onFirstFrameRendered() = Unit
@@ -50,7 +58,7 @@ fun FloatingVideo(
         .then(modifier)
 
     Box(modifier = dragModifier) {
-        if (enabled && videoTrack != null) {
+        if (cameraEnabled && videoTrack != null) {
             VideoRenderer(
                 modifier = Modifier.fillMaxSize(),
                 videoTrack = videoTrack,
@@ -59,6 +67,23 @@ fun FloatingVideo(
             )
         } else {
             placeholder()
+        }
+
+        if (!isMicEnable) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(6.dp)
+                    .background(Colors.Black, CircleShape)
+                    .padding(4.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_call_mic_off),
+                    contentDescription = null,
+                    tint = Colors.White,
+                    modifier = Modifier.size(12.dp)
+                )
+            }
         }
     }
 }
