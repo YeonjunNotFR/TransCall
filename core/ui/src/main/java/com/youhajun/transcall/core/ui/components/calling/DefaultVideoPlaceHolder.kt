@@ -2,6 +2,7 @@ package com.youhajun.transcall.core.ui.components.calling
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,10 +27,9 @@ import coil3.compose.AsyncImage
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
-import com.youhajun.core.design.toDisplayIcon
-import com.youhajun.core.design.toDisplayName
+import com.youhajun.core.design.toCountryIcon
 import com.youhajun.core.model.LanguageType
-import com.youhajun.core.model.room.CurrentParticipant
+import com.youhajun.core.model.room.Participant
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.modifier.speakingGlow
@@ -39,61 +38,63 @@ import com.youhajun.transcall.core.ui.components.modifier.speakingGlow
 fun DefaultVideoPlaceHolder(
     modifier: Modifier = Modifier,
     audioLevel: Float,
-    currentParticipant: CurrentParticipant?,
-    displayNameTextStyle: TextStyle = Typography.displayLarge.copy(
-        fontWeight = FontWeight.W800,
-    ),
-    languageTextStyle: TextStyle = Typography.bodyLarge.copy(
-        fontWeight = FontWeight.W500
-    ),
+    participant: Participant?,
+    displayNameTextStyle: TextStyle = Typography.displayLarge.copy(fontWeight = FontWeight.W800),
+    languageTextStyle: TextStyle = Typography.bodyLarge.copy(fontWeight = FontWeight.W500),
     languageIconSize: Dp = 24.dp,
     maxBlurValue: Dp = 50.dp,
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        AsyncImage(
-            model = currentParticipant?.imageUrl,
-            contentDescription = null,
-            error = painterResource(id = R.drawable.ic_person),
-            placeholder = painterResource(id = R.drawable.ic_person),
-            modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .aspectRatio(1f)
-                .speakingGlow(audioLevel, CircleShape, maxBlurDp = maxBlurValue)
-                .padding(1.dp)
-                .clip(CircleShape)
-        )
+    BoxWithConstraints(modifier = modifier) {
+        val totalHeight = maxHeight
+        val spacingImageName = totalHeight * 0.05f
+        val spacingNameLang = totalHeight * 0.01f
 
-        VerticalSpacer(24.dp)
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            AsyncImage(
+                model = participant?.imageUrl,
+                contentDescription = null,
+                error = painterResource(id = R.drawable.ic_person),
+                placeholder = painterResource(id = R.drawable.ic_person),
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .aspectRatio(1f)
+                    .speakingGlow(audioLevel, CircleShape, maxBlurDp = maxBlurValue, outlineWidth = 2.dp)
+                    .padding(1.dp)
+                    .clip(CircleShape)
+            )
 
-        Text(
-            text = currentParticipant?.displayName ?: "",
-            color = Colors.White,
-            style = displayNameTextStyle
-        )
+            VerticalSpacer(spacingImageName)
 
-        if(currentParticipant != null) {
-            VerticalSpacer(8.dp)
+            Text(
+                text = participant?.displayName ?: "",
+                color = Colors.White,
+                style = displayNameTextStyle
+            )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(currentParticipant.language.toDisplayIcon()),
-                    contentDescription = null,
-                    modifier = Modifier.size(languageIconSize)
-                )
+            if (participant != null) {
+                VerticalSpacer(spacingNameLang)
 
-                HorizontalSpacer(4.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(participant.country.toCountryIcon()),
+                        contentDescription = null,
+                        modifier = Modifier.size(languageIconSize)
+                    )
 
-                Text(
-                    text = stringResource(currentParticipant.language.toDisplayName()),
-                    color = Colors.Gray500,
-                    style = languageTextStyle,
-                )
+                    HorizontalSpacer(4.dp)
+
+                    Text(
+                        text = participant.language.code.uppercase(),
+                        color = Colors.Gray500,
+                        style = languageTextStyle,
+                    )
+                }
             }
         }
     }
@@ -105,7 +106,8 @@ private fun VideoPlaceHolderPreview() {
     DefaultVideoPlaceHolder(
         modifier = Modifier.fillMaxSize().background(Colors.SurfaceDark),
         audioLevel = 1f,
-        currentParticipant = CurrentParticipant(
+        participant = Participant(
+            participantId = "1",
             userId = "1",
             displayName = "John Doe",
             imageUrl = "https://example.com/image.jpg",
