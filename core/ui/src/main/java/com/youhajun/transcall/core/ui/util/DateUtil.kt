@@ -5,10 +5,11 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 enum class DateFormatPatterns(val pattern: String) {
-    DATE_TIME_WITH_SECONDS("yyyy.MM.dd HH:mm:ss"),
-    DATE_TIME_WITHOUT_SECONDS("yyyy.MM.dd HH:mm"),
-    DATE_ONLY("yyyy.MM.dd"),
-    TIME_ONLY("HH:mm"),
+    YEAR_MONTH_DAY_HOUR_MINUTE_SECOND("yyyy.MM.dd HH:mm:ss"),
+    YEAR_MONTH_DAY_HOUR_MINUTE("yyyy.MM.dd HH:mm"),
+    MONTH_DAY_HOUR_MINUTE("MM.dd HH:mm"),
+    YEAR_MONTH_DAY("yyyy.MM.dd"),
+    HOUR_MINUTE("HH:mm"),
 }
 
 fun Long.toUiDateString(format: DateFormatPatterns): String {
