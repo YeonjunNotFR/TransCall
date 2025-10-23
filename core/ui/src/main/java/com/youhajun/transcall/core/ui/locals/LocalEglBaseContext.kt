@@ -1,4 +1,4 @@
-package com.youhajun.transcall.core.ui.components.locals
+package com.youhajun.transcall.core.ui.locals
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.webrtc.EglBase
