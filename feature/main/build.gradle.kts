@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.youhajun.feature.main.impl"
+    namespace = "com.youhajun.feature.main"
 }
 
 dependencies {
@@ -15,20 +15,21 @@ dependencies {
     implementation(projects.core.route)
     implementation(projects.core.event)
     implementation(projects.core.model)
+    implementation(projects.feature.splash)
     implementation(projects.feature.splash.api)
-    implementation(projects.feature.splash.impl)
+    implementation(projects.feature.auth)
     implementation(projects.feature.auth.api)
-    implementation(projects.feature.auth.impl)
+    implementation(projects.feature.home)
     implementation(projects.feature.home.api)
-    implementation(projects.feature.home.impl)
+    implementation(projects.feature.history)
     implementation(projects.feature.history.api)
-    implementation(projects.feature.history.impl)
-    implementation(projects.feature.call.api)
+    implementation(projects.feature.room)
     implementation(projects.feature.room.api)
-    implementation(projects.feature.room.impl)
+    implementation(projects.feature.call.api)
     implementation(projects.domain.auth)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.bundles.compose.default)
     implementation(libs.bundles.orbit)
     implementation(libs.bundles.navigation)
     implementation(libs.androidx.core.ktx)
