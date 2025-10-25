@@ -11,13 +11,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
 import com.youhajun.core.route.NavigationEvent
 import com.youhajun.feature.auth.api.AuthNavRoute
-import com.youhajun.feature.auth.impl.navigation.loginNavGraph
-import com.youhajun.feature.history.impl.navigation.historyNavGraph
+import com.youhajun.feature.auth.navigation.loginNavGraph
+import com.youhajun.feature.history.navigation.historyNavGraph
 import com.youhajun.feature.home.api.HomeNavRoute
-import com.youhajun.feature.home.impl.navigation.homeNavGraph
-import com.youhajun.feature.impl.navigation.roomNavGraph
+import com.youhajun.feature.home.navigation.homeNavGraph
+import com.youhajun.feature.room.navigation.roomNavGraph
 import com.youhajun.feature.splash.api.SplashNavRoute
-import com.youhajun.feature.splash.impl.navigation.splashNavGraph
+import com.youhajun.feature.splash.navigation.splashNavGraph
 
 @Composable
 internal fun MainNavHost(

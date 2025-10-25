@@ -1,10 +1,5 @@
 package com.youhajun.feature.main.navigation
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.youhajun.core.design.Colors
 import com.youhajun.core.design.Typography
@@ -45,11 +39,7 @@ internal fun MainBottomBar(
     tabs: ImmutableList<MainTab>,
     onClickMainTab: (MainTab) -> Unit,
 ) {
-    AnimatedVisibility(
-        visible = visibility,
-        enter = fadeIn() + slideIn { IntOffset(0, it.height) },
-        exit = fadeOut() + slideOut { IntOffset(0, it.height) }
-    ) {
+    if (visibility) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -150,9 +140,11 @@ private fun RowScope.CenterTabItem(
                 contentDescription = null
             )
         }
-        
+
         Column(
-            modifier = Modifier.fillMaxSize().noRippleClickable { onClick(tab) },
+            modifier = Modifier
+                .fillMaxSize()
+                .noRippleClickable { onClick(tab) },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
