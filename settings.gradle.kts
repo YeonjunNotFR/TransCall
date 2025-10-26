@@ -28,16 +28,18 @@ include(":app")
 
 include(
     ":feature:main",
+    ":feature:home",
     ":feature:home:api",
-    ":feature:home:impl",
+    ":feature:call",
     ":feature:call:api",
-    ":feature:call:impl",
+    ":feature:history",
     ":feature:history:api",
-    ":feature:history:impl",
+    ":feature:splash",
     ":feature:splash:api",
-    ":feature:splash:impl",
+    ":feature:auth",
     ":feature:auth:api",
-    ":feature:auth:impl",
+    ":feature:room",
+    ":feature:room:api",
 )
 
 include(
@@ -47,7 +49,7 @@ include(
     ":data:auth",
     ":data:calling",
     ":data:user",
-    ":data:conversation",
+    ":data:conversation"
 )
 
 include(
@@ -56,7 +58,7 @@ include(
     ":domain:auth",
     ":domain:calling",
     ":domain:user",
-    ":domain:conversation",
+    ":domain:conversation"
 )
 
 include(
@@ -68,8 +70,8 @@ include(
     ":core:webRtc",
     ":core:notification",
     ":core:design",
-    ":core:stt",
     ":core:datastore",
     ":core:route",
     ":core:event",
+    ":core:permission"
 )
