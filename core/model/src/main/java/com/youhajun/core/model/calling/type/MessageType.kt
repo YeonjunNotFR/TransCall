@@ -4,7 +4,7 @@ enum class MessageType(val type: String) {
     UNKNOWN("unknown"),
     SIGNALING("signaling"),
     TRANSLATION("translation"),
-    MEDIA_STATE("media_state"),
+    MEDIA_STATE("mediaState"),
     ROOM("room");
 
     companion object {
