@@ -12,8 +12,8 @@ import com.youhajun.core.model.pagination.CursorPage
 import com.youhajun.core.model.pagination.CursorPageRequest
 import com.youhajun.data.conversation.ConversationLocalDataSource
 import com.youhajun.data.conversation.ConversationRemoteDataSource
-import com.youhajun.data.conversation.dto.toCursorEntities
-import com.youhajun.data.conversation.dto.toEntities
+import com.youhajun.data.common.dto.conversation.toCursorEntities
+import com.youhajun.data.common.dto.conversation.toEntities
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

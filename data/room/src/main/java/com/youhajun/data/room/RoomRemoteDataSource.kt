@@ -2,11 +2,11 @@ package com.youhajun.data.room
 
 import com.youhajun.core.model.room.CurrentRoomListRequest
 import com.youhajun.core.network.di.RestHttpClient
-import com.youhajun.data.common.pagination.CursorPageDto
+import com.youhajun.data.common.dto.pagination.CursorPageDto
 import com.youhajun.data.common.parametersFrom
-import com.youhajun.data.room.dto.CreateRoomRequestDto
-import com.youhajun.data.room.dto.CurrentRoomInfoDto
-import com.youhajun.data.room.dto.RoomInfoDto
+import com.youhajun.data.common.dto.room.CreateRoomRequestDto
+import com.youhajun.data.common.dto.room.CurrentRoomInfoDto
+import com.youhajun.data.common.dto.room.RoomInfoDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

@@ -9,6 +9,7 @@ data class ConversationEntity(
     val id: String,
     val roomId: String,
     val senderId: String,
+    val state: String,
     val originText: String,
     val originLanguageCode: String,
     val transText: String?,

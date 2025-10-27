@@ -6,9 +6,9 @@ import com.youhajun.core.model.room.CurrentRoomInfo
 import com.youhajun.core.model.room.CurrentRoomListRequest
 import com.youhajun.core.model.room.Participant
 import com.youhajun.core.model.room.RoomInfo
-import com.youhajun.data.room.dto.toDto
-import com.youhajun.data.room.dto.toEntity
-import com.youhajun.data.room.dto.toModel
+import com.youhajun.data.common.dto.room.toDto
+import com.youhajun.data.common.dto.room.toEntity
+import com.youhajun.data.common.dto.room.toModel
 import com.youhajun.domain.room.RoomRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

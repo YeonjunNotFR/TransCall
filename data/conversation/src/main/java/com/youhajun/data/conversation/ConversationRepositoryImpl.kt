@@ -10,10 +10,10 @@ import com.youhajun.core.model.TimeRange
 import com.youhajun.core.model.calling.payload.TranslationMessage
 import com.youhajun.core.model.pagination.CursorPage
 import com.youhajun.core.model.pagination.CursorPageRequest
-import com.youhajun.data.conversation.dto.toCursorEntities
-import com.youhajun.data.conversation.dto.toEntities
-import com.youhajun.data.conversation.dto.toEntity
-import com.youhajun.data.conversation.dto.toModel
+import com.youhajun.data.common.dto.conversation.toCursorEntities
+import com.youhajun.data.common.dto.conversation.toEntities
+import com.youhajun.data.common.dto.conversation.toEntity
+import com.youhajun.data.common.dto.conversation.toModel
 import com.youhajun.data.conversation.paging.ConversationRemoteMediator
 import com.youhajun.domain.conversation.ConversationRepository
 import kotlinx.coroutines.flow.Flow

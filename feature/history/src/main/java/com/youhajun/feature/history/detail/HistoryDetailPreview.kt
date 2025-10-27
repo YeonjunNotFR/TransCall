@@ -8,6 +8,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.history.CallHistory
 import com.youhajun.core.model.calling.payload.TranslationMessage
+import com.youhajun.core.model.conversation.ConversationState
 import com.youhajun.core.model.room.Participant
 import com.youhajun.transcall.core.ui.components.paging.rememberPaging3ListState
 import kotlinx.collections.immutable.persistentListOf
@@ -74,6 +75,7 @@ private fun getDummyTranslationMessages(count: Int = 20): List<TranslationMessag
         TranslationMessage(
             conversationId = "conv-$i",
             roomId = "room-123",
+            state = ConversationState.PENDING,
             senderId = "${(i % 3)+1}",
             originText = "원문 메시지 $i",
             originLanguage = LanguageType.ENGLISH,

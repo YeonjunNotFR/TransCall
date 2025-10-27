@@ -2,7 +2,7 @@ package com.youhajun.data.auth
 
 import com.youhajun.core.model.auth.Nonce
 import com.youhajun.core.model.auth.SocialLoginRequest
-import com.youhajun.data.auth.dto.toDto
+import com.youhajun.data.common.dto.auth.toDto
 import com.youhajun.domain.auth.AuthRepository
 import javax.inject.Inject
 

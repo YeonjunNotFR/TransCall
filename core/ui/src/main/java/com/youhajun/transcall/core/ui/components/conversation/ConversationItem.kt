@@ -30,6 +30,7 @@ import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
 import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.calling.payload.TranslationMessage
+import com.youhajun.core.model.conversation.ConversationState
 import com.youhajun.core.model.room.Participant
 import com.youhajun.hyanghae.graphics.modifier.conditional
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
@@ -183,6 +184,7 @@ private fun ConversationItemMinePreview() {
             conversationId = "1",
             roomId = "1",
             senderId = "1",
+            state = ConversationState.PENDING,
             originText = "안녕하세요 반갑습니다",
             originLanguage = LanguageType.KOREAN,
             transText = "Hello, Nice meet you",
@@ -208,6 +210,7 @@ private fun ConversationItemOtherPreview() {
         translationMessage = TranslationMessage(
             conversationId = "1",
             roomId = "1",
+            state = ConversationState.PENDING,
             senderId = "1",
             originText = "안녕하세요",
             originLanguage = LanguageType.KOREAN,

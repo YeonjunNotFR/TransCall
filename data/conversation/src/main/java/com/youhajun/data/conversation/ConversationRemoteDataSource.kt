@@ -3,9 +3,9 @@ package com.youhajun.data.conversation
 import com.youhajun.core.model.TimeRange
 import com.youhajun.core.model.pagination.CursorPageRequest
 import com.youhajun.core.network.di.RestHttpClient
-import com.youhajun.data.common.pagination.CursorPageDto
+import com.youhajun.data.common.dto.pagination.CursorPageDto
 import com.youhajun.data.common.parametersFrom
-import com.youhajun.data.conversation.dto.TranslationMessageDto
+import com.youhajun.data.common.dto.conversation.ConversationResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -17,14 +17,14 @@ internal interface ConversationRemoteDataSource {
         roomId: String,
         timeRange: TimeRange,
         request: CursorPageRequest,
-    ): CursorPageDto<TranslationMessageDto>
+    ): CursorPageDto<ConversationResponseDto>
 
     suspend fun getConversationsSyncTimeRange(
         roomId: String,
         timeRange: TimeRange,
         request: CursorPageRequest,
         updatedAfter: Long?
-    ): CursorPageDto<TranslationMessageDto>
+    ): CursorPageDto<ConversationResponseDto>
 }
 
 internal class ConversationRemoteDataSourceImpl @Inject constructor(
@@ -35,7 +35,7 @@ internal class ConversationRemoteDataSourceImpl @Inject constructor(
         roomId: String,
         timeRange: TimeRange,
         request: CursorPageRequest,
-    ): CursorPageDto<TranslationMessageDto> {
+    ): CursorPageDto<ConversationResponseDto> {
         return client.get(ConversationEndpoint.List(roomId).path) {
             parametersFrom(request)
             parametersFrom(timeRange)
@@ -47,7 +47,7 @@ internal class ConversationRemoteDataSourceImpl @Inject constructor(
         timeRange: TimeRange,
         request: CursorPageRequest,
         updatedAfter: Long?,
-    ): CursorPageDto<TranslationMessageDto> {
+    ): CursorPageDto<ConversationResponseDto> {
         return client.get(ConversationEndpoint.Sync(roomId).path) {
             parameter("updatedAfter", updatedAfter)
             parametersFrom(request)

@@ -1,7 +1,7 @@
 package com.youhajun.data.user
 
 import com.youhajun.core.network.di.RestHttpClient
-import com.youhajun.data.user.dto.MyInfoDto
+import com.youhajun.data.common.dto.user.MyInfoDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

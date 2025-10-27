@@ -3,7 +3,7 @@ package com.youhajun.data.calling
 import com.youhajun.core.model.calling.ClientMessage
 import com.youhajun.core.model.calling.ServerMessage
 import com.youhajun.core.model.calling.TurnCredential
-import com.youhajun.data.calling.dto.toDto
+import com.youhajun.data.common.dto.calling.toDto
 import com.youhajun.domain.calling.CallingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

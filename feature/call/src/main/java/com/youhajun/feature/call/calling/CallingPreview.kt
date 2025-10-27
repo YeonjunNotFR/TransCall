@@ -5,6 +5,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.calling.payload.TranslationMessage
 import com.youhajun.core.model.calling.type.MediaContentType
+import com.youhajun.core.model.conversation.ConversationState
 import com.youhajun.core.model.room.Participant
 import com.youhajun.core.model.room.RoomInfo
 import com.youhajun.core.model.room.RoomJoinType
@@ -66,6 +67,7 @@ internal fun CallingScreenFloatingPreview() {
                 conversationId = "abc",
                 roomId = "",
                 senderId = "1",
+                state = ConversationState.PENDING,
                 originText = "Hello",
                 originLanguage = LanguageType.ENGLISH,
                 transText = "안녕",
@@ -113,6 +115,7 @@ internal fun CallingScreenLazyGridPreview() {
             recentConversation = TranslationMessage(
                 conversationId = "abc",
                 roomId = "",
+                state = ConversationState.PENDING,
                 senderId = "1",
                 originText = "Hello",
                 originLanguage = LanguageType.ENGLISH,
@@ -155,6 +158,7 @@ internal fun CallingScreenGridPreview() {
                 conversationId = "abc",
                 roomId = "",
                 senderId = "1",
+                state = ConversationState.PENDING,
                 originText = "Hello",
                 originLanguage = LanguageType.ENGLISH,
                 transText = "안녕",

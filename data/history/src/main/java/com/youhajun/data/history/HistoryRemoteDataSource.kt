@@ -3,9 +3,9 @@ package com.youhajun.data.history
 import com.youhajun.core.model.filter.DateRangeFilter
 import com.youhajun.core.model.pagination.CursorPageRequest
 import com.youhajun.core.network.di.RestHttpClient
-import com.youhajun.data.common.pagination.CursorPageDto
+import com.youhajun.data.common.dto.pagination.CursorPageDto
 import com.youhajun.data.common.parametersFrom
-import com.youhajun.data.history.dto.CallHistoryDto
+import com.youhajun.data.common.dto.history.CallHistoryDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete

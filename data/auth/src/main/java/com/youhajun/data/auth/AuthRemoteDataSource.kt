@@ -1,9 +1,9 @@
 package com.youhajun.data.auth
 
 import com.youhajun.core.network.di.RestHttpClient
-import com.youhajun.data.auth.dto.JwtTokenDto
-import com.youhajun.data.auth.dto.NonceDto
-import com.youhajun.data.auth.dto.SocialLoginRequestDto
+import com.youhajun.data.common.dto.auth.JwtTokenDto
+import com.youhajun.data.common.dto.auth.NonceDto
+import com.youhajun.data.common.dto.auth.SocialLoginRequestDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

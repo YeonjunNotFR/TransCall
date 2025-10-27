@@ -8,7 +8,7 @@ import com.youhajun.data.auth.AuthRemoteDataSource
 import com.youhajun.data.auth.AuthRemoteDataSourceImpl
 import com.youhajun.data.auth.AuthRepositoryImpl
 import com.youhajun.data.auth.TokenRefresherImpl
-import com.youhajun.data.auth.dto.TokenProviderImpl
+import com.youhajun.data.auth.TokenProviderImpl
 import com.youhajun.domain.auth.AuthRepository
 import dagger.Binds
 import dagger.Module
