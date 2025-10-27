@@ -237,9 +237,7 @@ class CallingViewModel @Inject constructor(
         CallingScreenType.Grid -> {
             val state = container.stateFlow.value
             val myDefault = state.myDefaultCallUser ?: return this
-            val otherMedia =
-                state.callUserUiModelList.firstOrNull { it.mediaKey != myDefault.mediaKey }
-                    ?: return this
+            val otherMedia = state.callUserUiModelList.firstOrNull { it.mediaKey != myDefault.mediaKey } ?: return this
             CallingScreenType.PipMode(
                 popupScreenType = this,
                 pipFirstMediaKey = myDefault.mediaKey,
