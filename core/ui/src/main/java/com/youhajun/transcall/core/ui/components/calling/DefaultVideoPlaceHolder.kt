@@ -1,5 +1,6 @@
 package com.youhajun.transcall.core.ui.components.calling
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -28,6 +29,7 @@ import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.core.design.Typography
 import com.youhajun.core.design.toCountryIcon
+import com.youhajun.core.model.CountryType
 import com.youhajun.core.model.LanguageType
 import com.youhajun.core.model.room.Participant
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
@@ -81,7 +83,8 @@ fun DefaultVideoPlaceHolder(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
+
+                    Image(
                         painter = painterResource(participant.country.toCountryIcon()),
                         contentDescription = null,
                         modifier = Modifier.size(languageIconSize)
@@ -112,6 +115,7 @@ private fun VideoPlaceHolderPreview() {
             displayName = "John Doe",
             imageUrl = "https://example.com/image.jpg",
             language = LanguageType.ENGLISH,
+            country = CountryType.UNITED_STATES
         ),
     )
 }
