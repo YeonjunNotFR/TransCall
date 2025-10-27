@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -55,7 +57,7 @@ internal fun RoomCodeComp(
             HorizontalSpacer(16.dp)
 
             Icon(
-                painter = painterResource(id = R.drawable.ic_home),
+                painter = painterResource(id = R.drawable.ic_copy),
                 contentDescription = null,
                 modifier = Modifier
                     .noRippleClickable(
@@ -65,7 +67,7 @@ internal fun RoomCodeComp(
             )
 
             Icon(
-                painter = painterResource(id = R.drawable.ic_home),
+                imageVector = Icons.Default.Share,
                 contentDescription = null,
                 modifier = Modifier
                     .noRippleClickable(onClick = onClickShare)
