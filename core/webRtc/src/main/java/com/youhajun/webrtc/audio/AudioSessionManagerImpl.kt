@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 import org.webrtc.AudioTrack
 import org.webrtc.MediaConstraints
@@ -169,7 +170,7 @@ internal class AudioSessionManagerImpl @Inject constructor(
 
     private fun localMicChunkCollect(localUserId: String) {
         scope.launch {
-            peerConnectionFactory.localMicChunk.collect { chunk ->
+            peerConnectionFactory.localMicChunk.conflate().collect { chunk ->
                 updateAudioLevel(chunk, localUserId, localAudioTrack.enabled())
                 _myAudioPcmFlow.tryEmit(chunk.audioData)
             }
