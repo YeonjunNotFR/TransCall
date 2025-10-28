@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             TransCallTheme {
                 val navigator = rememberNavController()
-                val mainNavigator = rememberMainNavigator(navigator)
+                val mainTabNavigator = rememberMainNavigator(navigator)
                 val navigationEventHandler = rememberNavigationEventHandler(navigator)
 
                 viewModel.collectSideEffect {
@@ -83,8 +83,8 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     MainScreen(
                         navController = navigator,
-                        bottomBarVisibility = mainNavigator.shouldShowBottomBar(),
-                        currentTab = mainNavigator.currentTab ?: MainTab.Home,
+                        bottomBarVisibility = mainTabNavigator.shouldShowBottomBar(),
+                        currentTab = mainTabNavigator.currentTab ?: MainTab.Home,
                         mainTabs = MainTab.tabList().toImmutableList(),
                         onNavigationEvent = viewModel::onNavigationEvent,
                         onClickMainTab = viewModel::onClickMainTab

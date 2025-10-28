@@ -8,7 +8,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
-internal class MainNavigator(
+internal class MainTabNavigator(
     private val navController: NavHostController,
 ) {
 
@@ -36,6 +36,6 @@ internal class MainNavigator(
 @Composable
 internal fun rememberMainNavigator(
     navController: NavHostController,
-): MainNavigator = remember(navController) {
-    MainNavigator(navController)
+): MainTabNavigator = remember(navController) {
+    MainTabNavigator(navController)
 }
