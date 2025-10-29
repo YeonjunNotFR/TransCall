@@ -13,7 +13,8 @@ import com.youhajun.core.notification.notification.AppNotification
 import com.youhajun.core.notification.notification.CallActions
 import com.youhajun.core.notification.notification.CallNotification
 import com.youhajun.feature.call.api.CallIntentFactory
-import com.youhajun.feature.call.api.CallServiceMainContract
+import com.youhajun.feature.call.api.service.CallServiceContract
+import com.youhajun.feature.call.api.service.CallServiceBinder
 import com.youhajun.webrtc.model.LocalMediaUser
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -34,7 +35,7 @@ class CallForegroundService : Service(), CallServiceManager.ServiceCallback {
 
     private var onFinish: (() -> Unit)? = null
 
-    override fun onBind(intent: Intent?): IBinder = LocalBinder()
+    override fun onBind(intent: Intent?): IBinder = CallServiceBinderImpl()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if(currentRoomId == null) {
@@ -167,9 +168,9 @@ class CallForegroundService : Service(), CallServiceManager.ServiceCallback {
         private const val INTENT_EXTRA_CAMERA_TOGGLE = "EXTRA_CAMERA_TOGGLE"
     }
 
-    inner class LocalBinder : Binder(), CallServiceMainContract {
-        fun getContract(): CallServiceContract = serviceManager
-        fun onFinish(finish: () -> Unit) { onFinish = finish }
-        override fun currentRoomId(): String? = currentRoomId
+    internal inner class CallServiceBinderImpl : CallServiceBinder() {
+        override fun getContract(): CallServiceContract = serviceManager
+        override fun onFinish(finish: () -> Unit) { onFinish = finish }
+        override fun ongoingCallRoomId(): String? = currentRoomId
     }
 }
