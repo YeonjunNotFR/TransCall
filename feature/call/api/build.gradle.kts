@@ -12,6 +12,7 @@ android {
 dependencies {
     implementation(projects.core.model)
     implementation(projects.core.route)
+    implementation(projects.core.webRtc)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 }
