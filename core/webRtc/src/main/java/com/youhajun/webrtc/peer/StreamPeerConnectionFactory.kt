@@ -17,8 +17,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
 import org.webrtc.DefaultVideoDecoderFactory
+import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
-import org.webrtc.HardwareVideoEncoderFactory
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
@@ -26,12 +26,11 @@ import org.webrtc.MediaStreamTrack
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.RtpTransceiver
-import org.webrtc.SimulcastVideoEncoderFactory
-import org.webrtc.SoftwareVideoEncoderFactory
 import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
 import org.webrtc.audio.JavaAudioDeviceModule
 import javax.inject.Inject
+import kotlin.getValue
 
 @ServiceScoped
 class StreamPeerConnectionFactory @Inject constructor(
@@ -48,8 +47,7 @@ class StreamPeerConnectionFactory @Inject constructor(
     internal val localMicChunk: SharedFlow<MicChunk> = _localMicChunk.asSharedFlow()
 
     private val videoEncoderFactory by lazy {
-        val hardwareEncoder = HardwareVideoEncoderFactory(eglBaseContext, true, true)
-        SimulcastVideoEncoderFactory(hardwareEncoder, SoftwareVideoEncoderFactory())
+        DefaultVideoEncoderFactory(eglBaseContext, true, true)
     }
 
     private val audioDeviceModule by lazy {
@@ -118,23 +116,11 @@ class StreamPeerConnectionFactory @Inject constructor(
             onIceCandidate = onIceCandidateRequest,
             onTrack = onTrack,
         )
-        val connection = makePeerConnectionInternal(
+        val connection = makePeerConnection(
             configuration = rtcConfig,
             observer = peerConnection,
         )
         return peerConnection.apply { initialize(connection) }
-    }
-
-    private fun makePeerConnectionInternal(
-        configuration: PeerConnection.RTCConfiguration,
-        observer: PeerConnection.Observer?,
-    ): PeerConnection {
-        return requireNotNull(
-            factory.createPeerConnection(
-                configuration,
-                observer,
-            ),
-        )
     }
 
     fun makeVideoSource(isScreencast: Boolean): VideoSource =
@@ -168,6 +154,13 @@ class StreamPeerConnectionFactory @Inject constructor(
             iceTransportsType = PeerConnection.IceTransportsType.ALL
         }
     }
+
+    private fun makePeerConnection(
+        configuration: PeerConnection.RTCConfiguration,
+        observer: PeerConnection.Observer?,
+    ): PeerConnection = requireNotNull(
+        factory.createPeerConnection(configuration, observer)
+    )
 
     private fun createIceServerList(turnCredential: TurnCredential) = listOf(
         PeerConnection.IceServer.builder(iceStunServerUrls).createIceServer(),
