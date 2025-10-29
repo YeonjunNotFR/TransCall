@@ -28,12 +28,18 @@ dependencies {
 
 val featureModules = listOf(
     projects.feature.main,
-    projects.feature.home,
     projects.feature.splash,
+    projects.feature.splash.api,
+    projects.feature.home,
+    projects.feature.home.api,
     projects.feature.auth,
+    projects.feature.auth.api,
     projects.feature.room,
+    projects.feature.room.api,
     projects.feature.call,
+    projects.feature.call.api,
     projects.feature.history,
+    projects.feature.history.api,
 )
 
 val domainModules = listOf(
