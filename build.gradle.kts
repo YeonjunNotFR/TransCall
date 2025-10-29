@@ -11,3 +11,5 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.gms) apply false
 }
+
+apply(from = "gradle/projectDependencyGraph.gradle.kts")
