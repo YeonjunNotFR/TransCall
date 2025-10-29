@@ -1,4 +1,4 @@
-package com.youhajun.feature.call.service
+package com.youhajun.feature.call.api.service
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.youhajun.core.model.calling.ServerMessage
@@ -24,4 +24,8 @@ interface CallServiceContract {
 
 val LocalCallServiceContract = staticCompositionLocalOf<CallServiceContract?> {
     error("No CallServiceContract provided")
+}
+
+val LocalOngoingCallRoomId = staticCompositionLocalOf<String?> {
+    null
 }
