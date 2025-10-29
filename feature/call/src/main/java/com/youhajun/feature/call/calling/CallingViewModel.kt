@@ -15,7 +15,7 @@ import com.youhajun.feature.call.api.CallNavRoute
 import com.youhajun.feature.call.model.CallControlAction
 import com.youhajun.feature.call.model.CallUserUiModel
 import com.youhajun.feature.call.model.CallingScreenType
-import com.youhajun.feature.call.service.CallServiceContract
+import com.youhajun.feature.call.api.service.CallServiceContract
 import com.youhajun.webrtc.model.AudioDeviceType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList

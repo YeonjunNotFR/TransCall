@@ -10,7 +10,6 @@ import com.youhajun.domain.history.usecase.GetHistoryListUseCase
 import com.youhajun.domain.room.usecase.GetCurrentRoomInfoUseCase
 import com.youhajun.domain.room.usecase.JoinRoomCheckByCodeUseCase
 import com.youhajun.domain.user.usecase.GetMyInfoUseCase
-import com.youhajun.feature.call.api.CallServiceMainContract
 import com.youhajun.feature.history.api.HistoryNavRoute
 import com.youhajun.feature.home.api.HomeNavRoute
 import com.youhajun.room.api.RoomNavRoute
@@ -37,7 +36,7 @@ class HomeViewModel @Inject constructor(
         container(HomeState(callHistoryPreviewMaxSize = CALL_HISTORY_PREVIEW_MAX_SIZE))
 
     private var permissionPendingRoomCode: String? = null
-    private var callServiceMainContract: CallServiceMainContract? = null
+    private var ongoingCallRoomId: String? = null
 
     fun onResume() = intent {
         supervisorScope {
@@ -47,8 +46,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun setCallServiceMainContract(contract: CallServiceMainContract?) = intent {
-        callServiceMainContract = contract
+    fun setOngoingCallRoomId(roomId: String?) = intent {
+        ongoingCallRoomId = roomId
         updateCurrentRoomInfo()
     }
 
@@ -118,10 +117,7 @@ class HomeViewModel @Inject constructor(
 
     @OptIn(OrbitExperimental::class)
     private suspend fun updateCurrentRoomInfo() = subIntent {
-        val currentRoomInfo = callServiceMainContract?.currentRoomId()?.let {
-            getCurrentRoomInfoUseCase(it)
-        }?.getOrNull()
-
+        val currentRoomInfo = ongoingCallRoomId?.let { getCurrentRoomInfoUseCase(it) }?.getOrNull()
         reduce { state.copy(currentRoomInfo = currentRoomInfo) }
     }
 

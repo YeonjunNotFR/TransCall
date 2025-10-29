@@ -20,10 +20,10 @@ import com.youhajun.core.design.TransCallTheme
 import com.youhajun.core.route.rememberNavigationEventHandler
 import com.youhajun.feature.call.api.CallIntentFactory
 import com.youhajun.feature.call.api.CallNavRoute
+import com.youhajun.feature.call.api.service.CallServiceBinder
 import com.youhajun.feature.call.navigation.callNavGraph
-import com.youhajun.feature.call.service.CallForegroundService
-import com.youhajun.feature.call.service.CallServiceContract
-import com.youhajun.feature.call.service.LocalCallServiceContract
+import com.youhajun.feature.call.api.service.CallServiceContract
+import com.youhajun.feature.call.api.service.LocalCallServiceContract
 import com.youhajun.transcall.core.ui.locals.LocalEglBaseContext
 import dagger.hilt.android.AndroidEntryPoint
 import org.webrtc.EglBase
@@ -47,9 +47,9 @@ class CallActivity : ComponentActivity() {
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-            val localBinder = binder as? CallForegroundService.LocalBinder
-            callServiceContract = localBinder?.getContract()
-            localBinder?.onFinish { finish() }
+            val serviceBinder = binder as? CallServiceBinder
+            callServiceContract = serviceBinder?.getContract()
+            serviceBinder?.onFinish { finish() }
             isBound = true
         }
 

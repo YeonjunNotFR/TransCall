@@ -60,7 +60,7 @@ import com.youhajun.feature.call.component.rememberIsInPipMode
 import com.youhajun.feature.call.model.CallControlAction
 import com.youhajun.feature.call.model.CallUserUiModel
 import com.youhajun.feature.call.model.CallingScreenType
-import com.youhajun.feature.call.service.LocalCallServiceContract
+import com.youhajun.feature.call.api.service.LocalCallServiceContract
 import com.youhajun.hyanghae.graphics.modifier.conditional
 import com.youhajun.transcall.core.ui.components.VerticalSpacer
 import com.youhajun.transcall.core.ui.components.calling.DefaultVideoPlaceHolder

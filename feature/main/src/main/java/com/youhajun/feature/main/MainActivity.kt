@@ -19,9 +19,9 @@ import com.youhajun.core.route.rememberNavigationEventHandler
 import com.youhajun.feature.auth.api.GoogleAuthManager
 import com.youhajun.feature.auth.util.LocalGoogleAuthManager
 import com.youhajun.feature.call.api.CallIntentFactory
-import com.youhajun.feature.call.api.CallServiceMainContract
 import com.youhajun.feature.call.api.LocalCallIntentFactory
-import com.youhajun.feature.call.api.LocalCallServiceMainContract
+import com.youhajun.feature.call.api.service.CallServiceBinder
+import com.youhajun.feature.call.api.service.LocalOngoingCallRoomId
 import com.youhajun.feature.main.navigation.MainTab
 import com.youhajun.feature.main.navigation.rememberMainNavigator
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,17 +40,18 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var callIntentFactory: CallIntentFactory
 
-    private var callServiceMainContract: CallServiceMainContract? by mutableStateOf(null)
+    private var ongoingCallRoomId: String? by mutableStateOf(null)
     private var isBound = false
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-            callServiceMainContract = binder as? CallServiceMainContract
+            val binder: CallServiceBinder = binder as CallServiceBinder
+            ongoingCallRoomId = binder.ongoingCallRoomId()
             isBound = true
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            callServiceMainContract = null
+            ongoingCallRoomId = null
             isBound = false
         }
     }
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity() {
                 CompositionLocalProvider(
                     LocalGoogleAuthManager provides googleAuthManager,
                     LocalCallIntentFactory provides callIntentFactory,
-                    LocalCallServiceMainContract provides callServiceMainContract
+                    LocalOngoingCallRoomId provides ongoingCallRoomId
                 ) {
                     MainScreen(
                         navController = navigator,

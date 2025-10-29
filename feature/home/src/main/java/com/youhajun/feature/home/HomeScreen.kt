@@ -4,11 +4,9 @@ import android.Manifest
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,8 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -54,14 +49,13 @@ import com.youhajun.core.design.Typography
 import com.youhajun.core.model.history.CallHistory
 import com.youhajun.core.model.room.CurrentRoomInfo
 import com.youhajun.core.model.room.RoomInfo
-import com.youhajun.core.model.room.RoomVisibility
 import com.youhajun.core.model.user.MyInfo
 import com.youhajun.core.permission.PermissionForceHandler
 import com.youhajun.core.permission.PermissionSoftHandler
 import com.youhajun.core.permission.rememberPermissionRequestController
 import com.youhajun.core.route.NavigationEvent
 import com.youhajun.feature.call.api.LocalCallIntentFactory
-import com.youhajun.feature.call.api.LocalCallServiceMainContract
+import com.youhajun.feature.call.api.service.LocalOngoingCallRoomId
 import com.youhajun.transcall.core.ui.components.FilledActionButton
 import com.youhajun.transcall.core.ui.components.HorizontalSpacer
 import com.youhajun.transcall.core.ui.components.MembershipBadge
@@ -83,7 +77,7 @@ internal fun HomeRoute(
     val context = LocalContext.current
     val permissionController = rememberPermissionRequestController()
     val callIntentFactory = LocalCallIntentFactory.current
-    val callServiceMainContract = LocalCallServiceMainContract.current
+    val ongoingCallRoomId = LocalOngoingCallRoomId.current
 
     viewModel.collectSideEffect {
         when (it) {
@@ -100,8 +94,8 @@ internal fun HomeRoute(
         viewModel.onResume()
     }
 
-    LaunchedEffect(callServiceMainContract) {
-        viewModel.setCallServiceMainContract(callServiceMainContract)
+    LaunchedEffect(ongoingCallRoomId) {
+        viewModel.setOngoingCallRoomId(ongoingCallRoomId)
     }
 
     PermissionForceHandler(
