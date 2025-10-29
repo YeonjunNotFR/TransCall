@@ -12,30 +12,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.feature.main)
-    implementation(projects.feature.call)
-    implementation(projects.feature.history)
-    implementation(projects.feature.history.api)
-    implementation(projects.feature.home)
-    implementation(projects.domain.history)
-    implementation(projects.domain.room)
-    implementation(projects.domain.auth)
-    implementation(projects.domain.calling)
-    implementation(projects.domain.user)
-    implementation(projects.domain.conversation)
-    implementation(projects.data.history)
-    implementation(projects.data.room)
-    implementation(projects.data.auth)
-    implementation(projects.data.calling)
-    implementation(projects.data.user)
-    implementation(projects.data.conversation)
-    implementation(projects.core.route)
-    implementation(projects.core.network)
-    implementation(projects.core.common)
-    implementation(projects.core.webRtc)
-    implementation(projects.core.database)
-    implementation(projects.core.notification)
-
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.firebase.messaging)
     implementation(libs.timber)
@@ -48,4 +24,49 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+val featureModules = listOf(
+    projects.feature.main,
+    projects.feature.home,
+    projects.feature.splash,
+    projects.feature.auth,
+    projects.feature.room,
+    projects.feature.call,
+    projects.feature.history,
+)
+
+val domainModules = listOf(
+    projects.domain.history,
+    projects.domain.room,
+    projects.domain.auth,
+    projects.domain.calling,
+    projects.domain.user,
+    projects.domain.conversation
+)
+
+val dataModules = listOf(
+    projects.data.history,
+    projects.data.room,
+    projects.data.auth,
+    projects.data.calling,
+    projects.data.user,
+    projects.data.conversation
+)
+
+val coreModules = listOf(
+    projects.core.route,
+    projects.core.network,
+    projects.core.common,
+    projects.core.webRtc,
+    projects.core.database,
+    projects.core.datastore,
+    projects.core.design,
+    projects.core.event,
+    projects.core.model,
+    projects.core.notification
+)
+
+dependencies {
+    (featureModules + domainModules + dataModules + coreModules).forEach(::implementation)
 }
