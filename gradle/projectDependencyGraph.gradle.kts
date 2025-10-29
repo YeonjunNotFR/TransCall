@@ -61,9 +61,9 @@ tasks.register("projectDependencyGraph") {
             w.appendLine("digraph G {")
             w.appendLine("""graph [compound=true, dpi=180, bgcolor="#FFFFFF", newrank=true, pack=true];""")
             w.appendLine("""label="${rootProject.name}"; labelloc="t"; fontsize=28; fontname="Helvetica";""")
-            w.appendLine("""rankdir=TB; nodesep=0.35; ranksep=1.0; splines=polyline; overlap=false; concentrate=true;""")
+            w.appendLine("""rankdir=TB; nodesep=0.35; ranksep=1.0; splines=ortho; overlap=prism; concentrate=false;""")
             w.appendLine("""node [shape=box, style=filled, fontname="Helvetica", fontsize=11, color="#424242"];""")
-            w.appendLine("""edge [arrowsize=0.7, penwidth=1.1, weight=0];""")
+            w.appendLine("""edge [arrowsize=0.6, penwidth=1.1, weight=0, minlen=2];""")
 
             // 클러스터 유틸 (라벨이 가려지지 않도록 label pad를 둔다)
             fun writeCluster(name: String, label: String, bg: String, fill: String, rank: String) {
