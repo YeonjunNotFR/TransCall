@@ -1,7 +1,7 @@
 package com.youhajun.webrtc
 
-import com.youhajun.webrtc.model.MediaContentType
-import com.youhajun.webrtc.model.TrackType
+import com.youhajun.webrtc.model.local.MediaContentType
+import com.youhajun.webrtc.model.local.TrackType
 
 internal object Config {
     private const val SEPARATOR = "_"
