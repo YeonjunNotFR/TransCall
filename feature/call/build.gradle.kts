@@ -14,6 +14,7 @@ dependencies {
     implementation(projects.domain.room)
     implementation(projects.domain.conversation)
     implementation(projects.domain.user)
+    implementation(projects.core.share)
     implementation(projects.core.common)
     implementation(projects.core.webRtc)
     implementation(projects.core.ui)
