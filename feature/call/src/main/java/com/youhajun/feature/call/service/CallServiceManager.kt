@@ -212,7 +212,21 @@ class CallServiceManager @Inject constructor(
     private fun collectConnectRoom(roomId: String) {
         scope.launch {
             callConnectUseCase(roomId).collect {
-                handleServerMessage(it)
+                _messageFlow.emit(it)
+                when (val payload = it.payload) {
+                    is ConnectedRoom -> {
+                        roomStatus = payload.roomInfo.status
+                        webRtcManager.start(payload.videoRoomHandleInfo.toWebRtc())
+                    }
+
+                    is ChangedRoom -> {
+                        roomStatus = payload.roomInfo.status
+                    }
+
+                    is SttStart -> collectMicChunk()
+
+                    else -> Unit
+                }
             }
         }
     }
@@ -232,24 +246,6 @@ class CallServiceManager @Inject constructor(
                         isCameraEnable = it.videoStream.isVideoEnable
                     )
                 }
-        }
-    }
-
-    private suspend fun handleServerMessage(message: ServerMessage) {
-        _messageFlow.emit(message)
-        when (val payload = message.payload) {
-            is ConnectedRoom -> {
-                roomStatus = payload.roomInfo.status
-                webRtcManager.start(payload.videoRoomHandleInfo.toWebRtc())
-            }
-
-            is ChangedRoom -> {
-                roomStatus = payload.roomInfo.status
-            }
-
-            is SttStart -> collectMicChunk()
-
-            else -> Unit
         }
     }
 }
