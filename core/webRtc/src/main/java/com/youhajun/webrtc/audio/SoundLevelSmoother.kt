@@ -1,6 +1,6 @@
 package com.youhajun.webrtc.audio
 
-class SoundLevelSmoother {
+internal class SoundLevelSmoother {
 
     companion object {
         private const val ATTACK_RATE = 0.8f    // 올라갈 때 속도 (0.1-1.0)

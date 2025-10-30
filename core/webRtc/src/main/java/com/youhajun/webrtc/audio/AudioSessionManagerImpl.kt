@@ -2,14 +2,14 @@ package com.youhajun.webrtc.audio
 
 import com.youhajun.transcall.core.common.IoDispatcher
 import com.youhajun.webrtc.Config
-import com.youhajun.webrtc.model.AudioDeviceType
-import com.youhajun.webrtc.model.CallAudioStream
-import com.youhajun.webrtc.model.LocalAudioEvent
-import com.youhajun.webrtc.model.LocalAudioStream
-import com.youhajun.webrtc.model.MediaContentType
-import com.youhajun.webrtc.model.MediaState
-import com.youhajun.webrtc.model.MicChunk
-import com.youhajun.webrtc.model.RemoteAudioStream
+import com.youhajun.webrtc.model.stream.AudioDeviceType
+import com.youhajun.webrtc.model.stream.CallAudioStream
+import com.youhajun.webrtc.model.local.LocalAudioEvent
+import com.youhajun.webrtc.model.stream.LocalAudioStream
+import com.youhajun.webrtc.model.local.MediaContentType
+import com.youhajun.webrtc.model.media.MediaState
+import com.youhajun.webrtc.model.local.MicChunk
+import com.youhajun.webrtc.model.stream.RemoteAudioStream
 import com.youhajun.webrtc.peer.StreamPeerConnectionFactory
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope

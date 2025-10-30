@@ -22,7 +22,7 @@ import com.youhajun.core.design.Colors
 import com.youhajun.core.design.R
 import com.youhajun.feature.call.model.CallControlAction
 import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
-import com.youhajun.webrtc.model.AudioDeviceType
+import com.youhajun.webrtc.model.stream.AudioDeviceType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

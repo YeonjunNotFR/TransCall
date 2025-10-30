@@ -1,4 +1,4 @@
-package com.youhajun.webrtc.model
+package com.youhajun.webrtc.model.local
 
 internal enum class MediaContentType(val type: String) {
     DEFAULT("default"), SCREEN_SHARE("screenShare");

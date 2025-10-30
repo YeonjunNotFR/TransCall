@@ -1,4 +1,4 @@
-package com.youhajun.webrtc.model
+package com.youhajun.webrtc.model.stream
 
 object CallMediaKey {
     private const val KEY_SEPARATOR = "_"

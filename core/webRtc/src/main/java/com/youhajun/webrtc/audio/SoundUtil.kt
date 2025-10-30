@@ -1,6 +1,6 @@
 package com.youhajun.webrtc.audio
 
-import com.youhajun.webrtc.model.MicChunk
+import com.youhajun.webrtc.model.local.MicChunk
 import kotlin.math.log10
 import kotlin.math.sqrt
 

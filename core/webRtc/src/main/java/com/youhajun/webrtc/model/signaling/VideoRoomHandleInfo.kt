@@ -1,4 +1,4 @@
-package com.youhajun.webrtc.model
+package com.youhajun.webrtc.model.signaling
 
 data class VideoRoomHandleInfo(
     val defaultPublisherHandleId: Long,

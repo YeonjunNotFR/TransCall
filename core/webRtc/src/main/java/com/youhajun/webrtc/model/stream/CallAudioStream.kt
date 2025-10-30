@@ -1,5 +1,6 @@
-package com.youhajun.webrtc.model
+package com.youhajun.webrtc.model.stream
 
+import com.youhajun.webrtc.model.stream.AudioDeviceType
 import org.webrtc.AudioTrack
 
 sealed interface CallAudioStream {

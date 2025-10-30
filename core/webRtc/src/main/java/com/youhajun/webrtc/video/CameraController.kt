@@ -2,7 +2,7 @@ package com.youhajun.webrtc.video
 
 import org.webrtc.CapturerObserver
 
-interface CameraController {
+internal interface CameraController {
     val isFrontCamera: Boolean
     fun initCapture(capturerObserver: CapturerObserver)
     fun startCapture(): Result<Unit>

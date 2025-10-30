@@ -1,10 +1,10 @@
 package com.youhajun.webrtc.session
 
-import com.youhajun.webrtc.SignalingClient
-import com.youhajun.webrtc.model.AudioDeviceType
-import com.youhajun.webrtc.model.CallMediaUser
-import com.youhajun.webrtc.model.TurnCredential
-import com.youhajun.webrtc.model.VideoRoomHandleInfo
+import com.youhajun.webrtc.client.SignalingClient
+import com.youhajun.webrtc.model.stream.AudioDeviceType
+import com.youhajun.webrtc.model.stream.CallMediaUser
+import com.youhajun.webrtc.model.signaling.TurnCredential
+import com.youhajun.webrtc.model.signaling.VideoRoomHandleInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 

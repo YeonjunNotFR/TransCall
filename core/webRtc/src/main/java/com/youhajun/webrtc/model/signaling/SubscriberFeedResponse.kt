@@ -1,4 +1,7 @@
-package com.youhajun.webrtc.model
+package com.youhajun.webrtc.model.signaling
+
+import com.youhajun.webrtc.model.local.MediaContentType
+import com.youhajun.webrtc.model.local.TrackType
 
 data class SubscriberFeedResponse(
     val type: String,
@@ -10,8 +13,8 @@ data class SubscriberFeedResponse(
 ) {
     internal fun toSubscriberMidMapper() = SubscriberMidMapper(
         userId = feedDisplay,
-        mediaContentType = MediaContentType.fromType(feedDescription),
-        trackType = TrackType.fromString(type)
+        mediaContentType = MediaContentType.Companion.fromType(feedDescription),
+        trackType = TrackType.Companion.fromString(type)
     )
 }
 

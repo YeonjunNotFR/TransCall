@@ -1,4 +1,4 @@
-package com.youhajun.webrtc.model
+package com.youhajun.webrtc.model.local
 
 internal data class MicChunk(
     val audioData: ByteArray,

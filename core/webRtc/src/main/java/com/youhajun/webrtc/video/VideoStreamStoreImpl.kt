@@ -1,10 +1,10 @@
 package com.youhajun.webrtc.video
 
-import com.youhajun.webrtc.model.CallMediaKey
-import com.youhajun.webrtc.model.CallVideoStream
-import com.youhajun.webrtc.model.LocalVideoStream
-import com.youhajun.webrtc.model.MediaContentType
-import com.youhajun.webrtc.model.RemoteVideoStream
+import com.youhajun.webrtc.model.stream.CallMediaKey
+import com.youhajun.webrtc.model.stream.CallVideoStream
+import com.youhajun.webrtc.model.stream.LocalVideoStream
+import com.youhajun.webrtc.model.local.MediaContentType
+import com.youhajun.webrtc.model.stream.RemoteVideoStream
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

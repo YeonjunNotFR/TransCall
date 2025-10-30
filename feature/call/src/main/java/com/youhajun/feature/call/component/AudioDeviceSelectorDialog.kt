@@ -22,7 +22,7 @@ import com.youhajun.core.design.Colors
 import com.youhajun.core.design.Typography
 import com.youhajun.core.design.R
 import com.youhajun.transcall.core.ui.components.modifier.noRippleClickable
-import com.youhajun.webrtc.model.AudioDeviceType
+import com.youhajun.webrtc.model.stream.AudioDeviceType
 
 @Composable
 internal fun AudioDeviceSelectorDialog(

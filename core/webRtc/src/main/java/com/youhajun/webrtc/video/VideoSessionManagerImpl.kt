@@ -1,12 +1,12 @@
 package com.youhajun.webrtc.video
 
 import com.youhajun.webrtc.Config
-import com.youhajun.webrtc.model.CallVideoStream
-import com.youhajun.webrtc.model.LocalVideoEvent
-import com.youhajun.webrtc.model.LocalVideoStream
-import com.youhajun.webrtc.model.MediaContentType
-import com.youhajun.webrtc.model.MediaState
-import com.youhajun.webrtc.model.RemoteVideoStream
+import com.youhajun.webrtc.model.stream.CallVideoStream
+import com.youhajun.webrtc.model.local.LocalVideoEvent
+import com.youhajun.webrtc.model.stream.LocalVideoStream
+import com.youhajun.webrtc.model.local.MediaContentType
+import com.youhajun.webrtc.model.media.MediaState
+import com.youhajun.webrtc.model.stream.RemoteVideoStream
 import com.youhajun.webrtc.peer.StreamPeerConnectionFactory
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

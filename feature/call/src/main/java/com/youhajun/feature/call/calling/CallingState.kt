@@ -7,11 +7,11 @@ import com.youhajun.core.model.room.RoomInfo
 import com.youhajun.feature.call.model.CallControlAction
 import com.youhajun.feature.call.model.CallUserUiModel
 import com.youhajun.feature.call.model.CallingScreenType
-import com.youhajun.webrtc.model.AudioDeviceType
-import com.youhajun.webrtc.model.CallMediaKey
-import com.youhajun.webrtc.model.CallMediaUser
-import com.youhajun.webrtc.model.LocalAudioStream
-import com.youhajun.webrtc.model.LocalVideoStream
+import com.youhajun.webrtc.model.stream.AudioDeviceType
+import com.youhajun.webrtc.model.stream.CallMediaKey
+import com.youhajun.webrtc.model.stream.CallMediaUser
+import com.youhajun.webrtc.model.stream.LocalAudioStream
+import com.youhajun.webrtc.model.stream.LocalVideoStream
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf

@@ -4,7 +4,6 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import com.youhajun.core.design.R
@@ -15,7 +14,7 @@ import com.youhajun.core.notification.notification.CallNotification
 import com.youhajun.feature.call.api.CallIntentFactory
 import com.youhajun.feature.call.api.service.CallServiceContract
 import com.youhajun.feature.call.api.service.CallServiceBinder
-import com.youhajun.webrtc.model.LocalMediaUser
+import com.youhajun.webrtc.model.stream.LocalMediaUser
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

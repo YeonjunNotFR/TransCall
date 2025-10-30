@@ -1,10 +1,10 @@
 package com.youhajun.webrtc.audio
 
-import com.youhajun.webrtc.model.CallAudioStream
-import com.youhajun.webrtc.model.CallMediaKey
-import com.youhajun.webrtc.model.LocalAudioStream
-import com.youhajun.webrtc.model.MediaContentType
-import com.youhajun.webrtc.model.RemoteAudioStream
+import com.youhajun.webrtc.model.stream.CallAudioStream
+import com.youhajun.webrtc.model.stream.CallMediaKey
+import com.youhajun.webrtc.model.stream.LocalAudioStream
+import com.youhajun.webrtc.model.local.MediaContentType
+import com.youhajun.webrtc.model.stream.RemoteAudioStream
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

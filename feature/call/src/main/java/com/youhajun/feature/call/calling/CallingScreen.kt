@@ -68,7 +68,7 @@ import com.youhajun.transcall.core.ui.components.calling.FloatingVideo
 import com.youhajun.transcall.core.ui.components.calling.NormalVideo
 import com.youhajun.transcall.core.ui.components.calling.SubtitleStack
 import com.youhajun.transcall.core.ui.components.modifier.speakingGlow
-import com.youhajun.webrtc.model.LocalVideoStream
+import com.youhajun.webrtc.model.stream.LocalVideoStream
 import kotlinx.collections.immutable.ImmutableList
 import org.orbitmvi.orbit.compose.collectSideEffect
 

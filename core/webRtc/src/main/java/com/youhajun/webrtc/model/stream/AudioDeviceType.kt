@@ -1,4 +1,4 @@
-package com.youhajun.webrtc.model
+package com.youhajun.webrtc.model.stream
 
 import com.twilio.audioswitch.AudioDevice
 

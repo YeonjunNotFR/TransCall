@@ -1,8 +1,8 @@
 package com.youhajun.webrtc.video
 
-import com.youhajun.webrtc.model.CallVideoStream
-import com.youhajun.webrtc.model.LocalVideoStream
-import com.youhajun.webrtc.model.RemoteVideoStream
+import com.youhajun.webrtc.model.stream.CallVideoStream
+import com.youhajun.webrtc.model.stream.LocalVideoStream
+import com.youhajun.webrtc.model.stream.RemoteVideoStream
 import kotlinx.coroutines.flow.StateFlow
 
 internal interface VideoStreamStore {

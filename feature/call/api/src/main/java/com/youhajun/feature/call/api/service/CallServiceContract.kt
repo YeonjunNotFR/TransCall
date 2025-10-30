@@ -3,8 +3,8 @@ package com.youhajun.feature.call.api.service
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.youhajun.core.model.calling.ServerMessage
 import com.youhajun.core.model.calling.type.MediaContentType
-import com.youhajun.webrtc.model.AudioDeviceType
-import com.youhajun.webrtc.model.CallMediaUser
+import com.youhajun.webrtc.model.stream.AudioDeviceType
+import com.youhajun.webrtc.model.stream.CallMediaUser
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 

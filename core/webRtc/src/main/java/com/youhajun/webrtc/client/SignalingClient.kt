@@ -1,9 +1,9 @@
-package com.youhajun.webrtc
+package com.youhajun.webrtc.client
 
-import com.youhajun.webrtc.model.MediaStateMessageRequest
-import com.youhajun.webrtc.model.MediaStateMessageResponse
-import com.youhajun.webrtc.model.SignalingMessageRequest
-import com.youhajun.webrtc.model.SignalingMessageResponse
+import com.youhajun.webrtc.model.media.MediaStateMessageRequest
+import com.youhajun.webrtc.model.media.MediaStateMessageResponse
+import com.youhajun.webrtc.model.signaling.SignalingMessageRequest
+import com.youhajun.webrtc.model.signaling.SignalingMessageResponse
 import kotlinx.coroutines.flow.Flow
 
 interface SignalingClient {

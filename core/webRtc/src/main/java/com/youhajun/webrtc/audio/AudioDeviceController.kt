@@ -1,10 +1,10 @@
 package com.youhajun.webrtc.audio
 
-import com.youhajun.webrtc.model.AudioDeviceState
-import com.youhajun.webrtc.model.AudioDeviceType
+import com.youhajun.webrtc.model.local.AudioDeviceState
+import com.youhajun.webrtc.model.stream.AudioDeviceType
 import kotlinx.coroutines.flow.StateFlow
 
-interface AudioDeviceController {
+internal interface AudioDeviceController {
     val audioDeviceState: StateFlow<AudioDeviceState>
     fun start()
     fun stop()

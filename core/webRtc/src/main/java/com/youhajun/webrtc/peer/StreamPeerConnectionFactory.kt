@@ -4,9 +4,9 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.os.Build
-import com.youhajun.webrtc.model.MicChunk
-import com.youhajun.webrtc.model.TurnCredential
-import com.youhajun.webrtc.model.toRtpCodec
+import com.youhajun.webrtc.model.local.MicChunk
+import com.youhajun.webrtc.model.signaling.TurnCredential
+import com.youhajun.webrtc.model.signaling.toRtpCodec
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
 import kotlinx.coroutines.CoroutineScope

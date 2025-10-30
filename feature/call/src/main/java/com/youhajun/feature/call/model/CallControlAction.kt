@@ -2,7 +2,7 @@ package com.youhajun.feature.call.model;
 
 import androidx.annotation.DrawableRes
 import com.youhajun.core.design.R
-import com.youhajun.webrtc.model.AudioDeviceType
+import com.youhajun.webrtc.model.stream.AudioDeviceType
 
 sealed class CallControlAction {
     data class SelectAudioDevice(
