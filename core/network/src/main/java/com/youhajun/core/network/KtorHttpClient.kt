@@ -54,12 +54,7 @@ internal class KtorHttpClient @Inject constructor(
                 }
 
                 refreshTokens {
-                    tokenRefresher.refreshTokens(this@refreshTokens).onSuccess {
-                        val refreshToken = it.refreshToken
-                        if (refreshToken != null) tokenProvider.saveTokens(it.accessToken, refreshToken)
-                    }.onFailure {
-                        tokenProvider.deleteTokens()
-                    }.getOrNull()
+                    tokenRefresher.refreshTokens(this@refreshTokens).getOrNull()
                 }
             }
         }
