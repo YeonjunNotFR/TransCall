@@ -73,5 +73,6 @@ include(
     ":core:datastore",
     ":core:route",
     ":core:event",
-    ":core:permission"
+    ":core:permission",
+    ":core:share"
 )
