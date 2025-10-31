@@ -7,6 +7,7 @@ import com.youhajun.core.model.calling.payload.ChangedRoom
 import com.youhajun.core.model.calling.payload.ConnectedRoom
 import com.youhajun.core.model.room.RoomInfo
 import com.youhajun.core.model.room.RoomStatus
+import com.youhajun.core.share.ShareUtil
 import com.youhajun.domain.conversation.usecase.GetRecentConversationFlowUseCase
 import com.youhajun.domain.room.usecase.GetRoomInfoUseCase
 import com.youhajun.domain.room.usecase.GetRoomParticipantFlowUseCase
@@ -32,6 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CallingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val shareUtil: ShareUtil,
     private val getMyInfoUseCase: GetMyInfoUseCase,
     private val getRoomInfoUseCase: GetRoomInfoUseCase,
     private val getRoomParticipantFlowUseCase: GetRoomParticipantFlowUseCase,
@@ -85,12 +87,18 @@ class CallingViewModel @Inject constructor(
         reduce { state.copy(isShowAudioDeviceChangeDialog = false) }
     }
 
-    fun onClickRoomCodeCopy() {
+    fun onClickRoomCodeCopy() = intent {
+        val roomCode = state.roomInfo.roomCode
+        if(roomCode.isBlank()) return@intent
 
+        shareUtil.copyText(roomCode)
     }
 
-    fun onClickRoomCodeShare() {
+    fun onClickRoomCodeShare() = intent {
+        val roomCode = state.roomInfo.roomCode
+        if(roomCode.isBlank()) return@intent
 
+        shareUtil.shareTextChooser(roomCode)
     }
 
     fun onClickCallAction(action: CallControlAction) {
@@ -177,14 +185,8 @@ class CallingViewModel @Inject constructor(
         repeatOnSubscription {
             callServiceContract?.messageFlow?.collect {
                 when (val type = it.payload) {
-                    is ConnectedRoom -> {
-                        handleRoomInfo(type.roomInfo)
-                    }
-
-                    is ChangedRoom -> {
-                        handleRoomInfo(type.roomInfo)
-                    }
-
+                    is ConnectedRoom -> handleRoomInfo(type.roomInfo)
+                    is ChangedRoom -> handleRoomInfo(type.roomInfo)
                     else -> Unit
                 }
             }
