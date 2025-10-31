@@ -16,7 +16,8 @@ import javax.inject.Singleton
 
 @Singleton
 internal class TokenRefresherImpl @Inject constructor(
-    private val mainEventManager: MainEventManager
+    private val mainEventManager: MainEventManager,
+    private val authLocalDataSource: AuthLocalDataSource
 ) : TokenRefresher {
 
     override suspend fun refreshTokens(
@@ -31,7 +32,13 @@ internal class TokenRefresherImpl @Inject constructor(
 
             BearerTokens(response.accessToken, response.refreshToken)
         }
+    }.onSuccess {
+        val refreshToken = it.refreshToken
+        if(refreshToken != null) {
+            authLocalDataSource.saveTokens(it.accessToken, refreshToken)
+        }
     }.onFailure {
+        authLocalDataSource.deleteTokens()
         mainEventManager.sendEvent(MainEvent.RequireLogin)
     }
 }
