@@ -63,6 +63,7 @@ fun FloatingVideo(
                 modifier = Modifier.fillMaxSize(),
                 videoTrack = videoTrack,
                 isFrontCamera = isFrontCamera,
+                translucentOverlay = true,
                 rendererEvents = rendererEvent,
             )
         } else {

@@ -32,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.youhajun.transcall.core.ui.locals.LocalEglBaseContext
 import io.getstream.webrtc.android.compose.VideoScalingType
-import io.getstream.webrtc.android.ui.VideoTextureViewRenderer
 import org.webrtc.RendererCommon
 import org.webrtc.RendererCommon.RendererEvents
 import org.webrtc.VideoTrack
@@ -42,6 +41,7 @@ internal fun VideoRenderer(
     videoTrack: VideoTrack,
     modifier: Modifier = Modifier,
     isFrontCamera: Boolean = false,
+    translucentOverlay: Boolean = false,
     videoScalingType: VideoScalingType = VideoScalingType.SCALE_ASPECT_BALANCED,
     rendererEvents: RendererEvents = object : RendererEvents {
         override fun onFirstFrameRendered() = Unit
@@ -50,7 +50,7 @@ internal fun VideoRenderer(
 ) {
     val eglBaseContext = LocalEglBaseContext.current
     val trackState: MutableState<VideoTrack?> = remember { mutableStateOf(null) }
-    var view: VideoTextureViewRenderer? by remember { mutableStateOf(null) }
+    var view: VideoSurfaceViewRenderer? by remember { mutableStateOf(null) }
 
     DisposableEffect(videoTrack) {
         onDispose {
@@ -60,8 +60,8 @@ internal fun VideoRenderer(
 
     AndroidView(
         factory = { context ->
-            VideoTextureViewRenderer(context).apply {
-                init(eglBaseContext, rendererEvents)
+            VideoSurfaceViewRenderer(context).apply {
+                init(eglBaseContext, rendererEvents, translucentOverlay)
                 setScalingType(videoScalingType.toCommonScalingType())
                 setMirror(isFrontCamera)
                 setupVideo(trackState, videoTrack, this)
@@ -78,7 +78,7 @@ internal fun VideoRenderer(
 }
 
 private fun cleanTrack(
-    view: VideoTextureViewRenderer?,
+    view: VideoSurfaceViewRenderer?,
     trackState: MutableState<VideoTrack?>,
 ) {
     view?.let { trackState.value?.removeSink(it) }
@@ -88,7 +88,7 @@ private fun cleanTrack(
 private fun setupVideo(
     trackState: MutableState<VideoTrack?>,
     track: VideoTrack,
-    renderer: VideoTextureViewRenderer,
+    renderer: VideoSurfaceViewRenderer,
 ) {
     if (trackState.value == track) {
         return
