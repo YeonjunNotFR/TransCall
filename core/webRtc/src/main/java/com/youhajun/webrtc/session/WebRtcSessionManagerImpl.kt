@@ -326,6 +326,19 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
             .addIceCandidate(iceCandidate.toWebRtcCandidate())
     }
 
+    private fun unpublishedHandle(feedId: Long) {
+        val hit = midMapper.filterValues { mapper -> mapper.feedId == feedId }
+
+        hit.forEach { (mid, m) ->
+            when (m.trackType) {
+                TrackType.VIDEO -> videoManager.removeRemoteVideoTrack(m.userId, m.mediaContentType)
+                TrackType.AUDIO -> audioManager.removeRemoteAudioTrack(m.userId, m.mediaContentType)
+            }
+            midMapper.remove(mid)
+        }
+    }
+
+
     private fun collectMediaStateResponse() = sessionScope.launch {
         signalingClient.observeMediaStateResponse().collect {
             when(it) {
@@ -365,13 +378,13 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
                     )
                 )
 
-                is OnNewPublisher -> {
-                    if(midMapper.isEmpty()) {
-                        sendJoinSubscriber(it.feeds)
-                    } else {
-                        sendSubscribeAdd(it.feeds)
-                    }
+                is OnNewPublisher -> if (midMapper.isEmpty()) {
+                    sendJoinSubscriber(it.feeds)
+                } else {
+                    sendSubscribeAdd(it.feeds)
                 }
+
+                is OnUnpublished -> unpublishedHandle(it.feedId)
             }
         }
     }
