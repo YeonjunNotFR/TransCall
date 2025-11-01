@@ -14,7 +14,8 @@ data class SubscriberFeedResponse(
     internal fun toSubscriberMidMapper() = SubscriberMidMapper(
         userId = feedDisplay,
         mediaContentType = MediaContentType.Companion.fromType(feedDescription),
-        trackType = TrackType.Companion.fromString(type)
+        trackType = TrackType.Companion.fromString(type),
+        feedId = feedId
     )
 }
 

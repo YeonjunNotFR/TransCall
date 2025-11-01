@@ -74,3 +74,7 @@ data class OnIceCandidate(
 data class OnNewPublisher(
     val feeds: List<PublisherFeedResponse>,
 ) : SignalingMessageResponse
+
+data class OnUnpublished(
+    val feedId: Long
+) : SignalingMessageResponse
