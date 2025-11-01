@@ -17,6 +17,7 @@ import com.youhajun.data.common.dto.calling.payload.MediaStateInitDto
 import com.youhajun.data.common.dto.calling.payload.MicEnableChangedDto
 import com.youhajun.data.common.dto.calling.payload.OnIceCandidateDto
 import com.youhajun.data.common.dto.calling.payload.OnNewPublisherDto
+import com.youhajun.data.common.dto.calling.payload.OnUnpublishedDto
 import com.youhajun.data.common.dto.calling.payload.PublisherAnswerDto
 import com.youhajun.data.common.dto.calling.payload.PublisherOfferDto
 import com.youhajun.data.common.dto.calling.payload.RequestPayloadDto
@@ -117,6 +118,7 @@ internal class CallingDataSourceImpl @Inject constructor(
                     subclass(SubscriberOfferDto::class)
                     subclass(OnIceCandidateDto::class)
                     subclass(OnNewPublisherDto::class)
+                    subclass(OnUnpublishedDto::class)
                     subclass(ConnectedRoomDto::class)
                     subclass(ChangedRoomDto::class)
                     subclass(SttStartDto::class)

@@ -51,6 +51,7 @@ import com.youhajun.webrtc.model.signaling.SubscriberFeedResponse
 import com.youhajun.webrtc.model.signaling.SubscriberOffer
 import com.youhajun.webrtc.model.signaling.SubscriberUpdate
 import com.youhajun.webrtc.model.signaling.TurnCredential
+import com.youhajun.webrtc.model.signaling.OnUnpublished
 import com.youhajun.webrtc.model.signaling.VideoRoomHandleInfo
 import com.youhajun.webrtc.session.WebRtcSessionManager
 import dagger.hilt.android.scopes.ServiceScoped
@@ -85,6 +86,7 @@ import com.youhajun.core.model.calling.payload.MediaStateInit as DomainMediaStat
 import com.youhajun.core.model.calling.payload.MicEnableChanged as DomainMicEnableChanged
 import com.youhajun.core.model.calling.payload.OnIceCandidate as DomainOnIceCandidate
 import com.youhajun.core.model.calling.payload.OnNewPublisher as DomainOnNewPublisher
+import com.youhajun.core.model.calling.payload.OnUnpublished as DomainOnUnpublished
 import com.youhajun.core.model.calling.payload.PublisherAnswer as DomainPublisherAnswer
 import com.youhajun.core.model.calling.payload.PublisherOffer as DomainPublisherOffer
 import com.youhajun.core.model.calling.payload.SignalingIceCandidate as DomainIceCandidate
@@ -279,6 +281,10 @@ private fun SignalingResponse.toWebRtc(): SignalingMessageResponse {
 
         is DomainOnNewPublisher -> OnNewPublisher(
             feeds = feeds.map { it.toWebRtc() }
+        )
+
+        is DomainOnUnpublished -> OnUnpublished(
+            feedId = feedId
         )
     }
 }

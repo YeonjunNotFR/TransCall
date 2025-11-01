@@ -3,6 +3,7 @@ package com.youhajun.data.common.dto.calling.payload
 import com.youhajun.core.model.calling.payload.JoinedRoomPublisher
 import com.youhajun.core.model.calling.payload.OnIceCandidate
 import com.youhajun.core.model.calling.payload.OnNewPublisher
+import com.youhajun.core.model.calling.payload.OnUnpublished
 import com.youhajun.core.model.calling.payload.PublisherAnswer
 import com.youhajun.core.model.calling.payload.ResponsePayload
 import com.youhajun.core.model.calling.payload.SubscriberOffer
@@ -12,6 +13,7 @@ import com.youhajun.data.common.dto.calling.SubscriberFeedResponseDto
 import com.youhajun.data.common.dto.calling.payload.JoinedRoomPublisherDto.Companion.JOINED_PUBLISHER_ACTION_TYPE
 import com.youhajun.data.common.dto.calling.payload.OnIceCandidateDto.Companion.ON_ICE_CANDIDATE_ACTION_TYPE
 import com.youhajun.data.common.dto.calling.payload.OnNewPublisherDto.Companion.ON_NEW_PUBLISHER_ACTION_TYPE
+import com.youhajun.data.common.dto.calling.payload.OnUnpublishedDto.Companion.ON_UNPUBLISHED_ACTION_TYPE
 import com.youhajun.data.common.dto.calling.payload.PublisherAnswerDto.Companion.PUBLISHER_ANSWER_ACTION_TYPE
 import com.youhajun.data.common.dto.calling.payload.SubscriberOfferDto.Companion.SUBSCRIBER_OFFER_ACTION_TYPE
 import kotlinx.serialization.Serializable
@@ -124,5 +126,21 @@ data class OnNewPublisherDto(
 
     override fun toModel(): OnNewPublisher = OnNewPublisher(
         feeds = feeds.map { it.toModel() }
+    )
+}
+
+@Serializable
+@SerialName(ON_UNPUBLISHED_ACTION_TYPE)
+data class OnUnpublishedDto(
+    @SerialName("feedId")
+    val feedId: Long,
+) : SignalingResponseDto {
+
+    companion object {
+        const val ON_UNPUBLISHED_ACTION_TYPE: String = "unpublished"
+    }
+
+    override fun toModel(): OnUnpublished = OnUnpublished(
+        feedId = feedId
     )
 }
