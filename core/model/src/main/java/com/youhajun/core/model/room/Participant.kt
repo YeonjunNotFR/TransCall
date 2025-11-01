@@ -10,4 +10,5 @@ data class Participant(
     val imageUrl: String = "",
     val language: LanguageType = LanguageType.ENGLISH,
     val country: CountryType = CountryType.UNITED_STATES,
+    val leftAtToEpochTime: Long? = null
 )

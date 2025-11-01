@@ -25,6 +25,13 @@ internal class AudioStreamStoreImpl @Inject constructor() : AudioStreamStore {
         }
     }
 
+    override fun remove(userId: String, mediaContentType: MediaContentType) {
+        val key = CallMediaKey.createKey(userId, mediaContentType.type)
+        _audioStreamsFlow.update { list ->
+            list.onEach { if (it.key == key) it.audioTrack?.dispose() }.filterNot { it.key == key }
+        }
+    }
+
     override fun updateAll(transform: (CallAudioStream) -> CallAudioStream) {
         _audioStreamsFlow.update { list ->
             list.map { transform(it) }

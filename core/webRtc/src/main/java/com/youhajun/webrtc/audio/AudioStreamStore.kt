@@ -10,6 +10,7 @@ internal interface AudioStreamStore {
     val audioStreamsFlow: StateFlow<List<CallAudioStream>>
 
     fun upsert(stream: CallAudioStream)
+    fun remove(userId: String, mediaContentType: MediaContentType)
     fun update(userId: String, mediaContentType: MediaContentType, transform: (CallAudioStream) -> CallAudioStream)
     fun updateAll(transform: (CallAudioStream) -> CallAudioStream)
 

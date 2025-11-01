@@ -66,6 +66,10 @@ internal class VideoSessionManagerImpl @Inject constructor(
         videoStreamStore.upsert(remoteVideo)
     }
 
+    override fun removeRemoteVideoTrack(userId: String, mediaContentType: MediaContentType) {
+        videoStreamStore.remove(userId, mediaContentType)
+    }
+
     override fun dispose() {
         cameraController.stopCapture()
         runCatching { videoStreamsFlow.value.forEach { it.videoTrack?.dispose() } }

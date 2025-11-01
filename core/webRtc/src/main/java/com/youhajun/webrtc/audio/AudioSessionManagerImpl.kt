@@ -109,6 +109,10 @@ internal class AudioSessionManagerImpl @Inject constructor(
         remoteAudioAddSink(remoteAudio.audioTrack, remoteAudio.userId)
     }
 
+    override fun removeRemoteAudioTrack(userId: String, mediaContentType: MediaContentType) {
+        audioStreamStore.remove(userId, mediaContentType)
+    }
+
     override fun onMediaStateChanged(state: MediaState) {
         audioStreamStore.updateDefaultRemote(state.userId) {
             it.copy(isMicEnabled = state.micEnabled)

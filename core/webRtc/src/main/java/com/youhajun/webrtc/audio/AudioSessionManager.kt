@@ -21,6 +21,7 @@ internal interface AudioSessionManager {
     fun setOutputEnable(userId: String, mediaContentType: MediaContentType, enabled: Boolean)
     fun selectAudioDevice(deviceType: AudioDeviceType)
     fun addRemoteAudioTrack(remoteAudio: RemoteAudioStream)
+    fun removeRemoteAudioTrack(userId: String, mediaContentType: MediaContentType)
     fun onMediaStateChanged(state: MediaState)
     fun onMediaStateInit(list: List<MediaState>)
 }

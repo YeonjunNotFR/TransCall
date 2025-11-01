@@ -25,6 +25,13 @@ internal class VideoStreamStoreImpl @Inject constructor() : VideoStreamStore {
         }
     }
 
+    override fun remove(userId: String, mediaContentType: MediaContentType) {
+        val key = CallMediaKey.createKey(userId, mediaContentType.type)
+        _videoStreamsFlow.update { list ->
+            list.onEach { if (it.key == key) it.videoTrack?.dispose() }.filterNot { it.key == key }
+        }
+    }
+
     override fun updateDefaultLocal(userId: String, transform: (LocalVideoStream) -> LocalVideoStream) {
         val defaultKey = CallMediaKey.createKey(userId, MediaContentType.DEFAULT.type)
         _videoStreamsFlow.update { list ->

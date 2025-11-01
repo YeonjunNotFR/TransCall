@@ -2,6 +2,7 @@ package com.youhajun.webrtc.video
 
 import com.youhajun.webrtc.model.stream.CallVideoStream
 import com.youhajun.webrtc.model.local.LocalVideoEvent
+import com.youhajun.webrtc.model.local.MediaContentType
 import com.youhajun.webrtc.model.media.MediaState
 import com.youhajun.webrtc.model.stream.RemoteVideoStream
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,6 +18,7 @@ internal interface VideoSessionManager {
     fun flipCamera(localUserId: String)
     fun setCameraEnabled(localUserId: String, enabled: Boolean)
     fun addRemoteVideoTrack(remoteVideo: RemoteVideoStream)
+    fun removeRemoteVideoTrack(userId: String, mediaContentType: MediaContentType)
     fun onMediaStateChanged(state: MediaState)
     fun onMediaStateInit(list: List<MediaState>)
 }
