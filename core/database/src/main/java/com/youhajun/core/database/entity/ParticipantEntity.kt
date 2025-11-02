@@ -13,4 +13,5 @@ data class ParticipantEntity(
     val languageCode: String,
     val countryCode: String,
     val imageUrl: String? = null,
+    val leftAtToEpochTime: Long?
 )

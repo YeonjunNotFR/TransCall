@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ParticipantDao {
 
-    @Query("SELECT * FROM participant WHERE roomId = :roomId")
-    fun getRoomParticipantFlow(roomId: String): Flow<List<ParticipantEntity>>
+    @Query("SELECT * FROM participant WHERE roomId = :roomId AND leftAtToEpochTime IS NULL")
+    fun getCurrentRoomParticipantFlow(roomId: String): Flow<List<ParticipantEntity>>
 
     @Upsert
     suspend fun upsertParticipants(participants: List<ParticipantEntity>)

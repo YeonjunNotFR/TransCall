@@ -14,7 +14,7 @@ import com.youhajun.core.database.entity.ParticipantEntity
 
 @Database(
     entities = [ConversationEntity::class, ConversationMetaEntity::class, ConversationCursorEntity::class, ParticipantEntity::class],
-    version = 4
+    version = 5
 )
 @TypeConverters
 internal abstract class TransCallRoomDataBase : RoomDatabase() {
