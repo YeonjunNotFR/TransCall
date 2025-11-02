@@ -35,11 +35,14 @@ class TransCallApplication() : Application(), Configuration.Provider {
 
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
 
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             try {
                 stopService(Intent(this, CallForegroundService::class.java))
             } catch (e: Exception) {
                 Timber.tag("CrashHandler").e(e, "Failed to stop service")
+            } finally {
+                defaultHandler?.uncaughtException(thread, throwable)
             }
         }
     }
