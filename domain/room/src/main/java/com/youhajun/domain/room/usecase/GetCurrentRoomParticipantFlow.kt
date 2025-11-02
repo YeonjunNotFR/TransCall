@@ -7,10 +7,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GetRoomParticipantFlowUseCase @Inject constructor(
+class GetCurrentRoomParticipantFlow @Inject constructor(
     private val repository: RoomRepository
 ) {
     operator fun invoke(roomId: String): Flow<List<Participant>> {
-        return repository.getRoomParticipantFlow(roomId)
+        return repository.getCurrentRoomParticipantFlow(roomId)
     }
 }

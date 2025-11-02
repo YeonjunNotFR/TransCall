@@ -9,7 +9,7 @@ import com.youhajun.core.model.room.CurrentRoomListRequest
 import kotlinx.coroutines.flow.Flow
 
 interface RoomRepository {
-    fun getRoomParticipantFlow(roomId: String): Flow<List<Participant>>
+    fun getCurrentRoomParticipantFlow(roomId: String): Flow<List<Participant>>
     suspend fun getCurrentRoomList(request: CurrentRoomListRequest): Result<CursorPage<CurrentRoomInfo>>
     suspend fun getCurrentRoomInfo(roomId: String): Result<CurrentRoomInfo>
     suspend fun getRoomInfo(roomId: String): Result<RoomInfo>
