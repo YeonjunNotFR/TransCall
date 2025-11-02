@@ -19,8 +19,8 @@ internal class RoomRepositoryImpl @Inject constructor(
     private val participantLocal: ParticipantLocalDataSource
 ): RoomRepository {
 
-    override fun getRoomParticipantFlow(roomId: String): Flow<List<Participant>> {
-        return participantLocal.getRoomParticipantFlow(roomId).map { it.map { it.toModel() } }
+    override fun getCurrentRoomParticipantFlow(roomId: String): Flow<List<Participant>> {
+        return participantLocal.getCurrentRoomParticipantFlow(roomId).map { it.map { it.toModel() } }
     }
 
     override suspend fun getRoomInfo(roomId: String): Result<RoomInfo> = runCatching {

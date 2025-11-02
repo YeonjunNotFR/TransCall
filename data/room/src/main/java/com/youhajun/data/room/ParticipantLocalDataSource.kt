@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 internal interface ParticipantLocalDataSource {
-    fun getRoomParticipantFlow(roomId: String): Flow<List<ParticipantEntity>>
+    fun getCurrentRoomParticipantFlow(roomId: String): Flow<List<ParticipantEntity>>
     suspend fun upsertParticipants(participants: List<ParticipantEntity>)
 }
 
@@ -18,7 +18,7 @@ internal class ParticipantLocalDataSourceImpl @Inject constructor(
         participantDao.upsertParticipants(participants)
     }
 
-    override fun getRoomParticipantFlow(roomId: String): Flow<List<ParticipantEntity>> {
-        return participantDao.getRoomParticipantFlow(roomId)
+    override fun getCurrentRoomParticipantFlow(roomId: String): Flow<List<ParticipantEntity>> {
+        return participantDao.getCurrentRoomParticipantFlow(roomId)
     }
 }
