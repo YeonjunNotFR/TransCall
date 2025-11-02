@@ -10,7 +10,7 @@ import com.youhajun.core.model.room.RoomStatus
 import com.youhajun.core.share.ShareUtil
 import com.youhajun.domain.conversation.usecase.GetRecentConversationFlowUseCase
 import com.youhajun.domain.room.usecase.GetRoomInfoUseCase
-import com.youhajun.domain.room.usecase.GetRoomParticipantFlowUseCase
+import com.youhajun.domain.room.usecase.GetCurrentRoomParticipantFlow
 import com.youhajun.domain.user.usecase.GetMyInfoUseCase
 import com.youhajun.feature.call.api.CallNavRoute
 import com.youhajun.feature.call.model.CallControlAction
@@ -36,7 +36,7 @@ class CallingViewModel @Inject constructor(
     private val shareUtil: ShareUtil,
     private val getMyInfoUseCase: GetMyInfoUseCase,
     private val getRoomInfoUseCase: GetRoomInfoUseCase,
-    private val getRoomParticipantFlowUseCase: GetRoomParticipantFlowUseCase,
+    private val getCurrentRoomParticipantFlow: GetCurrentRoomParticipantFlow,
     private val getRecentConversationFlowUseCase: GetRecentConversationFlowUseCase
 ) : ContainerHost<CallingState, CallingSideEffect>, ViewModel() {
 
@@ -164,7 +164,7 @@ class CallingViewModel @Inject constructor(
     @OptIn(OrbitExperimental::class)
     private suspend fun collectRoomParticipants(roomId: String) = subIntent {
         repeatOnSubscription {
-            getRoomParticipantFlowUseCase(roomId).collect {
+            getCurrentRoomParticipantFlow(roomId).collect {
                 val participantsMap = it.associateBy { it.userId }.toImmutableMap()
                 reduce { state.copy(participantsMap = participantsMap) }
             }
