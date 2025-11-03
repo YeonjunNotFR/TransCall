@@ -5,9 +5,13 @@ data class PublisherFeedResponse(
     val display: String,
     val streams: List<PublisherFeedResponseStream>
 ) {
-    fun toSubscriberFeedRequest() = SubscriberFeedRequest(
-        feedId = feedId,
-    )
+    fun toSubscriberFeedRequest(): List<SubscriberFeedRequest> = streams.map {
+        SubscriberFeedRequest(
+            feedId = feedId,
+            mid = it.mid,
+            crossrefid = null
+        )
+    }
 }
 
 data class PublisherFeedResponseStream(

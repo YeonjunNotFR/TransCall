@@ -261,19 +261,22 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
     }
 
     private suspend fun sendJoinSubscriber(feeds: List<PublisherFeedResponse>) {
-        if(feeds.isEmpty()) return
+        val streams = feeds.flatMap { it.toSubscriberFeedRequest() }
+        if (streams.isEmpty()) return
 
         val message = JoinRoomSubscriber(
             privateId = privateId,
-            feeds = feeds.map { it.toSubscriberFeedRequest() }
+            feeds = streams
         )
         signalingClient.sendSignalingRequest(message)
     }
 
     private suspend fun sendSubscribeAdd(feeds: List<PublisherFeedResponse>) {
-        if (feeds.isEmpty()) return
+        val streams = feeds.flatMap { it.toSubscriberFeedRequest() }
+        if (streams.isEmpty()) return
+
         val message = SubscriberUpdate(
-            subscribeFeeds = feeds.map { it.toSubscriberFeedRequest() },
+            subscribeFeeds = streams,
             unsubscribeFeeds = emptyList()
         )
         signalingClient.sendSignalingRequest(message)
