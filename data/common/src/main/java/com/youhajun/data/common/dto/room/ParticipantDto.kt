@@ -21,6 +21,8 @@ data class ParticipantDto(
     val languageCode: String = "",
     @SerialName("countryCode")
     val countryCode: String = "",
+    @SerialName("leftAtToEpochTime")
+    val leftAtToEpochTime: Long?
 ) {
     fun toModel(): Participant = Participant(
         participantId = participantId,
@@ -28,7 +30,8 @@ data class ParticipantDto(
         imageUrl = imageUrl ?: "",
         userId = userId,
         language = LanguageType.fromCode(languageCode),
-        country = CountryType.fromCode(countryCode)
+        country = CountryType.fromCode(countryCode),
+        leftAtToEpochTime = leftAtToEpochTime
     )
 }
 
@@ -40,6 +43,7 @@ fun Participant.toEntity(roomId: String) = ParticipantEntity(
     languageCode = language.code,
     countryCode = country.code,
     imageUrl = imageUrl,
+    leftAtToEpochTime = leftAtToEpochTime
 )
 
 fun ParticipantEntity.toModel() = Participant(
@@ -49,4 +53,5 @@ fun ParticipantEntity.toModel() = Participant(
     language = LanguageType.fromCode(languageCode),
     country = CountryType.fromCode(countryCode),
     imageUrl = imageUrl ?: "",
+    leftAtToEpochTime = leftAtToEpochTime
 )
