@@ -59,11 +59,10 @@ fun FloatingVideo(
 
     Box(modifier = dragModifier) {
         if (cameraEnabled && videoTrack != null) {
-            VideoRenderer(
+            TextureVideoRenderer(
                 modifier = Modifier.fillMaxSize(),
                 videoTrack = videoTrack,
                 isFrontCamera = isFrontCamera,
-                translucentOverlay = true,
                 rendererEvents = rendererEvent,
             )
         } else {

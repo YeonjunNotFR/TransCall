@@ -32,7 +32,7 @@ fun NormalVideo(
 ) {
     Box(modifier = modifier) {
         if (cameraEnabled && videoTrack != null) {
-            VideoRenderer(
+            TextureVideoRenderer(
                 modifier = Modifier.fillMaxSize(),
                 videoTrack = videoTrack,
                 isFrontCamera = isFrontCamera,
