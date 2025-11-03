@@ -73,8 +73,8 @@ internal class AudioSessionManagerImpl @Inject constructor(
     override fun dispose() {
         scope.cancel()
         audioDeviceController.stop()
-        runCatching { audioStreamsFlow.value.forEach { it.audioTrack?.dispose() } }
         runCatching { audioSource.dispose() }
+        runCatching { localAudioTrack.dispose() }
     }
 
     override fun setMicEnabled(localUserId: String, enabled: Boolean) {

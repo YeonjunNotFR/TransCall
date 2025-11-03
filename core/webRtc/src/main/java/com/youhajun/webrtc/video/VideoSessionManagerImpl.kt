@@ -72,8 +72,8 @@ internal class VideoSessionManagerImpl @Inject constructor(
 
     override fun dispose() {
         cameraController.stopCapture()
-        runCatching { videoStreamsFlow.value.forEach { it.videoTrack?.dispose() } }
         runCatching { cameraSource.dispose() }
+        runCatching { cameraTrack.dispose() }
         cameraController.dispose()
     }
 

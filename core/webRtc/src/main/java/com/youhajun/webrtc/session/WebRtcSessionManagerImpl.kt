@@ -180,6 +180,7 @@ internal class WebRtcSessionManagerImpl @Inject constructor(
         videoManager.dispose()
         audioManager.dispose()
         runCatching { publisherPeerConnection.connection.dispose() }
+        runCatching { subscriberPeerConnection.connection.dispose() }
         sessionScope.cancel()
     }
 
