@@ -130,17 +130,17 @@ internal class VideoSurfaceViewRenderer @JvmOverloads constructor(
     fun init(
         sharedContext: EglBase.Context,
         rendererEvents: RendererEvents,
-        translucentOverlay: Boolean = false,
+        zOrderOnTop: Boolean = false,
     ) {
         ThreadUtils.checkIsOnMainThread()
         this.rendererEvents = rendererEvents
 
-        if (translucentOverlay) {
-            setZOrderMediaOverlay(true)
+        if (zOrderOnTop) {
+            setZOrderOnTop(true)
             holder.setFormat(PixelFormat.TRANSLUCENT)
         }
 
-        val config = if (translucentOverlay) EglBase.CONFIG_RGBA else EglBase.CONFIG_PLAIN
+        val config = if (zOrderOnTop) EglBase.CONFIG_RGBA else EglBase.CONFIG_PLAIN
         eglRenderer.init(sharedContext, config, GlRectDrawer())
     }
 
