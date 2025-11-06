@@ -34,11 +34,15 @@ paging-compose = "3.4.0-alpha04"
 work-manager = "2.10.5"
 androidx-hilt = "1.3.0"
 firebase-bom = "34.4.0"
+composeMarker = "1.0.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
+#compose-marker
+compose-marker = { group = "com.github.skydoves", name = "compose-stable-marker", version.ref = "composeMarker" }
 
 # androidx-compose
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
