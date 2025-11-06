@@ -1,5 +1,8 @@
 package com.youhajun.feature.call.model
 
+import androidx.compose.runtime.Stable
+
+@Stable
 sealed interface CallingScreenType {
 
     data object Waiting: CallingScreenType
