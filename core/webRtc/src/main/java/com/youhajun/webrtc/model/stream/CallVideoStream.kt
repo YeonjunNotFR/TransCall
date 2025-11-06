@@ -1,7 +1,9 @@
 package com.youhajun.webrtc.model.stream
 
+import androidx.compose.runtime.Stable
 import org.webrtc.VideoTrack
 
+@Stable
 sealed interface CallVideoStream {
     val key get() = CallMediaKey.createKey(userId, mediaContentType)
     val userId: String
@@ -10,6 +12,7 @@ sealed interface CallVideoStream {
     val isVideoEnable: Boolean
 }
 
+@Stable
 data class LocalVideoStream(
     override val userId: String,
     override val mediaContentType: String,
@@ -18,6 +21,7 @@ data class LocalVideoStream(
     val isFrontCamera: Boolean,
 ) : CallVideoStream
 
+@Stable
 data class RemoteVideoStream(
     override val userId: String,
     override val mediaContentType: String,

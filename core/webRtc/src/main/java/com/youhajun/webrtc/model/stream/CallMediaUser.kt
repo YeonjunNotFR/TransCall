@@ -1,5 +1,7 @@
 package com.youhajun.webrtc.model.stream
 
+import androidx.compose.runtime.Stable
+
 object CallMediaKey {
     private const val KEY_SEPARATOR = "_"
 
@@ -8,6 +10,7 @@ object CallMediaKey {
     }
 }
 
+@Stable
 sealed interface CallMediaUser {
     val key get() = CallMediaKey.createKey(userId, mediaContentType)
     val userId: String
@@ -15,14 +18,14 @@ sealed interface CallMediaUser {
     val videoStream: CallVideoStream
     val audioStream: CallAudioStream
 }
-
+@Stable
 data class LocalMediaUser(
     override val userId: String,
     override val videoStream: LocalVideoStream,
     override val audioStream: LocalAudioStream,
     override val mediaContentType: String,
 ) : CallMediaUser
-
+@Stable
 data class RemoteMediaUser(
     override val userId: String,
     override val videoStream: RemoteVideoStream,

@@ -1,8 +1,9 @@
 package com.youhajun.webrtc.model.stream
 
+import androidx.compose.runtime.Stable
 import com.youhajun.webrtc.model.stream.AudioDeviceType
 import org.webrtc.AudioTrack
-
+@Stable
 sealed interface CallAudioStream {
     val key get() = CallMediaKey.createKey(userId, mediaContentType)
     val userId: String
@@ -12,6 +13,7 @@ sealed interface CallAudioStream {
     val mediaContentType: String
 }
 
+@Stable
 data class LocalAudioStream(
     override val userId: String,
     override val audioTrack: AudioTrack?,
@@ -23,6 +25,7 @@ data class LocalAudioStream(
     val availableDevices: Set<AudioDeviceType> = emptySet()
 ) : CallAudioStream
 
+@Stable
 data class RemoteAudioStream(
     override val userId: String,
     override val audioTrack: AudioTrack?,

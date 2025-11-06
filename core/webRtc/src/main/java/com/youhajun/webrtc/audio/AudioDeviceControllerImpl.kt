@@ -26,6 +26,13 @@ internal class AudioDeviceControllerImpl @Inject constructor(
     override val audioDeviceState: StateFlow<AudioDeviceState> = _audioDeviceState.asStateFlow()
 
     override fun start() {
+        audioSwitch.setAudioDeviceChangeListener { audioDevices, selectedAudioDevice ->
+            val audioDeviceState = AudioDeviceState(
+                selectedDevice = AudioDeviceType.fromDevice(selectedAudioDevice),
+                availableDevices = audioDevices.map { AudioDeviceType.fromDevice(it) }.toSet()
+            )
+            _audioDeviceState.update { audioDeviceState }
+        }
         audioSwitch.start { audioDevices, selectedAudioDevice ->
             val audioDeviceState = AudioDeviceState(
                 selectedDevice = AudioDeviceType.fromDevice(selectedAudioDevice),
@@ -39,6 +46,7 @@ internal class AudioDeviceControllerImpl @Inject constructor(
     override fun stop() {
         audioSwitch.deactivate()
         audioSwitch.stop()
+        audioSwitch.setAudioDeviceChangeListener(null)
     }
 
     override fun select(device: AudioDeviceType) {
