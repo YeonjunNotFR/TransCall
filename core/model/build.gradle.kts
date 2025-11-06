@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-
+    compileOnly(libs.compose.marker)
     implementation(libs.kotlinx.collections.immutable)
 }
